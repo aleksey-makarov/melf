@@ -1,0 +1,17 @@
+<>
+<.bss>
+<.comment>
+<.data>
+<.group>
+<.note.GNU-stack>
+<.rela.data.rel.ro>
+<.rela.data.rel.ro._ZTI15QQmlDebugClient>
+<.rela.data.rel.ro._ZTV15QQmlDebugClient>
+<.rela.eh_frame>
+<.rela.qtversion>
+<.rela.text>
+<.rodata>
+<.rodata._ZTS15QQmlDebugClient>
+<.shstrtab>
+<.strtab>
+<.symtab>

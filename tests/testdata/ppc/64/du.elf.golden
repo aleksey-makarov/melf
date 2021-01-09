@@ -1,0 +1,369 @@
+segment {
+    Type:     PT_LOAD
+    Flags:    0x00000005
+    VirtAddr: 0x0000000000000000
+    PhysAddr: 0x0000000000000000
+    MemSize:  0x00000000000371d0
+    Align:    0x0000000000010000
+    Data:     
+        header {
+            Class:      ELFCLASS64
+            Data:       ELFDATA2MSB
+            OSABI:      ELFOSABI_SYSV
+            ABIVersion: 0
+            Type:       ET_DYN
+            Machine:    EM_PPC64
+            Entry:      0x000000000004dfa0
+            Flags:      0x00000001
+        }
+        segment {
+            Type:     PT_PHDR
+            Flags:    0x00000004
+            VirtAddr: 0x0000000000000040
+            PhysAddr: 0x0000000000000040
+            MemSize:  0x00000000000001c0
+            Align:    0x0000000000000008
+            Data:     
+                segment table
+        }
+        segment {
+            Type:     PT_INTERP
+            Flags:    0x00000004
+            VirtAddr: 0x0000000000000200
+            PhysAddr: 0x0000000000000200
+            MemSize:  0x0000000000000011
+            Align:    0x0000000000000001
+            Data:     
+                section 1 ".interp" {
+                    Type:      SHT_PROGBITS
+                    Flags:     0x0000000000000002
+                    Addr:      0x0000000000000200
+                    AddrAlign: 0x0000000000000001
+                    EntSize:   0x0000000000000000
+                    Data:      2f 6c 69 62 36 34 2f 6c 64 36 34 2e 73 6f 2e 31 # /lib64/ld64.so.1
+                               00                                              # .
+                }
+        }
+        segment {
+            Type:     PT_NOTE
+            Flags:    0x00000004
+            VirtAddr: 0x0000000000000214
+            PhysAddr: 0x0000000000000214
+            MemSize:  0x0000000000000020
+            Align:    0x0000000000000004
+            Data:     
+                section 2 ".note.ABI-tag" {
+                    Type:      SHT_NOTE
+                    Flags:     0x0000000000000002
+                    Addr:      0x0000000000000214
+                    AddrAlign: 0x0000000000000004
+                    EntSize:   0x0000000000000000
+                    Data:      00 00 00 04 00 00 00 10 00 00 00 01 47 4e 55 00 # ............GNU.
+                               00 00 00 00 00 00 00 03 00 00 00 02 00 00 00 00 # ................
+                }
+        }
+        section 3 ".gnu.hash" {
+            Type:      SHT_EXT 1879048182
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000000238
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+            Data:      00 00 00 01 00 00 00 01 00 00 00 01 00 00 00 00 # ................
+                       00 00 00 00 00 00 00 00 00 00 00 00             # ............
+        }
+        symbol table section 4 ".dynsym" {
+            Type:  SHT_DYNSYM
+            Flags: 0x0000000000000002
+            Data:  
+                symbol "" {
+                    Bind:  STB_Local
+                    Type:  STT_NoType
+                    ShNdx: SHN_Undef
+                    Value: 0x0000000000000000
+                    Size:  0x0000000000000000
+                }
+                symbol "" {
+                    Bind:  STB_Local
+                    Type:  STT_Section
+                    ShNdx: SHN_EXT 10
+                    Value: 0x0000000000006380
+                    Size:  0x0000000000000000
+                }
+                ...
+                symbol "__ctype_b_loc" {
+                    Bind:  STB_Global
+                    Type:  STT_Func
+                    ShNdx: SHN_Undef
+                    Value: 0x0000000000000000
+                    Size:  0x0000000000000000
+                }
+                total: 119
+        }
+        section 5 ".dynstr" {
+            Type:      SHT_STRTAB
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000000d80
+            AddrAlign: 0x0000000000000001
+            EntSize:   0x0000000000000000
+            Data:      00 6c 69 62 63 2e 73 6f 2e 36 00 66 66 6c 75 73 # .libc.so.6.fflus
+                       68 00 73 74 72 63 70 79 00 67 6d 74 69 6d 65 5f # h.strcpy.gmtime_
+                       ...
+                       74 65 72 54 4d 43 6c 6f 6e 65 54 61 62 6c 65 00 # terTMCloneTable.
+                       total: 1179
+        }
+        section 6 ".gnu.version" {
+            Type:      SHT_EXT 1879048191
+            Flags:     0x0000000000000002
+            Addr:      0x000000000000121c
+            AddrAlign: 0x0000000000000002
+            EntSize:   0x0000000000000002
+            Data:      00 00 00 00 00 00 00 02 00 02 00 02 00 02 00 02 # ................
+                       00 02 00 02 00 02 00 02 00 02 00 00 00 02 00 02 # ................
+                       ...
+                       00 02 00 02 00 02 00 02 00 02 00 02 00 02 00 02 # ................
+                       total: 238
+        }
+        section 7 ".gnu.version_r" {
+            Type:      SHT_EXT 1879048190
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000001310
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+            Data:      00 01 00 04 00 00 00 01 00 00 00 10 00 00 00 00 # ................
+                       0d 69 69 17 00 00 00 05 00 00 04 2c 00 00 00 10 # .ii........,....
+                       ...
+                       0d 69 69 13 00 00 00 02 00 00 04 4c 00 00 00 00 # .ii........L....
+                       total: 80
+        }
+        section 8 ".rela.dyn" {
+            Type:      SHT_RELA
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000001360
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000018
+            Data:      00 00 00 00 00 04 d9 80 00 00 00 00 00 00 00 16 # ................
+                       00 00 00 00 00 04 e0 30 00 00 00 00 00 04 d9 88 # .......0........
+                       ...
+                       00 00 00 1b 00 00 00 26 00 00 00 00 00 00 00 00 # .......&........
+                       total: 18000
+        }
+        section 9 ".rela.plt" {
+            Type:      SHT_RELA
+            Flags:     0x0000000000000042
+            Addr:      0x00000000000059b0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000018
+            Data:      00 00 00 00 00 05 00 18 00 00 00 03 00 00 00 15 # ................
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 05 00 30 # ...............0
+                       ...
+                       00 00 00 76 00 00 00 15 00 00 00 00 00 00 00 00 # ...v............
+                       total: 2496
+        }
+        section 10 ".init" {
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000006
+            Addr:      0x0000000000006380
+            AddrAlign: 0x0000000000000020
+            EntSize:   0x0000000000000000
+            Data:      f8 41 00 28 e9 82 86 68 7d 89 03 a6 e8 42 86 70 # .A.(...h}....B.p
+                       4e 80 04 20 00 00 00 00 00 00 00 00 00 00 00 00 # N.. ............
+                       ...
+                       38 21 00 70 e8 01 00 10 7c 08 03 a6 4e 80 00 20 # 8!.p....|...N.. 
+                       total: 84
+        }
+        section 11 ".text" {
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000006
+            Addr:      0x00000000000063e0
+            AddrAlign: 0x0000000000000020
+            EntSize:   0x0000000000000000
+            Data:      f8 41 00 28 e9 82 89 b0 7d 89 03 a6 e8 42 89 b8 # .A.(....}....B..
+                       4e 80 04 20 00 00 00 00 00 00 00 00 00 00 00 00 # N.. ............
+                       ...
+                       38 00 00 66 4b ff fc a0 38 00 00 67 4b ff fc 98 # 8..fK...8..gK...
+                       total: 165652
+        }
+        section 12 ".fini" {
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000006
+            Addr:      0x000000000002eaf4
+            AddrAlign: 0x0000000000000004
+            EntSize:   0x0000000000000000
+            Data:      7c 08 02 a6 f8 01 00 10 f8 21 ff 91 38 21 00 70 # |........!..8!.p
+                       e8 01 00 10 7c 08 03 a6 4e 80 00 20             # ....|...N.. 
+        }
+        section 13 ".rodata" {
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000002
+            Addr:      0x000000000002eb10
+            AddrAlign: 0x0000000000000010
+            EntSize:   0x0000000000000000
+            Data:      00 02 00 01 00 00 00 00 5b 00 00 00 00 00 00 00 # ........[.......
+                       74 65 73 74 20 69 6e 76 6f 63 61 74 69 6f 6e 00 # test invocation.
+                       ...
+                       00 00 00 00 41 e0 00 00 00 00 00 00 4f 00 00 00 # ....A.......O...
+                       total: 9228
+        }
+        segment {
+            Type:     PT_EXT 1685382480
+            Flags:    0x00000004
+            VirtAddr: 0x0000000000030f1c
+            PhysAddr: 0x0000000000030f1c
+            MemSize:  0x00000000000009fc
+            Align:    0x0000000000000004
+            Data:     
+                section 14 ".eh_frame_hdr" {
+                    Type:      SHT_PROGBITS
+                    Flags:     0x0000000000000002
+                    Addr:      0x0000000000030f1c
+                    AddrAlign: 0x0000000000000004
+                    EntSize:   0x0000000000000000
+                    Data:      01 1b 03 3b 00 00 09 f8 00 00 01 3e ff fd 61 a4 # ...;.......>..a.
+                               00 00 0a a8 ff fd 7d 34 00 00 0a 28 ff fd 7d e4 # ......}4...(..}.
+                               ...
+                               ff ff d8 24 00 00 62 90 ff ff d8 6c 00 00 0a 10 # ...$..b....l....
+                               total: 2556
+                }
+        }
+        section 15 ".eh_frame" {
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000031918
+            AddrAlign: 0x0000000000000004
+            EntSize:   0x0000000000000000
+            Data:      00 00 00 10 00 00 00 00 01 7a 52 00 04 78 41 01 # .........zR..xA.
+                       1b 0c 01 00 00 00 00 14 00 00 00 18 ff ff ce 54 # ...............T
+                       ...
+                       11 41 7e 43 0e 00 42 06 41 00 00 00 00 00 00 00 # .A~C..B.A.......
+                       total: 22712
+        }
+}
+segment {
+    Type:     PT_LOAD
+    Flags:    0x00000006
+    VirtAddr: 0x000000000004d980
+    PhysAddr: 0x000000000004d980
+    MemSize:  0x0000000000003368
+    Align:    0x0000000000010000
+    Data:     
+        segment {
+            Type:     PT_EXT 1685382482
+            Flags:    0x00000004
+            VirtAddr: 0x000000000004d980
+            PhysAddr: 0x000000000004d980
+            MemSize:  0x0000000000002680
+            Align:    0x0000000000000001
+            Data:     
+                section 16 ".init_array" {
+                    Type:      SHT_EXT 14
+                    Flags:     0x0000000000000003
+                    Addr:      0x000000000004d980
+                    AddrAlign: 0x0000000000000008
+                    EntSize:   0x0000000000000008
+                    Data:      00 00 00 00 00 04 e0 30                         # .......0
+                }
+                section 17 ".fini_array" {
+                    Type:      SHT_EXT 15
+                    Flags:     0x0000000000000003
+                    Addr:      0x000000000004d988
+                    AddrAlign: 0x0000000000000008
+                    EntSize:   0x0000000000000008
+                    Data:      00 00 00 00 00 04 e0 18                         # ........
+                }
+                section 18 ".data.rel.ro" {
+                    Type:      SHT_PROGBITS
+                    Flags:     0x0000000000000003
+                    Addr:      0x000000000004d990
+                    AddrAlign: 0x0000000000000008
+                    EntSize:   0x0000000000000000
+                    Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 04 e0 90 # ................
+                               00 00 00 00 00 04 fd b8 00 00 00 00 00 04 fd d0 # ................
+                               ...
+                               00 00 00 00 00 03 05 a0 00 00 00 00 00 00 00 00 # ................
+                               total: 1056
+                }
+                segment {
+                    Type:     PT_DYNAMIC
+                    Flags:    0x00000006
+                    VirtAddr: 0x000000000004ddb0
+                    PhysAddr: 0x000000000004ddb0
+                    MemSize:  0x00000000000001f0
+                    Align:    0x0000000000000008
+                    Data:     
+                        section 19 ".dynamic" {
+                            Type:      SHT_DYNAMIC
+                            Flags:     0x0000000000000003
+                            Addr:      0x000000000004ddb0
+                            AddrAlign: 0x0000000000000008
+                            EntSize:   0x0000000000000010
+                            Data:      00 00 00 00 00 00 00 01 00 00 00 00 00 00 00 01 # ................
+                                       00 00 00 00 00 00 00 0c 00 00 00 00 00 04 df b8 # ................
+                                       ...
+                                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+                                       total: 496
+                        }
+                }
+                section 20 ".opd" {
+                    Type:      SHT_PROGBITS
+                    Flags:     0x0000000000000003
+                    Addr:      0x000000000004dfa0
+                    AddrAlign: 0x0000000000000008
+                    EntSize:   0x0000000000000000
+                    Data:      00 00 00 00 00 00 8a d0 00 00 00 00 00 05 7e 00 # ..............~.
+                               00 00 00 00 00 00 00 00 00 00 00 00 00 00 63 a0 # ..............c.
+                               ...
+                               00 00 00 00 00 05 7e 00 00 00 00 00 00 00 00 00 # ......~.........
+                               total: 7776
+                }
+                section 21 ".got" {
+                    Type:      SHT_PROGBITS
+                    Flags:     0x0000000000000003
+                    Addr:      0x000000000004fe00
+                    AddrAlign: 0x0000000000000100
+                    EntSize:   0x0000000000000008
+                    Data:      00 00 00 00 00 05 7e 00 00 00 00 00 00 00 00 00 # ......~.........
+                               00 00 00 00 00 04 d9 90 00 00 00 00 00 03 0e b0 # ................
+                               ...
+                               00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+                               total: 288
+                }
+                section 22 ".plt" {
+                    Type:      SHT_NOBITS
+                    Flags:     0x0000000000000003
+                    Addr:      0x0000000000050000
+                    AddrAlign: 0x0000000000000008
+                    EntSize:   0x0000000000000018
+                    Data:      
+                }
+        }
+        section 23 ".data" {
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000003
+            Addr:      0x00000000000509d8
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+            Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 05 09 e0 # ................
+                       00 00 00 00 00 02 eb 18 00 00 00 00 00 02 eb 20 # ............... 
+                       ...
+                       00 00 00 00 00 00 01 00 00 00 00 00 00 05 0b a0 # ................
+                       total: 248
+        }
+}
+section 24 ".bss" {
+    Type:      SHT_NOBITS
+    Flags:     0x0000000000000003
+    Addr:      0x0000000000050ad0
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000000
+    Data:      
+}
+section 25 ".gnu.attributes" {
+    Type:      SHT_EXT 1879048181
+    Flags:     0x0000000000000000
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000001
+    EntSize:   0x0000000000000000
+    Data:      41 00 00 00 0f 67 6e 75 00 01 00 00 00 07 04 05 # A....gnu........
+}
+string table section 26 ".shstrtab"
+section table

@@ -1,0 +1,106 @@
+segment {
+    Type:     PT_EXT 1685382481
+    Flags:    0x00000007
+    VirtAddr: 0x00000000
+    PhysAddr: 0x00000000
+    MemSize:  0x00000000
+    Align:    0x00000004
+    Data:     
+}
+segment {
+    Type:     PT_LOAD
+    Flags:    0x00000005
+    VirtAddr: 0x00400000
+    PhysAddr: 0x00400000
+    MemSize:  0x00081b94
+    Align:    0x00001000
+    Data:     
+        header {
+            Class:      ELFCLASS32
+            Data:       ELFDATA2MSB
+            OSABI:      ELFOSABI_SYSV
+            ABIVersion: 0
+            Type:       ET_EXEC
+            Machine:    EM_MIPS
+            Entry:      0x004060f0
+            Flags:      0x50001007
+        }
+        segment {
+            Type:     PT_PHDR
+            Flags:    0x00000005
+            VirtAddr: 0x00400034
+            PhysAddr: 0x00400034
+            MemSize:  0x000000e0
+            Align:    0x00000004
+            Data:     
+                segment table
+        }
+        segment {
+            Type:     PT_INTERP
+            Flags:    0x00000004
+            VirtAddr: 0x00400114
+            PhysAddr: 0x00400114
+            MemSize:  0x00000014
+            Align:    0x00000001
+            Data:     
+                raw data {
+                    Data: 2f 6c 69 62 2f 6c 64 2d 75 43 6c 69 62 63 2e 73 # /lib/ld-uClibc.s
+                          6f 2e 30 00                                     # o.0.
+                }
+        }
+        segment {
+            Type:     PT_DYNAMIC
+            Flags:    0x00000007
+            VirtAddr: 0x00400128
+            PhysAddr: 0x00400128
+            MemSize:  0x00005f34
+            Align:    0x00000004
+            Data:     
+                raw data {
+                    Data: 00 00 00 01 00 00 1d 58 00 00 00 01 00 00 1d 97 # .......X........
+                          00 00 00 01 00 00 1d dd 00 00 00 0c 00 40 60 5c # .............@`\
+                          ...
+                          62 73 73 5f 73 74 61 72 74 00 5f 66 62 73 73 00 # bss_start._fbss.
+                          total: 24372
+                }
+        }
+        raw data {
+            Data: 3c 1c 00 0c 27 9c 4a 24 03 99 e0 21 27 bd ff e0 # <...'.J$...!'...
+                  af bc 00 10 af bf 00 1c af bc 00 18 8f bf 00 1c # ................
+                  ...
+                  41 e0 00 00 00 00 00 00 c1 e0 00 00 00 00 00 00 # A...............
+                  total: 506636
+        }
+        segment {
+            Type:     PT_EXT 1685382480
+            Flags:    0x00000004
+            VirtAddr: 0x00481b68
+            PhysAddr: 0x00481b68
+            MemSize:  0x0000002c
+            Align:    0x00000004
+            Data:     
+                raw data {
+                    Data: 01 1b 03 3b 00 04 04 94 00 00 00 04 ff f8 48 d8 # ...;..........H.
+                          00 04 04 a8 ff f8 4e e8 00 04 04 b8 ff f8 55 18 # ......N.......U.
+                          ...
+                          ff f8 55 18 00 04 04 d4 ff f8 5a a8 00 04 04 e4 # ..U.......Z.....
+                          total: 44
+                }
+        }
+}
+segment {
+    Type:     PT_LOAD
+    Flags:    0x00000006
+    VirtAddr: 0x004c2000
+    PhysAddr: 0x004c2000
+    MemSize:  0x00002c68
+    Align:    0x00001000
+    Data:     
+        raw data {
+            Data: 00 00 00 0c 00 00 00 00 01 00 01 7c 1f 0c 1d 00 # ...........|....
+                  00 00 00 0c 00 00 00 14 00 40 64 40 00 00 06 0c # .........@d@....
+                  ...
+                  00 47 38 fc 00 47 38 ec 00 47 38 dc 00 47 0b 50 # .G8..G8..G8..G.P
+                  total: 6332
+        }
+}

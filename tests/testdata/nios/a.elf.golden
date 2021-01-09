@@ -1,0 +1,239 @@
+segment {
+    Type:     PT_LOAD
+    Flags:    0x00000005
+    VirtAddr: 0x00001000
+    PhysAddr: 0x00001000
+    MemSize:  0x0000d23c
+    Align:    0x00001000
+    Data:     
+        header {
+            Class:      ELFCLASS32
+            Data:       ELFDATA2LSB
+            OSABI:      ELFOSABI_SYSV
+            ABIVersion: 0
+            Type:       ET_EXEC
+            Machine:    EM_EXT 113
+            Entry:      0x000010c8
+            Flags:      0x00000000
+        }
+        segment table
+        section 1 ".text" {
+            Type:      SHT_PROGBITS
+            Flags:     0x00000006
+            Addr:      0x00001078
+            AddrAlign: 0x00000008
+            EntSize:   0x00000000
+            Data:      04 ff ff de 84 01 00 01 15 00 c0 df c0 63 0a 00 # .............c..
+                       44 00 00 01 40 a7 0d 00 04 fe ff de 3a 88 0b 00 # D...@.......:...
+                       ...
+                       15 01 40 94 06 e8 3f 00 3a e8 3e 30 06 ed 3f 00 # ..@...?.:.>0..?.
+                       total: 52128
+        }
+        section 2 ".rodata" {
+            Type:      SHT_PROGBITS
+            Flags:     0x00000002
+            Addr:      0x0000dc18
+            AddrAlign: 0x00000004
+            EntSize:   0x00000000
+            Data:      48 65 6c 6c 6f 20 77 6f 72 6c 64 00 49 4e 46 00 # Hello world.INF.
+                       69 6e 66 00 4e 41 4e 00 6e 61 6e 00 30 31 32 33 # inf.NAN.nan.0123
+                       ...
+                       08 08 08 08 08 08 08 08 08 08 08 08 08 08 08 08 # ................
+                       total: 1572
+        }
+}
+segment {
+    Type:     PT_LOAD
+    Flags:    0x00000006
+    VirtAddr: 0x0000f23c
+    PhysAddr: 0x0000f23c
+    MemSize:  0x000009e8
+    Align:    0x00001000
+    Data:     
+        section 3 ".data" {
+            Type:      SHT_PROGBITS
+            Flags:     0x00000003
+            Addr:      0x0000f23c
+            AddrAlign: 0x00000004
+            EntSize:   0x00000000
+            Data:      00 00 00 00 28 f5 00 00 90 f5 00 00 f8 f5 00 00 # ....(...........
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+                       ...
+                       00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+                       total: 2456
+        }
+        section 4 ".sdata" {
+            Type:      SHT_PROGBITS
+            Flags:     0x10000003
+            Addr:      0x0000fbd4
+            AddrAlign: 0x00000004
+            EntSize:   0x00000000
+            Data:      3c f2 00 00 3c f2 00 00 ff ff ff ff 00 00 02 00 # <...<...........
+        }
+}
+section 5 ".sbss" {
+    Type:      SHT_NOBITS
+    Flags:     0x10000003
+    Addr:      0x0000fbe4
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      
+}
+section 6 ".bss" {
+    Type:      SHT_NOBITS
+    Flags:     0x00000003
+    Addr:      0x0000fbfc
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      
+}
+section 7 ".comment" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000030
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000001
+    Data:      47 43 43 3a 20 28 41 6c 74 65 72 61 20 32 30 2e # GCC: (Altera 20.
+               33 20 42 75 69 6c 64 20 31 30 37 29 20 39 2e 33 # 3 Build 107) 9.3
+               ...
+               20 39 2e 33 2e 31 20 32 30 32 30 30 34 32 30 00 #  9.3.1 20200420.
+               total: 44
+}
+section 8 ".debug_aranges" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      1c 00 00 00 02 00 00 00 00 00 04 00 00 00 00 00 # ................
+               f8 10 00 00 34 00 00 00 00 00 00 00 00 00 00 00 # ....4...........
+               ...
+               f8 da 00 00 20 01 00 00 00 00 00 00 00 00 00 00 # .... ...........
+               total: 3008
+}
+section 9 ".debug_info" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      23 09 00 00 04 00 00 00 00 00 04 01 0c 00 00 00 # #...............
+               0c 61 2e 63 00 8b 03 00 00 f8 10 00 00 34 00 00 # .a.c.........4..
+               ...
+               00 00 00 0f 04 aa 02 00 00 0f 04 12 02 00 00 00 # ................
+               total: 222382
+}
+section 10 ".debug_abbrev" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      01 11 01 25 0e 13 0b 03 08 1b 0e 11 01 12 06 10 # ...%............
+               17 00 00 02 24 00 0b 0b 3e 0b 03 0e 00 00 03 24 # ....$...>......$
+               ...
+               01 00 00 2b 8a 82 01 00 02 18 91 42 18 00 00 00 # ...+.......B....
+               total: 45127
+}
+section 11 ".debug_line" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      77 01 00 00 03 00 59 01 00 00 01 01 fb 0e 0d 00 # w.....Y.........
+               01 01 01 01 00 00 00 01 00 00 01 2f 6e 66 73 2f # .........../nfs/
+               ...
+               05 06 06 03 10 82 05 07 06 01 4a 02 04 00 01 01 # ..........J.....
+               total: 84902
+}
+section 12 ".debug_frame" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      0c 00 00 00 ff ff ff ff 01 00 01 7c 1f 0c 1b 00 # ...........|....
+               24 00 00 00 00 00 00 00 f8 10 00 00 34 00 00 00 # $...........4...
+               ...
+               44 d3 44 d2 44 d1 44 d0 44 0e 00 44 0b 00 00 00 # D.D.D.D.D..D....
+               total: 6064
+}
+section 13 ".debug_str" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000030
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000001
+    Data:      5f 64 73 6f 5f 68 61 6e 64 6c 65 00 47 4e 55 20 # _dso_handle.GNU 
+               43 31 37 20 39 2e 33 2e 31 20 32 30 32 30 30 34 # C17 9.3.1 202004
+               ...
+               72 65 63 75 72 73 69 76 65 5f 6d 75 74 65 78 00 # recursive_mutex.
+               total: 12678
+}
+section 14 ".debug_loc" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      00 00 00 00 00 00 5c 11 00 00 84 11 00 00 01 00 # ......\.........
+               54 84 11 00 00 87 11 00 00 01 00 55 87 11 00 00 # T..........U....
+               ...
+               00 18 dc 00 00 01 00 67 00 00 00 00 00 00 00 00 # .......g........
+               total: 119146
+}
+section 15 ".debug_ranges" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      2c 11 00 00 5c 11 00 00 5c 11 00 00 94 11 00 00 # ,...\...\.......
+               00 00 00 00 00 00 00 00 e8 11 00 00 f4 11 00 00 # ................
+               ...
+               f8 da 00 00 18 dc 00 00 00 00 00 00 00 00 00 00 # ................
+               total: 7376
+}
+symbol table section 16 ".symtab" {
+    Type:  SHT_SYMTAB
+    Flags: 0x00000000
+    Data:  
+        symbol "" {
+            Bind:  STB_Local
+            Type:  STT_NoType
+            ShNdx: SHN_Undef
+            Value: 0x00000000
+            Size:  0x00000000
+        }
+        symbol "" {
+            Bind:  STB_Local
+            Type:  STT_Section
+            ShNdx: SHN_EXT 1
+            Value: 0x00001078
+            Size:  0x00000000
+        }
+        ...
+        symbol "_Bfree" {
+            Bind:  STB_Global
+            Type:  STT_Func
+            ShNdx: SHN_EXT 1
+            Value: 0x00006680
+            Size:  0x00000024
+        }
+        total: 280
+}
+section 17 ".strtab" {
+    Type:      SHT_STRTAB
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      00 61 62 6f 72 74 2e 63 00 76 66 70 72 69 6e 74 # .abort.c.vfprint
+               66 2e 63 00 5f 5f 73 62 70 72 69 6e 74 66 00 62 # f.c.__sbprintf.b
+               ...
+               5f 6d 75 6c 74 61 64 64 00 5f 42 66 72 65 65 00 # _multadd._Bfree.
+               total: 2635
+}
+string table section 18 ".shstrtab"
+section table

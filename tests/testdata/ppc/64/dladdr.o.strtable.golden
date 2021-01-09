@@ -1,0 +1,10 @@
+<>
+<.bss>
+<.comment>
+<.data>
+<.rela.eh_frame>
+<.rela.opd>
+<.rela.text>
+<.shstrtab>
+<.strtab>
+<.symtab>

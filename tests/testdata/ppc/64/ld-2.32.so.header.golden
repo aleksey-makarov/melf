@@ -1,0 +1,302 @@
+Header:   Class:      ELFCLASS64
+          Data:       ELFDATA2MSB
+          OSABI:      ELFOSABI_LINUX
+          ABIVersion: 0
+          Type:       ET_DYN
+          Machine:    EM_PPC64
+          Entry:      0x000000000004e7b0
+          PhOff:      0x0000000000000040
+          ShOff:      0x00000000000410e0
+          Flags:      0x00000001
+          PhEntSize:  0x0038
+          PhNum:      5
+          ShEntSize:  0x0040
+          ShNum:      22
+          ShStrNdx:   21
+Sections: - N:         0
+            Name:      0
+            Type:      SHT_NULL
+            Flags:     0x0000000000000000
+            Addr:      0x0000000000000000
+            Offset:    0x0000000000000000
+            Size:      0x0000000000000000
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000000
+            EntSize:   0x0000000000000000
+          - N:         1
+            Name:      11
+            Type:      SHT_EXT 1879048182
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000000158
+            Offset:    0x0000000000000158
+            Size:      0x000000000000016c
+            Link:      2
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         2
+            Name:      21
+            Type:      SHT_DYNSYM
+            Flags:     0x0000000000000002
+            Addr:      0x00000000000002c8
+            Offset:    0x00000000000002c8
+            Size:      0x0000000000000360
+            Link:      3
+            Info:      3
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000018
+          - N:         3
+            Name:      29
+            Type:      SHT_STRTAB
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000000628
+            Offset:    0x0000000000000628
+            Size:      0x0000000000000251
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000001
+            EntSize:   0x0000000000000000
+          - N:         4
+            Name:      37
+            Type:      SHT_EXT 1879048191
+            Flags:     0x0000000000000002
+            Addr:      0x000000000000087a
+            Offset:    0x000000000000087a
+            Size:      0x0000000000000048
+            Link:      2
+            Info:      0
+            AddrAlign: 0x0000000000000002
+            EntSize:   0x0000000000000002
+          - N:         5
+            Name:      50
+            Type:      SHT_EXT 1879048189
+            Flags:     0x0000000000000002
+            Addr:      0x00000000000008c8
+            Offset:    0x00000000000008c8
+            Size:      0x00000000000000c8
+            Link:      3
+            Info:      6
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         6
+            Name:      65
+            Type:      SHT_RELA
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000000990
+            Offset:    0x0000000000000990
+            Size:      0x00000000000033f0
+            Link:      2
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000018
+          - N:         7
+            Name:      75
+            Type:      SHT_RELA
+            Flags:     0x0000000000000042
+            Addr:      0x0000000000003d80
+            Offset:    0x0000000000003d80
+            Size:      0x0000000000000060
+            Link:      2
+            Info:      15
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000018
+          - N:         8
+            Name:      85
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000006
+            Addr:      0x0000000000003de0
+            Offset:    0x0000000000003de0
+            Size:      0x00000000000247b4
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000020
+            EntSize:   0x0000000000000000
+          - N:         9
+            Name:      91
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000002
+            Addr:      0x0000000000028598
+            Offset:    0x0000000000028598
+            Size:      0x000000000000492c
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         10
+            Name:      99
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000002
+            Addr:      0x000000000002cec4
+            Offset:    0x000000000002cec4
+            Size:      0x0000000000000744
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000004
+            EntSize:   0x0000000000000000
+          - N:         11
+            Name:      113
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000002
+            Addr:      0x000000000002d608
+            Offset:    0x000000000002d608
+            Size:      0x000000000000397c
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000004
+            EntSize:   0x0000000000000000
+          - N:         12
+            Name:      123
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000003
+            Addr:      0x000000000004dac0
+            Offset:    0x000000000003dac0
+            Size:      0x0000000000000b60
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         13
+            Name:      136
+            Type:      SHT_DYNAMIC
+            Flags:     0x0000000000000003
+            Addr:      0x000000000004e620
+            Offset:    0x000000000003e620
+            Size:      0x0000000000000190
+            Link:      3
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000010
+          - N:         14
+            Name:      145
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000003
+            Addr:      0x000000000004e7b0
+            Offset:    0x000000000003e7b0
+            Size:      0x00000000000015c0
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         15
+            Name:      80
+            Type:      SHT_NOBITS
+            Flags:     0x0000000000000003
+            Addr:      0x000000000004fd70
+            Offset:    0x000000000003fd70
+            Size:      0x0000000000000078
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000018
+          - N:         16
+            Name:      150
+            Type:      SHT_NOBITS
+            Flags:     0x0000000000000003
+            Addr:      0x000000000004fde8
+            Offset:    0x000000000003fd70
+            Size:      0x0000000000000018
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         17
+            Name:      156
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000003
+            Addr:      0x000000000004fe00
+            Offset:    0x000000000003fe00
+            Size:      0x0000000000000190
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000100
+            EntSize:   0x0000000000000008
+          - N:         18
+            Name:      161
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000003
+            Addr:      0x0000000000050000
+            Offset:    0x0000000000040000
+            Size:      0x0000000000001010
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         19
+            Name:      168
+            Type:      SHT_PROGBITS
+            Flags:     0x0000000000000003
+            Addr:      0x0000000000051010
+            Offset:    0x0000000000041010
+            Size:      0x0000000000000018
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         20
+            Name:      174
+            Type:      SHT_NOBITS
+            Flags:     0x0000000000000003
+            Addr:      0x0000000000051028
+            Offset:    0x0000000000041028
+            Size:      0x0000000000000168
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000000
+          - N:         21
+            Name:      1
+            Type:      SHT_STRTAB
+            Flags:     0x0000000000000000
+            Addr:      0x0000000000000000
+            Offset:    0x0000000000041028
+            Size:      0x00000000000000b3
+            Link:      0
+            Info:      0
+            AddrAlign: 0x0000000000000001
+            EntSize:   0x0000000000000000
+Segments: - N:        0
+            Type:     PT_LOAD
+            Flags:    0x00000005
+            Offset:   0x0000000000000000
+            VirtAddr: 0x0000000000000000
+            PhysAddr: 0x0000000000000000
+            FileSize: 0x0000000000030f84
+            MemSize:  0x0000000000030f84
+            Align:    0x0000000000010000
+          - N:        1
+            Type:     PT_LOAD
+            Flags:    0x00000006
+            Offset:   0x000000000003dac0
+            VirtAddr: 0x000000000004dac0
+            PhysAddr: 0x000000000004dac0
+            FileSize: 0x0000000000003568
+            MemSize:  0x00000000000036d0
+            Align:    0x0000000000010000
+          - N:        2
+            Type:     PT_DYNAMIC
+            Flags:    0x00000006
+            Offset:   0x000000000003e620
+            VirtAddr: 0x000000000004e620
+            PhysAddr: 0x000000000004e620
+            FileSize: 0x0000000000000190
+            MemSize:  0x0000000000000190
+            Align:    0x0000000000000008
+          - N:        3
+            Type:     PT_EXT 1685382480
+            Flags:    0x00000004
+            Offset:   0x000000000002cec4
+            VirtAddr: 0x000000000002cec4
+            PhysAddr: 0x000000000002cec4
+            FileSize: 0x0000000000000744
+            MemSize:  0x0000000000000744
+            Align:    0x0000000000000004
+          - N:        4
+            Type:     PT_EXT 1685382482
+            Flags:    0x00000004
+            Offset:   0x000000000003dac0
+            VirtAddr: 0x000000000004dac0
+            PhysAddr: 0x000000000004dac0
+            FileSize: 0x0000000000002540
+            MemSize:  0x0000000000002540
+            Align:    0x0000000000000001

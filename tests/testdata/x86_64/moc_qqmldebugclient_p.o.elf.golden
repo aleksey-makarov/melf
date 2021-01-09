@@ -1,0 +1,275 @@
+header {
+    Class:      ELFCLASS64
+    Data:       ELFDATA2LSB
+    OSABI:      ELFOSABI_SYSV
+    ABIVersion: 0
+    Type:       ET_REL
+    Machine:    EM_X86_64
+    Entry:      0x0000000000000000
+    Flags:      0x00000000
+}
+section 1 ".group" {
+    Type:      SHT_EXT 17
+    Flags:     0x0000000000000000
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000004
+    EntSize:   0x0000000000000004
+    Data:      01 00 00 00 09 00 00 00 0a 00 00 00             # ............
+}
+section 2 ".group" {
+    Type:      SHT_EXT 17
+    Flags:     0x0000000000000000
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000004
+    EntSize:   0x0000000000000004
+    Data:      01 00 00 00 0b 00 00 00                         # ........
+}
+section 3 ".group" {
+    Type:      SHT_EXT 17
+    Flags:     0x0000000000000000
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000004
+    EntSize:   0x0000000000000004
+    Data:      01 00 00 00 0c 00 00 00 0d 00 00 00             # ............
+}
+section 4 ".group" {
+    Type:      SHT_EXT 17
+    Flags:     0x0000000000000000
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000004
+    EntSize:   0x0000000000000004
+    Data:      01 00 00 00 0e 00 00 00 0f 00 00 00             # ............
+}
+section 5 ".text" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000006
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000010
+    EntSize:   0x0000000000000000
+    Data:      48 8b 7f 08 48 83 7f 28 00 74 0d ff 25 00 00 00 # H...H..(.t..%...
+               00 0f 1f 80 00 00 00 00 48 8d 05 00 00 00 00 c3 # ........H.......
+               ...
+               e7 89 44 24 0c e8 99 fe ff ff 8b 44 24 0c eb c5 # ..D$.......D$...
+               total: 493
+}
+section 7 ".data" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000003
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000001
+    EntSize:   0x0000000000000000
+    Data:      
+}
+section 8 ".bss" {
+    Type:      SHT_NOBITS
+    Flags:     0x0000000000000003
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000001
+    EntSize:   0x0000000000000000
+    Data:      
+}
+section 9 ".qtversion" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000202
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000000
+    Data:      00 00 00 00 00 00 00 00 02 0e 05 00 00 00 00 00 # ................
+}
+section 11 ".rodata._ZTS15QQmlDebugClient" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000202
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000010
+    EntSize:   0x0000000000000000
+    Data:      31 35 51 51 6d 6c 44 65 62 75 67 43 6c 69 65 6e # 15QQmlDebugClien
+               74 00                                           # t.
+}
+section 12 ".data.rel.ro._ZTI15QQmlDebugClient" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000203
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000000
+    Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               00 00 00 00 00 00 00 00                         # ........
+}
+section 14 ".data.rel.ro._ZTV15QQmlDebugClient" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000203
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000000
+    Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               ...
+               00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               total: 120
+}
+section 16 ".data.rel.ro" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000003
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000020
+    EntSize:   0x0000000000000000
+    Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               ...
+               00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               total: 48
+}
+section 18 ".rodata" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000002
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000020
+    EntSize:   0x0000000000000000
+    Data:      08 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
+               01 00 00 00 0e 00 00 00 00 00 00 00 00 00 00 00 # ................
+               ...
+               61 74 65 00 73 74 61 74 65 00 00 00 00 00 00 00 # ate.state.......
+               total: 264
+}
+section 19 ".comment" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000030
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000001
+    EntSize:   0x0000000000000001
+    Data:      00 47 43 43 3a 20 28 41 72 63 68 20 4c 69 6e 75 # .GCC: (Arch Linu
+               78 20 39 2e 33 2e 30 2d 31 29 20 39 2e 33 2e 30 # x 9.3.0-1) 9.3.0
+               ...
+               20 39 2e 33 2e 30 2d 31 29 20 39 2e 33 2e 30 00 #  9.3.0-1) 9.3.0.
+               total: 33
+}
+section 20 ".note.GNU-stack" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000000
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000001
+    EntSize:   0x0000000000000000
+    Data:      
+}
+section 21 ".eh_frame" {
+    Type:      SHT_PROGBITS
+    Flags:     0x0000000000000002
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000000
+    Data:      14 00 00 00 00 00 00 00 01 7a 52 00 01 78 10 01 # .........zR..x..
+               1b 0c 07 08 90 01 00 00 10 00 00 00 1c 00 00 00 # ................
+               ...
+               0e 18 41 0e 10 42 0e 08 43 0b 00 00 00 00 00 00 # ..A..B..C.......
+               total: 232
+}
+symbol table section 23 ".symtab" {
+    Type:  SHT_SYMTAB
+    Flags: 0x0000000000000000
+    Data:  
+        symbol "" {
+            Bind:  STB_Local
+            Type:  STT_NoType
+            ShNdx: SHN_Undef
+            Value: 0x0000000000000000
+            Size:  0x0000000000000000
+        }
+        symbol "" {
+            Bind:  STB_Local
+            Type:  STT_Section
+            ShNdx: SHN_EXT 5
+            Value: 0x0000000000000000
+            Size:  0x0000000000000000
+        }
+        ...
+        symbol "_ZN7QObject16staticMetaObjectE" {
+            Bind:  STB_Global
+            Type:  STT_NoType
+            ShNdx: SHN_Undef
+            Value: 0x0000000000000000
+            Size:  0x0000000000000000
+        }
+        total: 50
+}
+section 24 ".strtab" {
+    Type:      SHT_STRTAB
+    Flags:     0x0000000000000000
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000001
+    EntSize:   0x0000000000000000
+    Data:      00 5f 5a 4e 31 35 51 51 6d 6c 44 65 62 75 67 43 # ._ZN15QQmlDebugC
+               6c 69 65 6e 74 31 38 71 74 5f 73 74 61 74 69 63 # lient18qt_static
+               ...
+               61 74 69 63 4d 65 74 61 4f 62 6a 65 63 74 45 00 # aticMetaObjectE.
+               total: 1193
+}
+section 6 ".rela.text" {
+    Type:      SHT_RELA
+    Flags:     0x0000000000000040
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Data:      0d 00 00 00 00 00 00 00 29 00 00 00 17 00 00 00 # ........).......
+               fc ff ff ff ff ff ff ff 1b 00 00 00 00 00 00 00 # ................
+               ...
+               29 00 00 00 21 00 00 00 fc ff ff ff ff ff ff ff # )...!...........
+               total: 312
+}
+section 10 ".rela.qtversion" {
+    Type:      SHT_RELA
+    Flags:     0x0000000000000240
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Data:      00 00 00 00 00 00 00 00 1b 00 00 00 15 00 00 00 # ................
+               00 00 00 00 00 00 00 00                         # ........
+}
+section 13 ".rela.data.rel.ro._ZTI15QQmlDebugClient" {
+    Type:      SHT_RELA
+    Flags:     0x0000000000000240
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Data:      00 00 00 00 00 00 00 00 01 00 00 00 24 00 00 00 # ............$...
+               10 00 00 00 00 00 00 00 08 00 00 00 00 00 00 00 # ................
+               ...
+               01 00 00 00 25 00 00 00 00 00 00 00 00 00 00 00 # ....%...........
+               total: 72
+}
+section 15 ".rela.data.rel.ro._ZTV15QQmlDebugClient" {
+    Type:      SHT_RELA
+    Flags:     0x0000000000000240
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Data:      08 00 00 00 00 00 00 00 01 00 00 00 23 00 00 00 # ............#...
+               00 00 00 00 00 00 00 00 10 00 00 00 00 00 00 00 # ................
+               ...
+               01 00 00 00 30 00 00 00 00 00 00 00 00 00 00 00 # ....0...........
+               total: 336
+}
+section 17 ".rela.data.rel.ro" {
+    Type:      SHT_RELA
+    Flags:     0x0000000000000040
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Data:      00 00 00 00 00 00 00 00 01 00 00 00 31 00 00 00 # ............1...
+               00 00 00 00 00 00 00 00 08 00 00 00 00 00 00 00 # ................
+               ...
+               01 00 00 00 1c 00 00 00 00 00 00 00 00 00 00 00 # ................
+               total: 96
+}
+section 22 ".rela.eh_frame" {
+    Type:      SHT_RELA
+    Flags:     0x0000000000000040
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Data:      20 00 00 00 00 00 00 00 02 00 00 00 01 00 00 00 #  ...............
+               00 00 00 00 00 00 00 00 34 00 00 00 00 00 00 00 # ........4.......
+               ...
+               02 00 00 00 01 00 00 00 90 01 00 00 00 00 00 00 # ................
+               total: 144
+}
+string table section 25 ".shstrtab"
+section table

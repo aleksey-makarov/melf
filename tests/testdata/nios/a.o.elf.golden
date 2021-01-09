@@ -1,0 +1,216 @@
+header {
+    Class:      ELFCLASS32
+    Data:       ELFDATA2LSB
+    OSABI:      ELFOSABI_SYSV
+    ABIVersion: 0
+    Type:       ET_REL
+    Machine:    EM_EXT 113
+    Entry:      0x00000000
+    Flags:      0x00000000
+}
+section 1 ".text" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000006
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      04 fe ff de 15 01 c0 df 15 00 00 df 3a 88 39 d8 # ............:.9.
+               34 00 00 01 04 00 00 21 00 00 00 00 3a 88 05 00 # 4......!....:...
+               ...
+               17 01 c0 df 17 00 00 df 04 02 c0 de 3a 28 00 f8 # ............:(..
+               total: 52
+}
+section 3 ".data" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000003
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      
+}
+section 4 ".bss" {
+    Type:      SHT_NOBITS
+    Flags:     0x00000003
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      
+}
+section 5 ".rodata" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000002
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      48 65 6c 6c 6f 20 77 6f 72 6c 64 00             # Hello world.
+}
+section 6 ".debug_info" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      23 09 00 00 04 00 00 00 00 00 04 01 00 00 00 00 # #...............
+               0c 61 2e 63 00 00 00 00 00 00 00 00 00 34 00 00 # .a.c.........4..
+               ...
+               05 5d 00 00 00 00 00 00 00 34 00 00 00 01 9c 00 # .].......4......
+               total: 2343
+}
+section 8 ".debug_abbrev" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      01 11 01 25 0e 13 0b 03 08 1b 0e 11 01 12 06 10 # ...%............
+               17 00 00 02 24 00 0b 0b 3e 0b 03 0e 00 00 03 24 # ....$...>......$
+               ...
+               39 0b 49 13 11 01 12 06 40 18 96 42 19 00 00 00 # 9.I.....@..B....
+               total: 461
+}
+section 9 ".debug_aranges" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      1c 00 00 00 02 00 00 00 00 00 04 00 00 00 00 00 # ................
+               00 00 00 00 34 00 00 00 00 00 00 00 00 00 00 00 # ....4...........
+}
+section 11 ".debug_line" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      77 01 00 00 03 00 59 01 00 00 01 01 fb 0e 0d 00 # w.....Y.........
+               01 01 01 01 00 00 00 01 00 00 01 2f 6e 66 73 2f # .........../nfs/
+               ...
+               00 14 05 05 f3 05 0c bb 05 01 4b 02 14 00 01 01 # ..........K.....
+               total: 379
+}
+section 13 ".debug_str" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000030
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000001
+    Data:      5f 64 73 6f 5f 68 61 6e 64 6c 65 00 47 4e 55 20 # _dso_handle.GNU 
+               43 31 37 20 39 2e 33 2e 31 20 32 30 32 30 30 34 # C17 9.3.1 202004
+               ...
+               00 6d 61 69 6e 00 5f 5f 74 6d 5f 6d 64 61 79 00 # .main.__tm_mday.
+               total: 1204
+}
+section 14 ".comment" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000030
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000001
+    Data:      00 47 43 43 3a 20 28 41 6c 74 65 72 61 20 32 30 # .GCC: (Altera 20
+               2e 33 20 42 75 69 6c 64 20 31 30 37 29 20 39 2e # .3 Build 107) 9.
+               ...
+               20 39 2e 33 2e 31 20 32 30 32 30 30 34 32 30 00 #  9.3.1 20200420.
+               total: 45
+}
+section 15 ".debug_frame" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      0c 00 00 00 ff ff ff ff 01 00 01 7c 1f 0c 1b 00 # ...........|....
+               24 00 00 00 00 00 00 00 00 00 00 00 34 00 00 00 # $...........4...
+               ...
+               44 0d 1c 54 0d 1b 44 df 44 dc 44 0e 00 00 00 00 # D..T..D.D.D.....
+               total: 56
+}
+symbol table section 17 ".symtab" {
+    Type:  SHT_SYMTAB
+    Flags: 0x00000000
+    Data:  
+        symbol "" {
+            Bind:  STB_Local
+            Type:  STT_NoType
+            ShNdx: SHN_Undef
+            Value: 0x00000000
+            Size:  0x00000000
+        }
+        symbol "a.c" {
+            Bind:  STB_Local
+            Type:  STT_File
+            ShNdx: SHN_Abs
+            Value: 0x00000000
+            Size:  0x00000000
+        }
+        ...
+        symbol "printf" {
+            Bind:  STB_Global
+            Type:  STT_NoType
+            ShNdx: SHN_Undef
+            Value: 0x00000000
+            Size:  0x00000000
+        }
+        total: 15
+}
+section 18 ".strtab" {
+    Type:      SHT_STRTAB
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      00 61 2e 63 00 6d 61 69 6e 00 70 72 69 6e 74 66 # .a.c.main.printf
+               00                                              # .
+}
+section 2 ".rela.text" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      10 00 00 00 0b 05 00 00 00 00 00 00 14 00 00 00 # ................
+               0a 05 00 00 00 00 00 00 18 00 00 00 04 0e 00 00 # ................
+               ...
+               00 00 00 00 18 00 00 00 04 0e 00 00 00 00 00 00 # ................
+               total: 36
+}
+section 7 ".rela.debug_info" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      06 00 00 00 0c 07 00 00 00 00 00 00 0c 00 00 00 # ................
+               0c 0a 00 00 0c 00 00 00 15 00 00 00 0c 0a 00 00 # ................
+               ...
+               a5 04 00 00 1c 09 00 00 0c 02 00 00 00 00 00 00 # ................
+               total: 1584
+}
+section 10 ".rela.debug_aranges" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      06 00 00 00 0c 06 00 00 00 00 00 00 10 00 00 00 # ................
+               0c 02 00 00 00 00 00 00                         # ........
+}
+section 12 ".rela.debug_line" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      68 01 00 00 0c 02 00 00 00 00 00 00             # h...........
+}
+section 16 ".rela.debug_frame" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      14 00 00 00 0c 0b 00 00 00 00 00 00 18 00 00 00 # ................
+               0c 02 00 00 00 00 00 00                         # ........
+}
+string table section 19 ".shstrtab"
+section table

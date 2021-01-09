@@ -1,0 +1,148 @@
+header {
+    Class:      ELFCLASS32
+    Data:       ELFDATA2MSB
+    OSABI:      ELFOSABI_SYSV
+    ABIVersion: 0
+    Type:       ET_REL
+    Machine:    EM_PPC
+    Entry:      0x00000000
+    Flags:      0x00008000
+}
+section 1 ".text" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000006
+    Addr:      0x00000000
+    AddrAlign: 0x00000010
+    EntSize:   0x00000000
+    Data:      94 21 ff e0 7c 08 02 a6 42 9f 00 05 93 c1 00 18 # .!..|...B.......
+               7f c8 02 a6 3f de 00 00 93 a1 00 14 3b de 00 00 # ....?.......;...
+               ...
+               7c 08 03 a6 83 e1 00 1c 38 21 00 20 4e 80 00 20 # |.......8!. N.. 
+               total: 172
+}
+section 3 ".data" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000003
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      
+}
+section 4 ".bss" {
+    Type:      SHT_NOBITS
+    Flags:     0x00000003
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      
+}
+section 5 ".got2" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000003
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      00 00 00 00                                     # ....
+}
+section 7 ".comment" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000030
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000001
+    Data:      00 47 43 43 3a 20 28 47 65 6e 74 6f 6f 20 39 2e # .GCC: (Gentoo 9.
+               33 2e 30 2d 72 31 20 70 33 29 20 39 2e 33 2e 30 # 3.0-r1 p3) 9.3.0
+               ...
+               2e 30 2d 72 31 20 70 33 29 20 39 2e 33 2e 30 00 # .0-r1 p3) 9.3.0.
+               total: 33
+}
+section 8 ".note.GNU-stack" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      
+}
+section 9 ".eh_frame" {
+    Type:      SHT_PROGBITS
+    Flags:     0x00000002
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000000
+    Data:      00 00 00 10 00 00 00 00 01 7a 52 00 04 7c 41 01 # .........zR..|A.
+               1b 0c 01 00 00 00 00 38 00 00 00 18 00 00 00 00 # .......8........
+               ...
+               0e 00 42 0b 48 06 41 42 df de dd 0e 00 00 00 00 # ..B.H.AB........
+               total: 80
+}
+symbol table section 11 ".symtab" {
+    Type:  SHT_SYMTAB
+    Flags: 0x00000000
+    Data:  
+        symbol "" {
+            Bind:  STB_Local
+            Type:  STT_NoType
+            ShNdx: SHN_Undef
+            Value: 0x00000000
+            Size:  0x00000000
+        }
+        symbol "" {
+            Bind:  STB_Local
+            Type:  STT_Section
+            ShNdx: SHN_EXT 1
+            Value: 0x00000000
+            Size:  0x00000000
+        }
+        ...
+        symbol "pthread_mutex_unlock" {
+            Bind:  STB_Global
+            Type:  STT_NoType
+            ShNdx: SHN_Undef
+            Value: 0x00000000
+            Size:  0x00000000
+        }
+        total: 13
+}
+section 12 ".strtab" {
+    Type:      SHT_STRTAB
+    Flags:     0x00000000
+    Addr:      0x00000000
+    AddrAlign: 0x00000001
+    EntSize:   0x00000000
+    Data:      00 5f 5f 67 61 69 5f 72 65 71 75 65 73 74 73 5f # .__gai_requests_
+               6d 75 74 65 78 00 67 61 69 5f 63 61 6e 63 65 6c # mutex.gai_cancel
+               ...
+               61 64 5f 6d 75 74 65 78 5f 75 6e 6c 6f 63 6b 00 # ad_mutex_unlock.
+               total: 94
+}
+section 2 ".rela.text" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      00 00 00 16 00 00 02 fc 00 00 80 0a 00 00 00 1e # ................
+               00 00 02 fa 00 00 80 12 00 00 00 34 00 00 0a 12 # ...........4....
+               ...
+               00 00 80 00 00 00 00 88 00 00 0c 12 00 00 80 00 # ................
+               total: 72
+}
+section 6 ".rela.got2" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      00 00 00 00 00 00 08 01 00 00 00 00             # ............
+}
+section 10 ".rela.eh_frame" {
+    Type:      SHT_RELA
+    Flags:     0x00000040
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x0000000c
+    Data:      00 00 00 1c 00 00 01 1a 00 00 00 00             # ............
+}
+string table section 13 ".shstrtab"
+section table

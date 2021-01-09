@@ -1,0 +1,104 @@
+Header:   Class:      ELFCLASS32
+          Data:       ELFDATA2MSB
+          OSABI:      ELFOSABI_SYSV
+          ABIVersion: 0
+          Type:       ET_REL
+          Machine:    EM_PPC
+          Entry:      0x00000000
+          PhOff:      0x00000000
+          ShOff:      0x00000094
+          Flags:      0x00008000
+          PhEntSize:  0x0000
+          PhNum:      0
+          ShEntSize:  0x0028
+          ShNum:      8
+          ShStrNdx:   7
+Sections: - N:         0
+            Name:      0
+            Type:      SHT_NULL
+            Flags:     0x00000000
+            Addr:      0x00000000
+            Offset:    0x00000000
+            Size:      0x00000000
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000000
+            EntSize:   0x00000000
+          - N:         1
+            Name:      11
+            Type:      SHT_PROGBITS
+            Flags:     0x00000006
+            Addr:      0x00000000
+            Offset:    0x00000034
+            Size:      0x00000000
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000001
+            EntSize:   0x00000000
+          - N:         2
+            Name:      17
+            Type:      SHT_PROGBITS
+            Flags:     0x00000003
+            Addr:      0x00000000
+            Offset:    0x00000034
+            Size:      0x00000000
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000001
+            EntSize:   0x00000000
+          - N:         3
+            Name:      23
+            Type:      SHT_NOBITS
+            Flags:     0x00000003
+            Addr:      0x00000000
+            Offset:    0x00000034
+            Size:      0x00000000
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000001
+            EntSize:   0x00000000
+          - N:         4
+            Name:      28
+            Type:      SHT_PROGBITS
+            Flags:     0x00000006
+            Addr:      0x00000000
+            Offset:    0x00000034
+            Size:      0x00000014
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000001
+            EntSize:   0x00000000
+          - N:         5
+            Name:      34
+            Type:      SHT_PROGBITS
+            Flags:     0x00000006
+            Addr:      0x00000000
+            Offset:    0x00000048
+            Size:      0x00000014
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000001
+            EntSize:   0x00000000
+          - N:         6
+            Name:      40
+            Type:      SHT_PROGBITS
+            Flags:     0x00000000
+            Addr:      0x00000000
+            Offset:    0x0000005c
+            Size:      0x00000000
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000001
+            EntSize:   0x00000000
+          - N:         7
+            Name:      1
+            Type:      SHT_STRTAB
+            Flags:     0x00000000
+            Addr:      0x00000000
+            Offset:    0x0000005c
+            Size:      0x00000038
+            Link:      0
+            Info:      0
+            AddrAlign: 0x00000001
+            EntSize:   0x00000000
+Segments: 

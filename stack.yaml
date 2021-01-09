@@ -1,0 +1,6 @@
+resolver: nightly-2020-12-04
+packages:
+- '.'
+extra-deps: []
+flags: {}
+extra-package-dbs: []

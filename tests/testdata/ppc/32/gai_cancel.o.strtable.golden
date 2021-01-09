@@ -1,0 +1,11 @@
+<>
+<.bss>
+<.comment>
+<.data>
+<.note.GNU-stack>
+<.rela.eh_frame>
+<.rela.got2>
+<.rela.text>
+<.shstrtab>
+<.strtab>
+<.symtab>

@@ -1,0 +1,15 @@
+<>
+<.bss>
+<.comment>
+<.data>
+<.debug_abbrev>
+<.debug_str>
+<.rela.debug_aranges>
+<.rela.debug_frame>
+<.rela.debug_info>
+<.rela.debug_line>
+<.rela.text>
+<.rodata>
+<.shstrtab>
+<.strtab>
+<.symtab>
