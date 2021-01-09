@@ -6,7 +6,7 @@
 ## Related work
 
 - [elf](https://github.com/wangbj/elf) - does not write ELF, only parses it
-- [data-elf]() - parses just headers/tables; depends on a library that fails to build with modern GHCs
+- [data-elf](https://github.com/mvv/data-elf) - parses just headers/tables; depends on a library that fails to build with modern GHCs
 
 ## History
 
