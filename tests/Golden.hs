@@ -15,7 +15,6 @@ module Main (main) where
 -- import Paths_elf
 import Prelude as P
 
-import Control.Arrow
 import Control.Monad
 import Control.Monad.Catch
 import Data.Binary
@@ -85,34 +84,16 @@ mkTest'' HeaderXX{..} bs = do
         bsSections = takeLen hShOff (hShEntSize * hShNum)
         bsSegments = takeLen hPhOff (hPhEntSize * hPhNum)
 
-    (off, s :: [SectionXX a]) <- withSingI (sing @ a) $ case hData of -- FIXME: use parse/serializeListA (?)
-        ELFDATA2LSB -> second (fmap fromLe . fromBList) <$> (decodeOrFailAssertion bsSections)
-        ELFDATA2MSB -> second (fmap fromBe . fromBList) <$> (decodeOrFailAssertion bsSections)
+    (ss :: [SectionXX a]) <- parseListA hData bsSections
+    assertEqual "Section table round trip does not work" bsSections $ serializeListA hData ss
 
-    assertEqual "Not all section table could be parsed" (BSL.length bsSections) off
-    let
-        encoded = case hData of -- FIXME: use parse/serializeListA (?)
-            ELFDATA2LSB -> encode $ BList $ Le <$> s
-            ELFDATA2MSB -> encode $ BList $ Be <$> s
-    assertEqual "Section table round trip does not work" bsSections encoded
-
-    (offp, p :: [SegmentXX a]) <- case hData of  -- FIXME: use parse/serializeListA (?)
-        ELFDATA2LSB -> second (fmap fromLe . fromBList) <$> (decodeOrFailAssertion bsSegments)
-        ELFDATA2MSB -> second (fmap fromBe . fromBList) <$> (decodeOrFailAssertion bsSegments)
-
-    assertEqual "Not all ssgment table could be parsed" (BSL.length bsSegments) offp
-    let
-        encodedp = case hData of -- FIXME: use parse/serializeListA (?)
-            ELFDATA2LSB -> encode $ BList $ Le <$> p
-            ELFDATA2MSB -> encode $ BList $ Be <$> p
-    assertEqual "Segment table round trip does not work" bsSegments encodedp
-
-    return ()
+    (ps :: [SegmentXX a]) <- parseListA hData bsSegments
+    assertEqual "Segment table round trip does not work" bsSegments $ serializeListA hData ps
 
 mkTest' :: ByteString -> Assertion
 mkTest' bs = do
     (off, elfh@(classS :&: hxx) :: Header) <- decodeOrFailAssertion bs
-    assertBool "Incorrect header size" ((headerSize ELFCLASS32 == off) || (headerSize ELFCLASS64 == off))
+    assertBool "Incorrect header size" ((headerSize $ fromSing classS) == off)
     assertEqual "Header round trip does not work" (BSL.take off bs) (encode elfh)
 
     (withElfClass classS mkTest'') hxx bs

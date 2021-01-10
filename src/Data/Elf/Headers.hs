@@ -88,6 +88,7 @@ import Data.Typeable (Typeable)
 
 -- https://stackoverflow.com/questions/10672981/export-template-haskell-generated-definitions
 
+import Data.BList
 import Data.Endian
 import Data.Elf.Exception
 import Data.Elf.Generated
@@ -177,18 +178,6 @@ putLe = putEndian ELFDATA2LSB
 
 splitBits :: (Num w, FiniteBits w) => w -> [w]
 splitBits w = fmap (shiftL 1) $ L.filter (testBit w) $ fmap (subtract 1) [ 1 .. (finiteBitSize w) ]
-
-newtype BList a = BList { fromBList :: [a] }
-
-instance Binary a => Binary (BList a) where
-    put (BList (a:as)) = put a >> put (BList as)
-    put (BList []) = return ()
-    get = do
-        e <- isEmpty
-        if e then return $ BList [] else do
-            a <- get
-            (BList as) <- get
-            return $ BList $ a : as
 
 --------------------------------------------------------------------------
 -- WordXX
@@ -576,16 +565,15 @@ elfDecodeAllOrFail bs = do
     (off, a) <- elfDecodeOrFail' bs
     if off == (BSL.length bs) then return a else $elfError $ "leftover != 0 @" ++ show off
 
--- FIXME: these should be instance Binary (Le a) => Binary (Le (Blist a))
 parseListA :: (MonadThrow m, Binary (Le a), Binary (Be a)) => ElfData -> BSL.ByteString -> m [a]
 parseListA d bs = case d of
-    ELFDATA2LSB -> fmap fromLe <$> fromBList <$> elfDecodeAllOrFail bs
-    ELFDATA2MSB -> fmap fromBe <$> fromBList <$> elfDecodeAllOrFail bs
+    ELFDATA2LSB -> fromBList . fromLe <$> elfDecodeAllOrFail bs
+    ELFDATA2MSB -> fromBList . fromBe <$> elfDecodeAllOrFail bs
 
 serializeListA :: (Binary (Le a), Binary (Be a)) => ElfData -> [a] -> BSL.ByteString
 serializeListA d as = case d of
-    ELFDATA2LSB -> encode $ BList $ fmap Le $ as
-    ELFDATA2MSB -> encode $ BList $ fmap Be $ as
+    ELFDATA2LSB -> encode $ Le $ BList as
+    ELFDATA2MSB -> encode $ Be $ BList as
 
 parseHeaders' :: (IsElfClass a, MonadThrow m) => HeaderXX a -> BSL.ByteString -> m (Sigma ElfClass (TyCon1 HeadersXX))
 parseHeaders' hxx@HeaderXX{..} bs =

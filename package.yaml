@@ -31,6 +31,7 @@ library:
     - Data.Elf.TH
     - Data.Elf.Generated
     - Data.Interval
+    - Data.BList
   exposed-modules:
     - Data.Endian
     - Data.Elf

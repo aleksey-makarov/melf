@@ -35,6 +35,7 @@ library
       Data.Elf.TH
       Data.Elf.Generated
       Data.Interval
+      Data.BList
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
