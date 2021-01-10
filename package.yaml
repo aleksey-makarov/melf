@@ -32,6 +32,7 @@ library:
     - Data.Elf.Generated
     - Data.Interval
   exposed-modules:
+    - Data.Endian
     - Data.Elf
     - Data.Elf.Headers
     - Data.Elf.PrettyPrint

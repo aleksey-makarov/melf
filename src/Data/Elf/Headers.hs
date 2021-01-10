@@ -88,6 +88,7 @@ import Data.Typeable (Typeable)
 
 -- https://stackoverflow.com/questions/10672981/export-template-haskell-generated-definitions
 
+import Data.Endian
 import Data.Elf.Exception
 import Data.Elf.Generated
 
