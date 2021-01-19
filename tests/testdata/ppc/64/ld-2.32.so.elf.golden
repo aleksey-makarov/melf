@@ -264,6 +264,10 @@ segment {
                                00 00 00 00 00 02 7a 2c 00 00 00 00 00 02 7d 64 # ......z,......}d
                                total: 400
                 }
+                raw align {
+                    Offset: 0x0000000000040000
+                    Align:  0x0000000000010000
+                }
         }
         section 18 ".sdata" {
             Type:      SHT_PROGBITS

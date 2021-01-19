@@ -363,6 +363,10 @@ segment {
                                00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
                                total: 96
                 }
+                raw align {
+                    Offset: 0x000000000002b000
+                    Align:  0x0000000000001000
+                }
         }
         section 22 ".data" {
             Type:      SHT_PROGBITS

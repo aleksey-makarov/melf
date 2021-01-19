@@ -293,6 +293,14 @@ segment {
                     EntSize:   0x0000000000000008
                     Data:      
                 }
+                raw align {
+                    Offset: 0x0000000000030000
+                    Align:  0x0000000000010000
+                }
+        }
+        raw align {
+            Offset: 0x00000000000300c0
+            Align:  0x0000000000010000
         }
         section 20 ".data" {
             Type:      SHT_PROGBITS

@@ -105,6 +105,10 @@ data RBuilder (c :: ElfClass)
     | RBuilderRawData
         { rbrdInterval :: Interval (WordXX c)
         }
+    | RBuilderRawAlign
+        { rbraOffset :: WordXX c
+        , rbraAlign  :: WordXX c
+        }
 
 rBuilderInterval :: IsElfClass a => RBuilder a -> Interval (WordXX a)
 rBuilderInterval RBuilderHeader{..}       = headerInterval rbhHeader
@@ -113,6 +117,7 @@ rBuilderInterval RBuilderSegmentTable{..} = segmentTableInterval rbptHeader
 rBuilderInterval RBuilderSection{..}      = sectionInterval rbsHeader
 rBuilderInterval RBuilderSegment{..}      = segmentInterval rbpHeader
 rBuilderInterval RBuilderRawData{..}      = rbrdInterval
+rBuilderInterval RBuilderRawAlign{}       = undefined -- FIXME
 
 data LZip a = LZip [a] (Maybe a) [a]
 
@@ -135,6 +140,7 @@ showRBuilber' RBuilderSegmentTable{} = "segment table"
 showRBuilber' RBuilderSection{..}    = "section " ++ show rbsN
 showRBuilber' RBuilderSegment{..}    = "segment " ++ show rbpN
 showRBuilber' RBuilderRawData{}      = "raw data" -- should not be called
+showRBuilber' RBuilderRawAlign{}     = "alignment" -- should not be called
 
 showRBuilber :: IsElfClass a => RBuilder a -> String
 showRBuilber v = showRBuilber' v ++ " (" ++ (show $ rBuilderInterval v) ++ ")"
@@ -268,8 +274,8 @@ data Elf (c :: ElfClass)
         , esAddr      :: WordXX c
         , esAddrAlign :: WordXX c
         , esEntSize   :: WordXX c
-        , esN         :: Word16
-        , esLink      :: Word32
+        , esN         :: Word16 -- FIXME: why these types differ?
+        , esLink      :: Word32 --
         , esData      :: ElfSectionData
         }
     | ElfSegment
@@ -283,6 +289,10 @@ data Elf (c :: ElfClass)
         }
     | ElfRawData
         { erData :: BSL.ByteString
+        }
+    | ElfRawAlign
+        { raOffset :: WordXX c
+        , raAlign  :: WordXX c
         }
 
 -- FIXME MyTree nodeT leafT, bifunctor MyTree, Elf -> split to 6 separate types
@@ -374,32 +384,31 @@ tail' :: [a] -> [a]
 tail' [] = []
 tail' (_ : xs) = xs
 
+nextOffset :: IsElfClass a => WordXX a -> WordXX a -> WordXX a -> WordXX a
+nextOffset _ 0 a = a
+nextOffset t m a | m .&. (m - 1) /= 0 = error $ "align module is not power of two " ++ (show m)
+                  | otherwise          = if a' + t' < a then a' + m + t' else a' + t'
+    where
+        a' = a .&. complement (m - 1)
+        t' = t .&. (m - 1)
+
 addRawData :: forall a . IsElfClass a => BSL.ByteString -> [RBuilder a] -> [RBuilder a]
 addRawData _ [] = []
-addRawData bs rBuilders = snd $ addRawData' (lrbie, rBuilders)
+addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
     where
+
+        -- e, e', ee and lrbie stand for the first occupied byte after the place being fixed
+        -- lrbi: last rBuilder interval (begin, size)
+        lrbi@(I lrbib lrbis) = rBuilderInterval $ L.last rBuilders
+        lrbie = if I.empty lrbi then lrbib else lrbib + lrbis
 
         allEmpty :: WordXX a -> WordXX a -> Bool
         allEmpty b s = BSL.all (== 0) bs'
             where
                 bs' = cut bs (fromIntegral b) (fromIntegral s)
 
-        -- e, e' and lrbie stand for the first occupied byte after the place being fixed
-
-        -- names: last rBuilder interval (begin, size)
-        lrbi@(I lrbib lrbis) = rBuilderInterval $ L.last rBuilders
-        lrbie = if I.empty lrbi then lrbib else lrbib + lrbis
-
-        addRaw :: WordXX a -> WordXX a -> [RBuilder a] -> [RBuilder a]
-        addRaw b e rbs =
-            if b < e && (not $ allEmpty b s)
-                then RBuilderRawData (I b s) : rbs
-                else rbs
-            where
-                s = e - b
-
-        addRawData' :: (WordXX a, [RBuilder a]) -> (WordXX a, [RBuilder a])
-        addRawData' (e, rbs) = L.foldr f (e, []) $ fmap fixRBuilder rbs
+        addRawData' :: WordXX a -> (WordXX a, [RBuilder a]) -> (WordXX a, [RBuilder a])
+        addRawData' alignHint (e, rbs) = L.foldr f (e, []) $ fmap fixRBuilder rbs
             where
                 f rb (e', rbs') =
                     let
@@ -409,14 +418,49 @@ addRawData bs rBuilders = snd $ addRawData' (lrbie, rBuilders)
                     in
                         (b, rb : rbs'')
 
-        fixRBuilder :: RBuilder a -> RBuilder a
-        fixRBuilder p | I.empty $ rBuilderInterval p = p
-        fixRBuilder p@RBuilderSegment{..}            = RBuilderSegment{ rbpData = addRaw b e' rbs, ..}
-            where
-                (I b s) = rBuilderInterval p
-                e = b + s
-                (e', rbs) = addRawData' (e, rbpData)
-        fixRBuilder x = x
+                fixRBuilder :: RBuilder a -> RBuilder a
+                fixRBuilder p | I.empty $ rBuilderInterval p = p
+                fixRBuilder p@RBuilderSegment{..} =
+                    RBuilderSegment{ rbpData = addRaw b ee' rbs', ..}
+                        where
+                            (I b s) = rBuilderInterval p
+                            ee = b + s
+                            alignHint' = max (pAlign rbpHeader) alignHint
+                            (ee', rbs') = addRawData' alignHint' (ee, rbpData)
+                fixRBuilder x = x
+
+                -- b is the first free byte
+                addRaw :: WordXX a -> WordXX a -> [RBuilder a] -> [RBuilder a]
+                addRaw b ee rbs' =
+                    if b < ee
+                        then
+                            if not $ allEmpty b s
+                                then
+                                    RBuilderRawData (I b s) : rbs'
+                                else
+                                    -- check e' < ee means
+                                    -- check if next section/segment was actually placed (ee) with greater offset
+                                    -- than is required by alignment rules (e')
+                                    if e' < ee && e'' == ee
+                                        then
+                                            RBuilderRawAlign ee alignHint : rbs'
+                                        else
+                                            rbs'
+                        else
+                            rbs'
+                    where
+                        s = ee - b
+                        eAddr = case rbs' of
+                            (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pVirtAddr
+                            _ -> 0
+                        eAddrAlign = case rbs' of
+                            (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pAlign
+                            (RBuilderSection{rbsHeader = SectionXX{..}} : _) -> sAddrAlign
+                            _ -> wordAlign $ fromSing $ sing @a
+                        -- e' here is the address of the next section/segment
+                        -- according to the regular alignment rules
+                        e' = nextOffset eAddr eAddrAlign b
+                        e'' = nextOffset ee alignHint b
 
 parseRBuilder :: (IsElfClass a, MonadCatch m) => HeaderXX a -> [SectionXX a] -> [SegmentXX a] -> BSL.ByteString -> m [RBuilder a]
 parseRBuilder hdr@HeaderXX{..} ss ps bs = do
@@ -507,6 +551,8 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 }
         rBuilderToElf RBuilderRawData{ rbrdInterval = I o s } =
             return $ ElfRawData $ cut bs (fromIntegral o) (fromIntegral s)
+        rBuilderToElf RBuilderRawAlign{..} =
+            return $ ElfRawAlign rbraOffset rbraAlign
 
     el <- mapM rBuilderToElf rbs
     return $ sing :&: ElfList el
@@ -650,16 +696,12 @@ serializeElf' elfs = do
         align t m WBuilderState{..} | m .&. (m - 1) /= 0 = $elfError $ "align module is not power of two " ++ (show m)
                                     | otherwise =
             let
-                o' = wbsOffset .&. complement (m - 1)
-                t' = t .&. (m - 1)
-                o'' = if o' + t' < wbsOffset
-                    then o' + m + t'
-                    else o' + t'
-                d = WBuilderDataByteStream $ BSL.replicate (fromIntegral $ o'' - wbsOffset) 0
+                wbsOffset' = nextOffset t m wbsOffset
+                d = WBuilderDataByteStream $ BSL.replicate (fromIntegral $ wbsOffset' - wbsOffset) 0
             in
                 return WBuilderState
                     { wbsDataReversed = d : wbsDataReversed
-                    , wbsOffset = o''
+                    , wbsOffset = wbsOffset'
                     , ..
                     }
 
@@ -761,6 +803,7 @@ serializeElf' elfs = do
                 , wbsOffset = wbsOffset + (fromIntegral $ BSL.length erData)
                 , ..
                 }
+        elf2WBuilder' ElfRawAlign{..} s = align raOffset raAlign s
 
         elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => Elf a -> n ()
         elf2WBuilder elf = MS.get >>= elf2WBuilder' elf >>= MS.put

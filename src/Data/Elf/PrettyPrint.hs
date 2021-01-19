@@ -230,6 +230,7 @@ printRBuilder getStr rbs = vsep ldoc
                         [(o,         "╓", doc)
                         ,(o + s - 1, "╙", [])
                         ]
+                f RBuilderRawAlign{} = []
 
 --------------------------------------------------------------------
 --
@@ -361,6 +362,11 @@ printElf (classS :&: ElfList elfs) = withSingI classS do
         printElf'' ElfRawData{..} =
             return $ formatPairsBlock "raw data"
                 [ ("Data",       printData erData)
+                ]
+        printElf'' ElfRawAlign{..} =
+            return $ formatPairsBlock "raw align"
+                [ ("Offset", printWordXX raOffset )
+                , ("Align",  printWordXX raAlign  )
                 ]
 
     printElf' elfs

@@ -26,6 +26,10 @@ segment {
             Flags:      0x00000000
         }
         segment table
+        raw align {
+            Offset: 0x00000000000000e0
+            Align:  0x0000000000200000
+        }
         section 1 ".text" {
             Type:      SHT_PROGBITS
             Flags:     0x0000000000000006
