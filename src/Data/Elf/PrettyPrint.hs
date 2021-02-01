@@ -54,7 +54,7 @@ formatList = align . vsep . fmap f
 
 padLeadingZeros :: Int -> String -> String
 padLeadingZeros n s | length s > n = error "padLeadingZeros args"
-padLeadingZeros n s | otherwise = "0x" ++ replicate (n - length s) '0' ++ s
+                    | otherwise = "0x" ++ replicate (n - length s) '0' ++ s
 
 -- printWord8 :: Word8 -> Doc ()
 -- printWord8 n = pretty $ padLeadingZeros 2 $ showHex n ""
@@ -154,7 +154,7 @@ printRBuilder getStr rbs = vsep ldoc
         longest rbs' = maximum $ fmap (length . getS) rbs'
 
         padL n s | length s > n = error "incorrect number of pad symbols for `padL`"
-        padL n s | otherwise = replicate (n - length s) ' ' ++ s
+                 | otherwise = replicate (n - length s) ' ' ++ s
 
         equalize l = fmap (mapL (padL l))
 
@@ -264,7 +264,7 @@ splitBy :: Int64 -> BSL.ByteString -> [BSL.ByteString]
 splitBy n = L.unfoldr f
     where
         f s | BSL.null s = Nothing
-        f s | otherwise  = Just $ BSL.splitAt n s
+            | otherwise  = Just $ BSL.splitAt n s
 
 formatChar :: Char -> Doc ()
 formatChar c = pretty $ if isAscii c && not (isControl c) then c else '.'

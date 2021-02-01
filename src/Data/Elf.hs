@@ -130,8 +130,8 @@ findInterval f e list = findInterval' [] list
     where
         findInterval' l []                          = LZip l Nothing []
         findInterval' l (x : xs) | e `member` (f x) = LZip l (Just x) xs
-        findInterval' l (x : xs) | e < offset (f x) = LZip l Nothing (x : xs)
-        findInterval' l (x : xs) | otherwise        = findInterval' (x : l) xs
+                                 | e < offset (f x) = LZip l Nothing (x : xs)
+                                 | otherwise        = findInterval' (x : l) xs
 
 showRBuilber' :: RBuilder a -> String
 showRBuilber' RBuilderHeader{}       = "header"
@@ -387,7 +387,7 @@ tail' (_ : xs) = xs
 nextOffset :: IsElfClass a => WordXX a -> WordXX a -> WordXX a -> WordXX a
 nextOffset _ 0 a = a
 nextOffset t m a | m .&. (m - 1) /= 0 = error $ "align module is not power of two " ++ (show m)
-                  | otherwise          = if a' + t' < a then a' + m + t' else a' + t'
+                 | otherwise          = if a' + t' < a then a' + m + t' else a' + t'
     where
         a' = a .&. complement (m - 1)
         t' = t .&. (m - 1)
