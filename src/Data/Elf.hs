@@ -566,7 +566,7 @@ parseElf bs = do
 --
 -------------------------------------------------------------------------------
 
-data WBuilderData (a :: ElfClass)
+data WBuilderData (a :: ElfClass) -- FIXME: do we really need this 'a'?
     = WBuilderDataHeader
     | WBuilderDataByteStream { wbdData :: BSL.ByteString }
     | WBuilderDataSectionTable

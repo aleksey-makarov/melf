@@ -125,6 +125,8 @@ mkGoldenTestOSuffix name osuffix formatFunction file = mkGoldenTest' g o formatF
 
 ------------------------------------------------------------------------------
 
+-- FIXME: define foldMapRBuilderList
+
 findHeader :: SingI a => [RBuilder a] -> Maybe (HeaderXX a)
 findHeader rbs = getFirst $ foldMap f rbs
     where
