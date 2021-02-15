@@ -1,13 +1,4 @@
 segment {
-    Type:     PT_EXT 1685382481
-    Flags:    0x00000006
-    VirtAddr: 0x0000000000000000
-    PhysAddr: 0x0000000000000000
-    MemSize:  0x0000000000000000
-    Align:    0x0000000000000010
-    Data:     
-}
-segment {
     Type:     PT_LOAD
     Flags:    0x00000005
     VirtAddr: 0x0000000000000000
@@ -15,6 +6,15 @@ segment {
     MemSize:  0x0000000000018aec
     Align:    0x0000000000010000
     Data:     
+        segment {
+            Type:     PT_EXT 1685382481
+            Flags:    0x00000006
+            VirtAddr: 0x0000000000000000
+            PhysAddr: 0x0000000000000000
+            MemSize:  0x0000000000000000
+            Align:    0x0000000000000010
+            Data:     
+        }
         header {
             Class:      ELFCLASS64
             Data:       ELFDATA2LSB
@@ -247,23 +247,6 @@ segment {
         }
 }
 segment {
-    Type:     PT_EXT 7
-    Flags:    0x00000004
-    VirtAddr: 0x0000000000029910
-    PhysAddr: 0x0000000000029910
-    MemSize:  0x0000000000000004
-    Align:    0x0000000000000004
-    Data:     
-}
-section 17 ".tbss" {
-    Type:      SHT_NOBITS
-    Flags:     0x0000000000000403
-    Addr:      0x0000000000029910
-    AddrAlign: 0x0000000000000004
-    EntSize:   0x0000000000000000
-    Data:      
-}
-segment {
     Type:     PT_LOAD
     Flags:    0x00000006
     VirtAddr: 0x0000000000029910
@@ -279,6 +262,23 @@ segment {
             MemSize:  0x00000000000006f0
             Align:    0x0000000000000001
             Data:     
+                segment {
+                    Type:     PT_EXT 7
+                    Flags:    0x00000004
+                    VirtAddr: 0x0000000000029910
+                    PhysAddr: 0x0000000000029910
+                    MemSize:  0x0000000000000004
+                    Align:    0x0000000000000004
+                    Data:     
+                        section 17 ".tbss" {
+                            Type:      SHT_NOBITS
+                            Flags:     0x0000000000000403
+                            Addr:      0x0000000000029910
+                            AddrAlign: 0x0000000000000004
+                            EntSize:   0x0000000000000000
+                            Data:      
+                        }
+                }
                 section 18 ".init_array" {
                     Type:      SHT_EXT 14
                     Flags:     0x0000000000000003

@@ -1,13 +1,4 @@
 segment {
-    Type:     PT_EXT 1685382481
-    Flags:    0x00000006
-    VirtAddr: 0x00000000
-    PhysAddr: 0x00000000
-    MemSize:  0x00000000
-    Align:    0x00000010
-    Data:     
-}
-segment {
     Type:     PT_LOAD
     Flags:    0x00000005
     VirtAddr: 0x08048000
@@ -15,6 +6,15 @@ segment {
     MemSize:  0x00000934
     Align:    0x00001000
     Data:     
+        segment {
+            Type:     PT_EXT 1685382481
+            Flags:    0x00000006
+            VirtAddr: 0x00000000
+            PhysAddr: 0x00000000
+            MemSize:  0x00000000
+            Align:    0x00000010
+            Data:     
+        }
         header {
             Class:      ELFCLASS32
             Data:       ELFDATA2LSB

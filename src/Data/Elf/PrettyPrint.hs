@@ -210,7 +210,7 @@ printRBuilder getStr rbs = vsep ldoc
                               , viaShow $ splitBits $ ElfSegmentFlag $ fromIntegral pFlags
                               ]
                     in
-                        if empty i
+                        if empty i && L.null rbpData
                             then
                                 [(o, "-", doc)]
                             else
@@ -222,9 +222,9 @@ printRBuilder getStr rbs = vsep ldoc
                                     b = '┌' : ((replicate l '─'))
                                     e = '└' : ((replicate l '─'))
                                 in
-                                    [(o,         b, doc)] ++
-                                    xsf                         ++
-                                    [(o + s - 1, e, [])]
+                                    [(o,                                b, doc)] ++
+                                    xsf                                          ++
+                                    [(if empty i then o else o + s - 1, e, [] )]
                 f RBuilderRawData{} =
                     let
                         doc = [ "R" ]

@@ -68,6 +68,8 @@ import Data.Singletons
 import Data.Singletons.Sigma
 -- import Data.Word
 
+-- import System.IO.Unsafe
+
 headerInterval :: forall a . IsElfClass a => HeaderXX a -> Interval (WordXX a)
 headerInterval _ = I 0 $ headerSize $ fromSing $ sing @a
 
@@ -128,128 +130,183 @@ instance Foldable LZip where
 findInterval :: (Ord t, Num t) => (a -> Interval t) -> t -> [a] -> LZip a
 findInterval f e list = findInterval' [] list
     where
-        findInterval' l []                          = LZip l Nothing []
-        findInterval' l (x : xs) | e `member` (f x) = LZip l (Just x) xs
-                                 | e < offset (f x) = LZip l Nothing (x : xs)
-                                 | otherwise        = findInterval' (x : l) xs
+        findInterval' l []                           = LZip l Nothing []
+        findInterval' l (x : xs) | e `touches` (f x) = LZip l (Just x) xs
+                                 | e < offset  (f x) = LZip l Nothing (x : xs)
+                                 | otherwise         = findInterval' (x : l) xs
+        touches a i | I.empty i = a == offset i
+                    | otherwise = a `member` i
 
-showRBuilber' :: RBuilder a -> String
-showRBuilber' RBuilderHeader{}       = "header"
-showRBuilber' RBuilderSectionTable{} = "section table"
-showRBuilber' RBuilderSegmentTable{} = "segment table"
-showRBuilber' RBuilderSection{..}    = "section " ++ show rbsN
-showRBuilber' RBuilderSegment{..}    = "segment " ++ show rbpN
-showRBuilber' RBuilderRawData{}      = "raw data" -- should not be called
-showRBuilber' RBuilderRawAlign{}     = "alignment" -- should not be called
+showRBuilder' :: RBuilder a -> String
+showRBuilder' RBuilderHeader{}       = "header"
+showRBuilder' RBuilderSectionTable{} = "section table"
+showRBuilder' RBuilderSegmentTable{} = "segment table"
+showRBuilder' RBuilderSection{..}    = "section " ++ show rbsN
+showRBuilder' RBuilderSegment{..}    = "segment " ++ show rbpN
+showRBuilder' RBuilderRawData{}      = "raw data" -- should not be called
+showRBuilder' RBuilderRawAlign{}     = "alignment" -- should not be called
 
-showRBuilber :: IsElfClass a => RBuilder a -> String
-showRBuilber v = showRBuilber' v ++ " (" ++ (show $ rBuilderInterval v) ++ ")"
+showRBuilder :: IsElfClass a => RBuilder a -> String
+showRBuilder v = showRBuilder' v ++ " (" ++ (show $ rBuilderInterval v) ++ ")"
 
--- showERBList :: [ElfRBuilder a] -> String
--- showERBList l = "[" ++ (L.concat $ L.intersperse ", " $ fmap showElfRBuilber l) ++ "]"
+-- showERBList :: IsElfClass a => [RBuilder a] -> String
+-- showERBList l = "[" ++ (L.concat $ L.intersperse ", " $ fmap showRBuilder l) ++ "]"
 
 intersectMessage :: IsElfClass a => RBuilder a -> RBuilder a -> String
-intersectMessage x y = showRBuilber x ++ " and " ++ showRBuilber y ++ " intersect"
+intersectMessage x y = showRBuilder x ++ " and " ++ showRBuilder y ++ " intersect"
 
-addRBuildersToList :: (IsElfClass a, MonadCatch m) => [RBuilder a] -> [RBuilder a] -> m [RBuilder a]
-addRBuildersToList newts l = foldM (flip addRBuilder) l newts
-
-addRBuilders :: (IsElfClass a, MonadCatch m) => [RBuilder a] -> RBuilder a -> m (RBuilder a)
-addRBuilders [] x = return x
-addRBuilders ts RBuilderSegment{..} = do
-    d <- addRBuildersToList ts rbpData
-    return RBuilderSegment{ rbpData = d, .. }
-addRBuilders (x:_) y = $elfError $ intersectMessage x y
-
-addOneRBuilder :: (IsElfClass a, MonadCatch m) => RBuilder a -> RBuilder a -> m (RBuilder a)
-addOneRBuilder t@RBuilderSegment{..} c | rBuilderInterval t == rBuilderInterval c = do
-    d <- addRBuilder c rbpData
-    return RBuilderSegment{ rbpData = d, .. }
-addOneRBuilder t RBuilderSegment{..} = do
-    d <- addRBuilder t rbpData
-    return RBuilderSegment{ rbpData = d, .. }
-addOneRBuilder t c = $elfError $ intersectMessage t c
-
-addRBuilder :: (IsElfClass a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
-addRBuilder t ts =
+addRBuilders :: forall a m . (IsElfClass a, MonadCatch m) => [RBuilder a] -> m [RBuilder a]
+addRBuilders newts =
     let
-        ti  = rBuilderInterval t
-        tir = if I.empty ti then offset ti else offset ti + size ti - 1
-        (LZip l  c'  r ) = findInterval rBuilderInterval (offset ti) ts
-        (LZip l2 c2' r2) = findInterval rBuilderInterval tir         r
-    in
-        case (c', c2') of
-            (Just c, _)  ->
-                let
-                    ci = rBuilderInterval c
-                in if ci `contains` ti then
+        addRBuilders' f newts' l = foldM (flip f) l newts'
 
-                    if I.empty ti && offset ti == offset ci
-                        then
+        addRBuilderEmpty :: (IsElfClass a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
+        addRBuilderEmpty t ts =
+            -- (unsafePerformIO $ Prelude.putStrLn $ "Add Empty " ++ showRBuilder t ++ " to " ++ showERBList ts) `seq`
+            let
+                to = offset $ rBuilderInterval t
+                (LZip l c' r) = findInterval rBuilderInterval to ts
 
-                            return $ toList $ LZip (t : l) c' r
+                -- Let `(le, lo)` is the result of `allEmptyStarting a l`.
+                -- Then `le` is the initial sublist of `l` each element of which is empty and starts at `a`,
+                -- `lo` is the rest of `l`.
+                allEmptyStartingAt :: WordXX a -> [RBuilder a] -> ([RBuilder a], [RBuilder a])
+                allEmptyStartingAt a ls = f ([], ls)
+                    where
+                        f (le, []) = (L.reverse le, [])
+                        f (le, h : lo) =
+                            let
+                                hi = rBuilderInterval h
+                            in if (not $ I.empty hi) || (offset hi /= a)
+                                then (L.reverse le, h : lo)
+                                else f (h : le, lo)
+            in case c' of
+                Just RBuilderSegment{..} -> do
+                    d <- $addContext' $ addRBuilderEmpty t rbpData
+                    return $ toList $ LZip l (Just RBuilderSegment{ rbpData = d, .. }) r
+                Just c ->
+                    if offset (rBuilderInterval c) /= to then
+                        $elfError $ intersectMessage t c
+                    else
+                        let
+                            (ce, re) = allEmptyStartingAt to (c : r)
+                        in case t of
+                            RBuilderSegment{..} ->
+                                return $ toList $ LZip l (Just RBuilderSegment{ rbpData = ce, .. }) re
+                            _ ->
+                                return $ toList $ LZip l Nothing (ce ++ (t : re))
+                Nothing -> return $ toList $ LZip l (Just t) r
 
-                        else do
+        addRBuilderNonEmpty :: (IsElfClass a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
+        addRBuilderNonEmpty t ts =
+            -- (unsafePerformIO $ Prelude.putStrLn $ "Add NonEmpty " ++ showRBuilder t ++ " to " ++ showERBList ts) `seq`
+            let
+                ti = rBuilderInterval t
+                (LZip l c' r) = findInterval rBuilderInterval (offset ti) ts
 
-                            -- add this:     .........[t____].................................
-                            -- or this:      .....[t___________]..............................
-                            -- to this list: .....[c___________]......[___]......[________]...
-                            c'' <- $addContext' $ addOneRBuilder t c
-                            return $ toList $ LZip l (Just c'') r
+                addRBuildersNonEmpty :: (IsElfClass a, MonadCatch m) => [RBuilder a] -> RBuilder a -> m (RBuilder a)
+                addRBuildersNonEmpty [] x = return x
+                addRBuildersNonEmpty ts' RBuilderSegment{..} = do
+                    d <- $addContext' $ addRBuilders' addRBuilderNonEmpty ts' rbpData
+                    return RBuilderSegment{ rbpData = d, .. }
+                addRBuildersNonEmpty (x:_) y = $elfError $ intersectMessage x y
 
-                else if ti `contains` ci then
-                    case c2' of
+            in case c' of
+
+                Just c ->
+
+                    if ti == rBuilderInterval c then
+
+                        case t of
+
+                                -- NB: If a segment A has number greater than segment B and they have same size, then
+                                --     segment A contains segment B
+                                --     This should be taken into account in the serialization code.
+                                RBuilderSegment{..} ->
+
+                                    return $ toList $ LZip l (Just RBuilderSegment{ rbpData = [c], .. }) r
+
+                                _ ->  do
+
+                                    c'' <- $addContext' $ addRBuildersNonEmpty [t] c
+                                    return $ toList $ LZip l (Just c'') r
+
+                    else if rBuilderInterval c `contains` ti then do
+
+                        c'' <- $addContext' $ addRBuildersNonEmpty [t] c
+                        return $ toList $ LZip l (Just c'') r
+
+                    else if ti `contains` rBuilderInterval c then
+
+                        let
+
+                            tir = offset ti + size ti - 1
+                            (LZip l2 c2' r2) = findInterval rBuilderInterval tir r
+
+                        in case c2' of
+
+                            Nothing -> do
+
+                                -- add this:     ......[t__________________________]...................
+                                -- to this list: ......[c__]......[l2__]...[l2__].....[________].......
+                                -- no need to keep the order of l2 as each member of the list will be placed independently from scratch
+                                c'' <- $addContext' $ addRBuildersNonEmpty (c : l2) t
+                                return $ toList $ LZip l (Just c'') r2
+
+                            Just c2 ->
+
+                                if ti `contains` (rBuilderInterval c2) then do
+
+                                    -- add this:     ......[t______________________]........................
+                                    -- to this list: ......[c_________]......[c2___]......[________]........
+                                    c'' <- $addContext' $ addRBuildersNonEmpty (c : c2 : l2) t
+                                    return $ toList $ LZip l (Just c'') r2
+                                else
+
+                                    -- add this:     ......[t_________________].............................
+                                    -- to this list: ......[c_________]......[c2___]......[________]........
+                                    $elfError $ intersectMessage t c2
+
+                    else
+
+                        -- add this:     ..........[t________].............................
+                        -- to this list: ......[c_________]......[_____]......[________]...
+                        $elfError $ intersectMessage t c
+
+                Nothing ->
+
+                    let
+                        tir = offset ti + size ti - 1
+                        (LZip l2 c2' r2) = findInterval rBuilderInterval tir r
+                    in case c2' of
 
                         Nothing -> do
 
-                            -- add this:     ......[t__________________________]...................
-                            -- to this list: ......[c__]......[l2__]...[l2__].....[________].......
-                            c'' <- $addContext' $ addRBuilders (c : l2) t
+                            -- add this:     ....[t___].........................................
+                            -- or this:      ....[t_________________________]...................
+                            -- to this list: .............[l2__]...[l2__].....[________]........
+                            c'' <- $addContext' $ addRBuildersNonEmpty l2 t
                             return $ toList $ LZip l (Just c'') r2
 
                         Just c2 ->
-                            let
-                                c2i = rBuilderInterval c2
-                            in if ti `contains` c2i then do
 
-                                -- add this:     ......[t______________________]........................
-                                -- to this list: ......[c_________]......[c2___]......[________]........
-                                c'' <- $addContext' $ addRBuilders (c : l2 ++ [c2]) t
+                            if ti `contains` (rBuilderInterval c2) then do
+
+                                -- add this:     ....[t_________________________________]........
+                                -- to this list: ..........[l2__]..[l2__].....[c2_______]........
+                                c'' <- $addContext' $ addRBuildersNonEmpty (c2 : l2) t
                                 return $ toList $ LZip l (Just c'') r2
+
                             else
 
-                                -- add this:     ......[t_________________].............................
-                                -- to this list: ......[c_________]......[c2___]......[________]........
+                                -- add this:     ....[t_______________________________]..........
+                                -- to this list: ..........[l2__]..[l2__].....[c2_______]........
                                 $elfError $ intersectMessage t c2
-                else
 
-                    -- add this:     ..........[t________].............................
-                    -- to this list: ......[c_________]......[_____]......[________]...
-                    $elfError $ intersectMessage t c
+        (emptyRBs, nonEmptyRBs) = L.partition (I.empty . rBuilderInterval) newts
 
-            (Nothing, Nothing) -> do
-
-                -- add this:     ....[t___].........................................
-                -- or this:      ....[t_________________________]...................
-                -- to this list: .............[l2__]...[l2__].....[________]........
-                c'' <- $addContext' $ addRBuilders l2 t
-                return $ toList $ LZip l (Just c'') r2
-
-            (Nothing, Just c2) ->
-                let
-                    c2i = rBuilderInterval c2
-                in if ti `contains` c2i then do
-
-                    -- add this:     ....[t_________________________________]........
-                    -- to this list: ..........[l2__]..[l2__].....[c2_______]........
-                    c'' <- $addContext' $ addRBuilders (l2 ++ [c2]) t
-                    return $ toList $ LZip l (Just c'') r2
-
-                else
-
-                    -- add this:     ....[t_______________________________]..........
-                    -- to this list: ..........[l2__]..[l2__].....[c2_______]........
-                    $elfError $ intersectMessage t c2
+    in
+        addRBuilders' addRBuilderNonEmpty nonEmptyRBs [] >>= addRBuilders' addRBuilderEmpty emptyRBs
 
 data ElfSectionData
     = ElfSectionData BSL.ByteString
@@ -481,12 +538,10 @@ parseRBuilder hdr@HeaderXX{..} ss ps bs = do
         maybeSectionTable = if hShNum == 0 then Nothing else  Just $ RBuilderSectionTable hdr
         maybeSegmentTable = if hPhNum == 0 then Nothing else  Just $ RBuilderSegmentTable hdr
 
-    rbs <- addRBuilder header
-        =<< maybe return addRBuilder maybeSectionTable
-        =<< maybe return addRBuilder maybeSegmentTable
-        =<< addRBuildersToList sections
-        =<< addRBuildersToList segments []
-
+    rbs <- addRBuilders $ [header] ++ maybeToList maybeSectionTable
+                                   ++ maybeToList maybeSegmentTable
+                                   ++ segments
+                                   ++ sections
     return $ addRawData bs rbs
 
 parseElf' :: forall a m . (IsElfClass a, MonadCatch m) =>
