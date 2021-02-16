@@ -51,6 +51,37 @@ library
     , template-haskell
   default-language: Haskell2010
 
+executable hobjdump
+  main-is: hObjDump.hs
+  other-modules:
+      Paths_melf
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.6 && <5.0
+    , binary
+    , bytestring
+    , melf
+    , prettyprinter
+  default-language: Haskell2010
+
+executable hobjlayout
+  main-is: hObjLayout.hs
+  other-modules:
+      Paths_melf
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.6 && <5.0
+    , binary
+    , bytestring
+    , exceptions
+    , melf
+    , prettyprinter
+  default-language: Haskell2010
+
 test-suite golden
   type: exitcode-stdio-1.0
   main-is: Golden.hs

@@ -25,7 +25,6 @@ import Data.Foldable as F
 -- import Data.Functor.Identity
 import Data.Int
 -- import Data.List as L
-import Data.Monoid
 import Data.Singletons
 import Data.Singletons.Sigma
 import Data.Text.Prettyprint.Doc as D
@@ -127,36 +126,6 @@ mkGoldenTestOSuffix name osuffix formatFunction file = mkGoldenTest' g o formatF
 
 -- FIXME: define foldMapRBuilderList
 
-findHeader :: SingI a => [RBuilder a] -> Maybe (HeaderXX a)
-findHeader rbs = getFirst $ foldMap f rbs
-    where
-        f RBuilderSegment{..} = First $ findHeader rbpData
-        f RBuilderHeader{ rbhHeader = h@HeaderXX{} } = First $ Just h
-        f _ = First Nothing
-
-findSection :: SingI a => Word16 -> [RBuilder a] -> Maybe (SectionXX a)
-findSection n = findSection'
-    where
-        findSection' rbs = getFirst $ foldMap f rbs
-        f RBuilderSegment{..} = First $ findSection' rbpData
-        f RBuilderSection{..} = if n == rbsN then First $ Just rbsHeader else First Nothing
-        f _ = First Nothing
-
-findStringSection :: SingI a => [RBuilder a] -> Maybe (SectionXX a)
-findStringSection rbs = do
-    HeaderXX{..} <- findHeader rbs
-    findSection hShStrNdx rbs
-
-printRBuilder' :: MonadCatch m => (Sigma ElfClass (TyCon1 HeadersXX)) -> BSL.ByteString -> m (Doc ())
-printRBuilder' (classS :&: HeadersXX (hdr, ss, ps)) bs = withElfClass classS do
-    rbs <- parseRBuilder hdr ss ps bs
-    let
-        stringSectionData = getSectionData bs <$> findStringSection rbs
-        getString' n = case stringSectionData of
-            Nothing -> error "no string table"
-            Just st -> getString st $ fromIntegral n
-    return $ printRBuilder getString' rbs
-
 readFileLazy :: FilePath -> IO BSL.ByteString
 readFileLazy path = fromStrict <$> BS.readFile path
 
@@ -201,14 +170,14 @@ printRBuilderFile :: FilePath -> IO (Doc ())
 printRBuilderFile path = do
     bs <- readFileLazy path
     hdrs <- parseHeaders bs
-    printRBuilder' hdrs bs
+    printLayout hdrs bs
 
 printCopyRBuilderFile :: FilePath -> IO (Doc ())
 printCopyRBuilderFile path = do
     bs <- readFileLazy path
     bs' <- copyElf bs
     hdrs <- parseHeaders bs'
-    printRBuilder' hdrs bs'
+    printLayout hdrs bs'
 
 printElfFile :: FilePath -> IO (Doc ())
 printElfFile path = do

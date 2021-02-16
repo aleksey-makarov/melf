@@ -9,7 +9,7 @@ copyright: Aleksey Makarov
 license: BSD3
 homepage: https://github.com/aleksey-makarov/melf
 dependencies:
-- base >=4.6 && <5.0
+  - base >=4.6 && <5.0
 tested-with: GHC == 8.10.2
 ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
 
@@ -57,20 +57,23 @@ tests:
       - tasty-golden
       - tasty-hunit
 
-# executables:
-#   hobjdump:
-#     main: hObjDump.hs
-#     source-dirs: app
-#     ghc-options: -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
-#     dependencies:
-#       - elf
-#       - binary
-#       - bytestring
-#       - prettyprinter
-#   hobjlayout:
-#     main: hObjLayout.hs
-#     source-dirs: app
-#     ghc-options: -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
-#     dependencies:
-#       - elf
-#       - binary
+executables:
+  hobjdump:
+    main: hObjDump.hs
+    source-dirs: app
+    ghc-options: -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+    dependencies:
+      - melf
+      - binary
+      - bytestring
+      - prettyprinter
+  hobjlayout:
+    main: hObjLayout.hs
+    source-dirs: app
+    ghc-options: -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+    dependencies:
+      - melf
+      - binary
+      - prettyprinter
+      - bytestring
+      - exceptions
