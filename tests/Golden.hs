@@ -158,13 +158,16 @@ printStrTableFile :: FilePath -> IO (Doc ())
 printStrTableFile path = do
     bs <- readFileLazy path
     hdrs <- parseHeaders bs
-    getStringTable hdrs bs >>= printStringTable
+    st <- getStringTable hdrs bs
+    printStringTable st
 
 printCopyStrTableFile :: FilePath -> IO (Doc ())
 printCopyStrTableFile path = do
-    bs <- readFileLazy path >>= copyElf
-    hdrs <- parseHeaders bs
-    getStringTable hdrs bs >>= printStringTable
+    bs <- readFileLazy path
+    bs' <- copyElf bs
+    hdrs <- parseHeaders bs'
+    st <- getStringTable hdrs bs'
+    printStringTable st
 
 printRBuilderFile :: FilePath -> IO (Doc ())
 printRBuilderFile path = do
