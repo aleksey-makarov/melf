@@ -13,6 +13,17 @@
 For the early history look at the branch "[amakarov](https://github.com/aleksey-makarov/elf/tree/amakarov)" of
 the my copy of the [elf](https://github.com/aleksey-makarov/elf) repo.
 
+## Tests
+
+Test data is committed with [git-lfs](https://git-lfs.github.com/).
+If you are going to run tests then checkout the repo with
+`git lfs clone https://github.com/aleksey-makarov/melf.git`
+
+## Development
+
+- `melf.cabal` is generated from `package.yaml`.  Use `hpack` to do that.
+- `melf.nix` is generated.  Use `cabal2nix . > melf.nix` to do that.
+
 ## License
 
 BSD 3-Clause License (c) Aleksey Makarov

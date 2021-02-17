@@ -6,11 +6,16 @@ mkDerivation {
   pname = "melf";
   version = "0.1";
   src = ./.;
+  isLibrary = true;
+  isExecutable = true;
   libraryHaskellDepends = [
     base binary bytestring exceptions lens mtl prettyprinter singletons
     template-haskell
   ];
   libraryToolDepends = [ hpack ];
+  executableHaskellDepends = [
+    base binary bytestring exceptions prettyprinter
+  ];
   testHaskellDepends = [
     base binary bytestring directory exceptions filepath prettyprinter
     singletons tasty tasty-golden tasty-hunit
