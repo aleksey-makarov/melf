@@ -134,6 +134,7 @@ $(mkDeclarations BaseWord16 "ElfMachine" "EM" "EM_EXT"
     , ("_SEP",        108) -- Sharp embedded microprocessor
     , ("_ARCA",       109) -- Arca RISC Microprocessor
     , ("_UNICORE",    110) -- Microprocessor series from PKU-Unity Ltd. and MPRC of Peking University
+    , ("_AARCH64",    183) -- ELF for the Arm 64-bit Architecture (AArch64)
     ])
 
 $(mkDeclarations BaseWord32 "ElfSectionType" "SHT" "SHT_EXT"
