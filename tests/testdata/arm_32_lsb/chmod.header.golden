@@ -323,7 +323,7 @@ Sections: - N:         0
             EntSize:   0x00000000
 Segments: - N:        0
             Type:     PT_EXT 1879048193
-            Flags:    0x00000004
+            Flags:    [PF_R]
             Offset:   0x00009ba4
             VirtAddr: 0x00019ba4
             PhysAddr: 0x00019ba4
@@ -332,7 +332,7 @@ Segments: - N:        0
             Align:    0x00000004
           - N:        1
             Type:     PT_PHDR
-            Flags:    0x00000005
+            Flags:    [PF_X,PF_R]
             Offset:   0x00000034
             VirtAddr: 0x00010034
             PhysAddr: 0x00010034
@@ -341,7 +341,7 @@ Segments: - N:        0
             Align:    0x00000004
           - N:        2
             Type:     PT_INTERP
-            Flags:    0x00000004
+            Flags:    [PF_R]
             Offset:   0x00000154
             VirtAddr: 0x00010154
             PhysAddr: 0x00010154
@@ -350,7 +350,7 @@ Segments: - N:        0
             Align:    0x00000001
           - N:        3
             Type:     PT_LOAD
-            Flags:    0x00000005
+            Flags:    [PF_X,PF_R]
             Offset:   0x00000000
             VirtAddr: 0x00010000
             PhysAddr: 0x00010000
@@ -359,7 +359,7 @@ Segments: - N:        0
             Align:    0x00010000
           - N:        4
             Type:     PT_LOAD
-            Flags:    0x00000006
+            Flags:    [PF_W,PF_R]
             Offset:   0x00009efc
             VirtAddr: 0x00029efc
             PhysAddr: 0x00029efc
@@ -368,7 +368,7 @@ Segments: - N:        0
             Align:    0x00010000
           - N:        5
             Type:     PT_DYNAMIC
-            Flags:    0x00000006
+            Flags:    [PF_W,PF_R]
             Offset:   0x00009f08
             VirtAddr: 0x00029f08
             PhysAddr: 0x00029f08
@@ -377,7 +377,7 @@ Segments: - N:        0
             Align:    0x00000004
           - N:        6
             Type:     PT_NOTE
-            Flags:    0x00000004
+            Flags:    [PF_R]
             Offset:   0x00000170
             VirtAddr: 0x00010170
             PhysAddr: 0x00010170
@@ -386,7 +386,7 @@ Segments: - N:        0
             Align:    0x00000004
           - N:        7
             Type:     PT_EXT 1685382481
-            Flags:    0x00000006
+            Flags:    [PF_W,PF_R]
             Offset:   0x00000000
             VirtAddr: 0x00000000
             PhysAddr: 0x00000000
@@ -395,7 +395,7 @@ Segments: - N:        0
             Align:    0x00000010
           - N:        8
             Type:     PT_EXT 1685382482
-            Flags:    0x00000004
+            Flags:    [PF_R]
             Offset:   0x00009efc
             VirtAddr: 0x00029efc
             PhysAddr: 0x00029efc

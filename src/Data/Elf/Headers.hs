@@ -403,7 +403,7 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SectionXX a)) where
 data SegmentXX (c :: ElfClass) =
     SegmentXX
         { pType     :: ElfSegmentType
-        , pFlags    :: Word32
+        , pFlags    :: ElfSegmentFlag
         , pOffset   :: WordXX c
         , pVirtAddr :: WordXX c
         , pPhysAddr :: WordXX c

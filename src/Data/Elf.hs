@@ -337,7 +337,7 @@ data Elf (c :: ElfClass)
         }
     | ElfSegment
         { epType     :: ElfSegmentType
-        , epFlags    :: Word32
+        , epFlags    :: ElfSegmentFlag
         , epVirtAddr :: WordXX c
         , epPhysAddr :: WordXX c
         , epMemSize  :: WordXX c

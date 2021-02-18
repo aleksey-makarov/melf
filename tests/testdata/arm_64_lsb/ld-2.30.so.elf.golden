@@ -1,6 +1,6 @@
 segment {
     Type:     PT_LOAD
-    Flags:    0x00000005
+    Flags:    [PF_X,PF_R]
     VirtAddr: 0x0000000000000000
     PhysAddr: 0x0000000000000000
     MemSize:  0x000000000001eef8
@@ -8,7 +8,7 @@ segment {
     Data:     
         segment {
             Type:     PT_EXT 1685382481
-            Flags:    0x00000006
+            Flags:    [PF_W,PF_R]
             VirtAddr: 0x0000000000000000
             PhysAddr: 0x0000000000000000
             MemSize:  0x0000000000000000
@@ -28,7 +28,7 @@ segment {
         segment table
         segment {
             Type:     PT_NOTE
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x00000000000001c8
             PhysAddr: 0x00000000000001c8
             MemSize:  0x0000000000000024
@@ -197,7 +197,7 @@ segment {
         }
         segment {
             Type:     PT_EXT 1685382480
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x000000000001c160
             PhysAddr: 0x000000000001c160
             MemSize:  0x000000000000069c
@@ -231,7 +231,7 @@ segment {
 }
 segment {
     Type:     PT_LOAD
-    Flags:    0x00000006
+    Flags:    [PF_W,PF_R]
     VirtAddr: 0x000000000002f588
     PhysAddr: 0x000000000002f588
     MemSize:  0x0000000000001c10
@@ -239,7 +239,7 @@ segment {
     Data:     
         segment {
             Type:     PT_EXT 1685382482
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x000000000002f588
             PhysAddr: 0x000000000002f588
             MemSize:  0x0000000000000a78
@@ -259,7 +259,7 @@ segment {
                 }
                 segment {
                     Type:     PT_DYNAMIC
-                    Flags:    0x00000006
+                    Flags:    [PF_W,PF_R]
                     VirtAddr: 0x000000000002fdd0
                     PhysAddr: 0x000000000002fdd0
                     MemSize:  0x0000000000000190

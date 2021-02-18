@@ -48,7 +48,7 @@ Sections: - N:         0
             EntSize:   0x0000000000000000
 Segments: - N:        0
             Type:     PT_LOAD
-            Flags:    0x00000005
+            Flags:    [PF_X,PF_R]
             Offset:   0x0000000000000000
             VirtAddr: 0x0000000000400000
             PhysAddr: 0x0000000000400000
@@ -57,7 +57,7 @@ Segments: - N:        0
             Align:    0x0000000000200000
           - N:        1
             Type:     PT_NOTE
-            Flags:    0x00000004
+            Flags:    [PF_R]
             Offset:   0x0000000000000000
             VirtAddr: 0x0000000000000000
             PhysAddr: 0x0000000000000000

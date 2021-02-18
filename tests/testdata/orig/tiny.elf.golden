@@ -1,6 +1,6 @@
 segment {
     Type:     PT_LOAD
-    Flags:    0x00000005
+    Flags:    [PF_X,PF_R]
     VirtAddr: 0x0000000000400000
     PhysAddr: 0x0000000000400000
     MemSize:  0x00000000000000ec
@@ -8,7 +8,7 @@ segment {
     Data:     
         segment {
             Type:     PT_NOTE
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x0000000000000000
             PhysAddr: 0x0000000000000000
             MemSize:  0x0000000000000000

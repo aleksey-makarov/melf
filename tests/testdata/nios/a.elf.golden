@@ -1,6 +1,6 @@
 segment {
     Type:     PT_LOAD
-    Flags:    0x00000005
+    Flags:    [PF_X,PF_R]
     VirtAddr: 0x00001000
     PhysAddr: 0x00001000
     MemSize:  0x0000d23c
@@ -44,7 +44,7 @@ segment {
 }
 segment {
     Type:     PT_LOAD
-    Flags:    0x00000006
+    Flags:    [PF_W,PF_R]
     VirtAddr: 0x0000f23c
     PhysAddr: 0x0000f23c
     MemSize:  0x000009e8

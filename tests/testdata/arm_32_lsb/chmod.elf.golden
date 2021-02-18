@@ -1,6 +1,6 @@
 segment {
     Type:     PT_LOAD
-    Flags:    0x00000005
+    Flags:    [PF_X,PF_R]
     VirtAddr: 0x00010000
     PhysAddr: 0x00010000
     MemSize:  0x00009bc8
@@ -8,7 +8,7 @@ segment {
     Data:     
         segment {
             Type:     PT_EXT 1685382481
-            Flags:    0x00000006
+            Flags:    [PF_W,PF_R]
             VirtAddr: 0x00000000
             PhysAddr: 0x00000000
             MemSize:  0x00000000
@@ -27,7 +27,7 @@ segment {
         }
         segment {
             Type:     PT_PHDR
-            Flags:    0x00000005
+            Flags:    [PF_X,PF_R]
             VirtAddr: 0x00010034
             PhysAddr: 0x00010034
             MemSize:  0x00000120
@@ -37,7 +37,7 @@ segment {
         }
         segment {
             Type:     PT_INTERP
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x00010154
             PhysAddr: 0x00010154
             MemSize:  0x00000019
@@ -55,7 +55,7 @@ segment {
         }
         segment {
             Type:     PT_NOTE
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x00010170
             PhysAddr: 0x00010170
             MemSize:  0x00000044
@@ -237,7 +237,7 @@ segment {
         }
         segment {
             Type:     PT_EXT 1879048193
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x00019ba4
             PhysAddr: 0x00019ba4
             MemSize:  0x00000020
@@ -264,7 +264,7 @@ segment {
 }
 segment {
     Type:     PT_LOAD
-    Flags:    0x00000006
+    Flags:    [PF_W,PF_R]
     VirtAddr: 0x00029efc
     PhysAddr: 0x00029efc
     MemSize:  0x00000410
@@ -272,7 +272,7 @@ segment {
     Data:     
         segment {
             Type:     PT_EXT 1685382482
-            Flags:    0x00000004
+            Flags:    [PF_R]
             VirtAddr: 0x00029efc
             PhysAddr: 0x00029efc
             MemSize:  0x00000104
@@ -304,7 +304,7 @@ segment {
                 }
                 segment {
                     Type:     PT_DYNAMIC
-                    Flags:    0x00000006
+                    Flags:    [PF_W,PF_R]
                     VirtAddr: 0x00029f08
                     PhysAddr: 0x00029f08
                     MemSize:  0x000000f8

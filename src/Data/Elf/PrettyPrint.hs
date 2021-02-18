@@ -118,7 +118,7 @@ printSegment (n, SegmentXX{..}) =
     formatPairs
         [ ("N",        viaShow n             )
         , ("Type",     viaShow pType         ) -- ElfSegmentType
-        , ("Flags",    printWord32 pFlags    ) -- Word32
+        , ("Flags",    viaShow $ splitBits pFlags ) -- ElfSegmentFlag
         , ("Offset",   printWordXX pOffset   ) -- WordXX c
         , ("VirtAddr", printWordXX pVirtAddr ) -- WordXX c
         , ("PhysAddr", printWordXX pPhysAddr ) -- WordXX c
@@ -207,7 +207,7 @@ printRBuilder getStr rbs = vsep ldoc
                     let
                         doc = [ "P"
                               , viaShow pType
-                              , viaShow $ splitBits $ ElfSegmentFlag $ fromIntegral pFlags
+                              , viaShow $ splitBits pFlags
                               ]
                     in
                         if empty i && L.null rbpData
@@ -383,7 +383,7 @@ printElf (classS :&: ElfList elfs) = withSingI classS do
                     return $ line <> (indent 4 dataDoc')
             return $ formatPairsBlock "segment"
                 [ ("Type",       viaShow epType         )
-                , ("Flags",      printWord32 epFlags    )
+                , ("Flags",      viaShow $ splitBits epFlags )
                 , ("VirtAddr",   printWordXX epVirtAddr )
                 , ("PhysAddr",   printWordXX epPhysAddr )
                 , ("MemSize",    printWordXX epMemSize  )

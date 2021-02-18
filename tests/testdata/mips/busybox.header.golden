@@ -16,7 +16,7 @@ Header:   Class:      ELFCLASS32
 Sections: 
 Segments: - N:        0
             Type:     PT_PHDR
-            Flags:    0x00000005
+            Flags:    [PF_X,PF_R]
             Offset:   0x00000034
             VirtAddr: 0x00400034
             PhysAddr: 0x00400034
@@ -25,7 +25,7 @@ Segments: - N:        0
             Align:    0x00000004
           - N:        1
             Type:     PT_INTERP
-            Flags:    0x00000004
+            Flags:    [PF_R]
             Offset:   0x00000114
             VirtAddr: 0x00400114
             PhysAddr: 0x00400114
@@ -34,7 +34,7 @@ Segments: - N:        0
             Align:    0x00000001
           - N:        2
             Type:     PT_LOAD
-            Flags:    0x00000005
+            Flags:    [PF_X,PF_R]
             Offset:   0x00000000
             VirtAddr: 0x00400000
             PhysAddr: 0x00400000
@@ -43,7 +43,7 @@ Segments: - N:        0
             Align:    0x00001000
           - N:        3
             Type:     PT_LOAD
-            Flags:    0x00000006
+            Flags:    [PF_W,PF_R]
             Offset:   0x00082000
             VirtAddr: 0x004c2000
             PhysAddr: 0x004c2000
@@ -52,7 +52,7 @@ Segments: - N:        0
             Align:    0x00001000
           - N:        4
             Type:     PT_DYNAMIC
-            Flags:    0x00000007
+            Flags:    [PF_X,PF_W,PF_R]
             Offset:   0x00000128
             VirtAddr: 0x00400128
             PhysAddr: 0x00400128
@@ -61,7 +61,7 @@ Segments: - N:        0
             Align:    0x00000004
           - N:        5
             Type:     PT_EXT 1685382480
-            Flags:    0x00000004
+            Flags:    [PF_R]
             Offset:   0x00081b68
             VirtAddr: 0x00481b68
             PhysAddr: 0x00481b68
@@ -70,7 +70,7 @@ Segments: - N:        0
             Align:    0x00000004
           - N:        6
             Type:     PT_EXT 1685382481
-            Flags:    0x00000007
+            Flags:    [PF_X,PF_W,PF_R]
             Offset:   0x00000000
             VirtAddr: 0x00000000
             PhysAddr: 0x00000000
