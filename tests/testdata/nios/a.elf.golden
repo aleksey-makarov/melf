@@ -19,7 +19,7 @@ segment {
         segment table
         section 1 ".text" {
             Type:      SHT_PROGBITS
-            Flags:     0x00000006
+            Flags:     [SHF_ALLOC,SHF_EXECINSTR]
             Addr:      0x00001078
             AddrAlign: 0x00000008
             EntSize:   0x00000000
@@ -31,7 +31,7 @@ segment {
         }
         section 2 ".rodata" {
             Type:      SHT_PROGBITS
-            Flags:     0x00000002
+            Flags:     [SHF_ALLOC]
             Addr:      0x0000dc18
             AddrAlign: 0x00000004
             EntSize:   0x00000000
@@ -52,7 +52,7 @@ segment {
     Data:     
         section 3 ".data" {
             Type:      SHT_PROGBITS
-            Flags:     0x00000003
+            Flags:     [SHF_WRITE,SHF_ALLOC]
             Addr:      0x0000f23c
             AddrAlign: 0x00000004
             EntSize:   0x00000000
@@ -64,7 +64,7 @@ segment {
         }
         section 4 ".sdata" {
             Type:      SHT_PROGBITS
-            Flags:     0x10000003
+            Flags:     [SHF_WRITE,SHF_ALLOC,SHF_EXT 268435456]
             Addr:      0x0000fbd4
             AddrAlign: 0x00000004
             EntSize:   0x00000000
@@ -73,7 +73,7 @@ segment {
 }
 section 5 ".sbss" {
     Type:      SHT_NOBITS
-    Flags:     0x10000003
+    Flags:     [SHF_WRITE,SHF_ALLOC,SHF_EXT 268435456]
     Addr:      0x0000fbe4
     AddrAlign: 0x00000004
     EntSize:   0x00000000
@@ -81,7 +81,7 @@ section 5 ".sbss" {
 }
 section 6 ".bss" {
     Type:      SHT_NOBITS
-    Flags:     0x00000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000fbfc
     AddrAlign: 0x00000004
     EntSize:   0x00000000
@@ -89,7 +89,7 @@ section 6 ".bss" {
 }
 section 7 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000030
+    Flags:     [SHF_EXT 16,SHF_EXT 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -101,7 +101,7 @@ section 7 ".comment" {
 }
 section 8 ".debug_aranges" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
@@ -113,7 +113,7 @@ section 8 ".debug_aranges" {
 }
 section 9 ".debug_info" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
@@ -125,7 +125,7 @@ section 9 ".debug_info" {
 }
 section 10 ".debug_abbrev" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
@@ -137,7 +137,7 @@ section 10 ".debug_abbrev" {
 }
 section 11 ".debug_line" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
@@ -149,7 +149,7 @@ section 11 ".debug_line" {
 }
 section 12 ".debug_frame" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x00000000
@@ -161,7 +161,7 @@ section 12 ".debug_frame" {
 }
 section 13 ".debug_str" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000030
+    Flags:     [SHF_EXT 16,SHF_EXT 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -173,7 +173,7 @@ section 13 ".debug_str" {
 }
 section 14 ".debug_loc" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
@@ -185,7 +185,7 @@ section 14 ".debug_loc" {
 }
 section 15 ".debug_ranges" {
     Type:      SHT_PROGBITS
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
@@ -197,7 +197,7 @@ section 15 ".debug_ranges" {
 }
 symbol table section 16 ".symtab" {
     Type:  SHT_SYMTAB
-    Flags: 0x00000000
+    Flags: []
     Data:  
         symbol "" {
             Bind:  STB_Local
@@ -225,7 +225,7 @@ symbol table section 16 ".symtab" {
 }
 section 17 ".strtab" {
     Type:      SHT_STRTAB
-    Flags:     0x00000000
+    Flags:     []
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000

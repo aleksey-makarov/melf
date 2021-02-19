@@ -10,7 +10,7 @@ header {
 }
 section 1 ".text" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000006
+    Flags:     [SHF_ALLOC,SHF_EXECINSTR]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -18,7 +18,7 @@ section 1 ".text" {
 }
 section 2 ".data" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -26,7 +26,7 @@ section 2 ".data" {
 }
 section 3 ".bss" {
     Type:      SHT_NOBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -34,7 +34,7 @@ section 3 ".bss" {
 }
 section 4 ".rodata.str1.8" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000032
+    Flags:     [SHF_ALLOC,SHF_EXT 16,SHF_EXT 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000001
@@ -46,7 +46,7 @@ section 4 ".rodata.str1.8" {
 }
 section 5 ".data.rel.ro.local" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -58,7 +58,7 @@ section 5 ".data.rel.ro.local" {
 }
 section 7 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000030
+    Flags:     [SHF_EXT 16,SHF_EXT 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -70,7 +70,7 @@ section 7 ".comment" {
 }
 section 8 ".note.GNU-stack" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000000
+    Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -78,7 +78,7 @@ section 8 ".note.GNU-stack" {
 }
 symbol table section 9 ".symtab" {
     Type:  SHT_SYMTAB
-    Flags: 0x0000000000000000
+    Flags: []
     Data:  
         symbol "" {
             Bind:  STB_Local
@@ -106,7 +106,7 @@ symbol table section 9 ".symtab" {
 }
 section 10 ".strtab" {
     Type:      SHT_STRTAB
-    Flags:     0x0000000000000000
+    Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -118,7 +118,7 @@ section 10 ".strtab" {
 }
 section 6 ".rela.data.rel.ro.local" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018

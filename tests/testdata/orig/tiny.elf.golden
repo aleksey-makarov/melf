@@ -32,7 +32,7 @@ segment {
         }
         section 1 ".text" {
             Type:      SHT_PROGBITS
-            Flags:     0x0000000000000006
+            Flags:     [SHF_ALLOC,SHF_EXECINSTR]
             Addr:      0x00000000004000e0
             AddrAlign: 0x0000000000000010
             EntSize:   0x0000000000000000

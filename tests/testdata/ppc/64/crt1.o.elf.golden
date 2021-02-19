@@ -10,7 +10,7 @@ header {
 }
 section 1 ".note.ABI-tag" {
     Type:      SHT_NOTE
-    Flags:     0x0000000000000002
+    Flags:     [SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
@@ -19,7 +19,7 @@ section 1 ".note.ABI-tag" {
 }
 section 2 ".text" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000006
+    Flags:     [SHF_ALLOC,SHF_EXECINSTR]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
@@ -31,7 +31,7 @@ section 2 ".text" {
 }
 section 4 ".rodata.cst4" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000012
+    Flags:     [SHF_ALLOC,SHF_EXT 16]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000004
@@ -39,7 +39,7 @@ section 4 ".rodata.cst4" {
 }
 section 5 ".opd" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -48,7 +48,7 @@ section 5 ".opd" {
 }
 section 7 ".toc" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -56,7 +56,7 @@ section 7 ".toc" {
 }
 section 9 ".data" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -64,7 +64,7 @@ section 9 ".data" {
 }
 section 10 ".data.rel.ro.local" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -73,7 +73,7 @@ section 10 ".data.rel.ro.local" {
 }
 section 12 ".bss" {
     Type:      SHT_NOBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -81,7 +81,7 @@ section 12 ".bss" {
 }
 section 13 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000030
+    Flags:     [SHF_EXT 16,SHF_EXT 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -93,7 +93,7 @@ section 13 ".comment" {
 }
 symbol table section 14 ".symtab" {
     Type:  SHT_SYMTAB
-    Flags: 0x0000000000000000
+    Flags: []
     Data:  
         symbol "" {
             Bind:  STB_Local
@@ -121,7 +121,7 @@ symbol table section 14 ".symtab" {
 }
 section 15 ".strtab" {
     Type:      SHT_STRTAB
-    Flags:     0x0000000000000000
+    Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -133,7 +133,7 @@ section 15 ".strtab" {
 }
 section 3 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -145,7 +145,7 @@ section 3 ".rela.text" {
 }
 section 6 ".rela.opd" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -157,7 +157,7 @@ section 6 ".rela.opd" {
 }
 section 8 ".rela.toc" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -166,7 +166,7 @@ section 8 ".rela.toc" {
 }
 section 11 ".rela.data.rel.ro.local" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018

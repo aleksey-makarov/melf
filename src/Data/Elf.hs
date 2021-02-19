@@ -327,7 +327,7 @@ data Elf (c :: ElfClass)
     | ElfSection
         { esName      :: String -- NB: different
         , esType      :: ElfSectionType
-        , esFlags     :: WordXX c
+        , esFlags     :: ElfSectionFlag
         , esAddr      :: WordXX c
         , esAddrAlign :: WordXX c
         , esEntSize   :: WordXX c
@@ -579,7 +579,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
             return ElfSection
                 { esName      = getString stringData $ fromIntegral sName
                 , esType      = sType
-                , esFlags     = sFlags
+                , esFlags     = fromIntegral sFlags
                 , esAddr      = sAddr
                 , esAddrAlign = sAddrAlign
                 , esEntSize   = sEntSize
@@ -796,7 +796,9 @@ serializeElf' elfs = do
                 , wbsPhOff = wbsOffset
                 , ..
                 }
-        elf2WBuilder' ElfSection{..} s = do
+        elf2WBuilder' ElfSection{esFlags = ElfSectionFlag f, ..} s = do
+            when (f .&. (fromIntegral $ complement (maxBound @ (WordXX a))) /= 0)
+                ($elfError $ "section flags at section " ++ show esN ++ "don't fit")
             WBuilderState{..} <- if esType == SHT_NOBITS
                 then return s
                 else align 0 esAddrAlign s
@@ -809,7 +811,7 @@ serializeElf' elfs = do
                     _ -> error "internal error: different number of sections in two iterations"
                 sName = fromIntegral n                 -- Word32
                 sType = esType                         -- ElfSectionType
-                sFlags = esFlags                       -- WXX c
+                sFlags = fromIntegral f
                 sAddr = esAddr                         -- WXX c
                 sOffset = wbsOffset                    -- WXX c
                 sSize = fromIntegral $ BSL.length d    -- WXX c

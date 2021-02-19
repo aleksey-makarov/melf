@@ -361,13 +361,13 @@ printElf (classS :&: ElfList elfs) = withSingI classS do
                     stes <- parseSymbolTable hData' s elfs
                     return $ formatPairsBlock ("symbol table section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
                         [ ("Type",       viaShow esType       )
-                        , ("Flags",      printWordXX esFlags     )
+                        , ("Flags",      viaShow $ splitBits esFlags )
                         , ("Data",       if null stes then "" else line <> (indent 4 $ printElfSymbolTable stes) )
                         ]
                 else
                     return $ formatPairsBlock ("section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
                         [ ("Type",       viaShow esType          )
-                        , ("Flags",      printWordXX esFlags     )
+                        , ("Flags",      viaShow $ splitBits esFlags )
                         , ("Addr",       printWordXX esAddr      )
                         , ("AddrAlign",  printWordXX esAddrAlign )
                         , ("EntSize",    printWordXX esEntSize   )

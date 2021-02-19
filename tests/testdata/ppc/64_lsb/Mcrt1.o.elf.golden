@@ -10,7 +10,7 @@ header {
 }
 section 1 ".text" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000006
+    Flags:     [SHF_ALLOC,SHF_EXECINSTR]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -18,7 +18,7 @@ section 1 ".text" {
 }
 section 2 ".data" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -26,7 +26,7 @@ section 2 ".data" {
 }
 section 3 ".bss" {
     Type:      SHT_NOBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -34,7 +34,7 @@ section 3 ".bss" {
 }
 section 4 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000030
+    Flags:     [SHF_EXT 16,SHF_EXT 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -46,7 +46,7 @@ section 4 ".comment" {
 }
 section 5 ".note.GNU-stack" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000000
+    Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000

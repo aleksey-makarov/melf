@@ -10,7 +10,7 @@ header {
 }
 section 1 ".note.gnu.build-id" {
     Type:      SHT_NOTE
-    Flags:     0x0000000000000002
+    Flags:     [SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
@@ -22,7 +22,7 @@ section 1 ".note.gnu.build-id" {
 }
 section 2 ".note.Linux" {
     Type:      SHT_NOTE
-    Flags:     0x0000000000000002
+    Flags:     [SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
@@ -31,7 +31,7 @@ section 2 ".note.Linux" {
 }
 section 3 ".text" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000006
+    Flags:     [SHF_ALLOC,SHF_EXECINSTR]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000010
     EntSize:   0x0000000000000000
@@ -43,7 +43,7 @@ section 3 ".text" {
 }
 section 5 ".init.text" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000006
+    Flags:     [SHF_ALLOC,SHF_EXECINSTR]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -55,7 +55,7 @@ section 5 ".init.text" {
 }
 section 7 ".exit.text" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000006
+    Flags:     [SHF_ALLOC,SHF_EXECINSTR]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -64,7 +64,7 @@ section 7 ".exit.text" {
 }
 section 9 ".rodata" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000002
+    Flags:     [SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000010
     EntSize:   0x0000000000000000
@@ -76,7 +76,7 @@ section 9 ".rodata" {
 }
 section 11 ".rodata.cst16.aegis128_const" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000012
+    Flags:     [SHF_ALLOC,SHF_EXT 16]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000010
     EntSize:   0x0000000000000020
@@ -85,7 +85,7 @@ section 11 ".rodata.cst16.aegis128_const" {
 }
 section 12 ".rodata.cst16.aegis128_counter" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000012
+    Flags:     [SHF_ALLOC,SHF_EXT 16]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000010
     EntSize:   0x0000000000000010
@@ -93,7 +93,7 @@ section 12 ".rodata.cst16.aegis128_counter" {
 }
 section 13 "__mcount_loc" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000002
+    Flags:     [SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -105,7 +105,7 @@ section 13 "__mcount_loc" {
 }
 section 15 ".modinfo" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000002
+    Flags:     [SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -117,7 +117,7 @@ section 15 ".modinfo" {
 }
 section 16 ".data" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000020
     EntSize:   0x0000000000000000
@@ -129,7 +129,7 @@ section 16 ".data" {
 }
 section 18 ".gnu.linkonce.this_module" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000040
     EntSize:   0x0000000000000000
@@ -141,7 +141,7 @@ section 18 ".gnu.linkonce.this_module" {
 }
 section 20 ".bss" {
     Type:      SHT_NOBITS
-    Flags:     0x0000000000000003
+    Flags:     [SHF_WRITE,SHF_ALLOC]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -149,7 +149,7 @@ section 20 ".bss" {
 }
 section 21 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000030
+    Flags:     [SHF_EXT 16,SHF_EXT 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -161,7 +161,7 @@ section 21 ".comment" {
 }
 section 22 ".note.GNU-stack" {
     Type:      SHT_PROGBITS
-    Flags:     0x0000000000000004
+    Flags:     [SHF_EXECINSTR]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -169,7 +169,7 @@ section 22 ".note.GNU-stack" {
 }
 symbol table section 23 ".symtab" {
     Type:  SHT_SYMTAB
-    Flags: 0x0000000000000000
+    Flags: []
     Data:  
         symbol "" {
             Bind:  STB_Local
@@ -197,7 +197,7 @@ symbol table section 23 ".symtab" {
 }
 section 24 ".strtab" {
     Type:      SHT_STRTAB
-    Flags:     0x0000000000000000
+    Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
@@ -209,7 +209,7 @@ section 24 ".strtab" {
 }
 section 4 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -221,7 +221,7 @@ section 4 ".rela.text" {
 }
 section 6 ".rela.init.text" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -233,7 +233,7 @@ section 6 ".rela.init.text" {
 }
 section 8 ".rela.exit.text" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -245,7 +245,7 @@ section 8 ".rela.exit.text" {
 }
 section 10 ".rela.rodata" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -257,7 +257,7 @@ section 10 ".rela.rodata" {
 }
 section 14 ".rela__mcount_loc" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -269,7 +269,7 @@ section 14 ".rela__mcount_loc" {
 }
 section 17 ".rela.data" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -281,7 +281,7 @@ section 17 ".rela.data" {
 }
 section 19 ".rela.gnu.linkonce.this_module" {
     Type:      SHT_RELA
-    Flags:     0x0000000000000040
+    Flags:     [SHF_EXT 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
