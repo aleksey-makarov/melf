@@ -22,10 +22,15 @@ module Data.Elf.PrettyPrint
     , printLayout
     , printElf
     , printStringTable
+
+    , readFileLazy
+    , writeElfDump
+    , writeElfLayout
     ) where
 
 import Control.Monad
 import Control.Monad.Catch
+import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy.Char8 as BSL8
 import qualified Data.ByteString.Lazy as BSL
 import Data.Char
@@ -35,8 +40,10 @@ import Data.Monoid
 import Data.Singletons
 import Data.Singletons.Sigma
 import Data.Text.Prettyprint.Doc as D
+import Data.Text.Prettyprint.Doc.Render.Text
 import Data.Word
 import Numeric
+import System.IO
 
 import Data.Elf
 import Data.Elf.Exception
@@ -417,3 +424,24 @@ printStringTable bs =
             return if (BSL.length bs' == 0)
                 then angles ""
                 else vsep $ map (angles . pretty) $ L.sort $ map BSL8.unpack $ BSL.splitWith (== 0) $ bs'
+
+--------------------------------------------------------------------
+--
+--------------------------------------------------------------------
+
+readFileLazy :: FilePath -> IO BSL.ByteString
+readFileLazy path = BSL.fromStrict <$> BS.readFile path
+
+writeElfDump :: FilePath -> FilePath -> IO ()
+writeElfDump i o = do
+    bs <- readFileLazy i
+    e <- parseElf bs
+    doc <- printElf e
+    withFile o WriteMode (\ h -> hPutDoc h (doc <> line))
+
+writeElfLayout :: FilePath -> FilePath -> IO ()
+writeElfLayout i o = do
+    bs <- readFileLazy i
+    hdrs <- parseHeaders bs
+    doc <- printLayout hdrs bs
+    withFile o WriteMode (\ h -> hPutDoc h (doc <> line))

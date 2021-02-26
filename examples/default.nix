@@ -1,0 +1,11 @@
+-- FIXME: fix this mess
+-- let
+--   pkgsf = import <nixpkgs>;
+--   pkgs = pkgsf {};
+--   pkgsCross = pkgs;
+--   # pkgsCross = pkgsf { crossSystem.config = "aarch64-unknown-linux-gnu"; };
+--   melf = pkgs.haskellPackages.callPackage ../melf.nix { };
+-- in
+--   pkgsCross.mkShell {
+--     nativeBuildInputs = [ melf ];
+--   }

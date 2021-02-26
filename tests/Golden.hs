@@ -32,7 +32,6 @@ import Data.Text.Prettyprint.Doc.Render.Text
 import System.Directory
 import System.FilePath
 import System.IO as IO
--- import System.Process.Typed
 import Test.Tasty
 import Test.Tasty.Golden
 import Test.Tasty.HUnit
@@ -42,13 +41,6 @@ import Data.Elf.PrettyPrint
 import Data.Elf.Exception
 import Data.Elf.Headers
 import Data.Endian
-
--- runExecWithStdoutFile :: FilePath -> [String] -> FilePath -> IO ()
--- runExecWithStdoutFile execFilePath args stdoutPath =
---     withBinaryFile stdoutPath WriteMode (\ oh -> do
---         let cfg = setStdout (useHandleClose oh) $ proc execFilePath args
---         runProcess_ cfg
---     )
 
 partitionM :: Monad m => (a -> m Bool) -> [a] -> m ([a], [a])
 partitionM p l = foldlM f ([], []) l
@@ -125,9 +117,6 @@ mkGoldenTestOSuffix name osuffix formatFunction file = mkGoldenTest' g o formatF
 ------------------------------------------------------------------------------
 
 -- FIXME: define foldMapRBuilderList
-
-readFileLazy :: FilePath -> IO BSL.ByteString
-readFileLazy path = fromStrict <$> BS.readFile path
 
 index' :: (Integral i, MonadThrow m) => [a] -> i -> m a
 index' (x:_) 0 = return x

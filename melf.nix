@@ -1,6 +1,6 @@
 { mkDerivation, base, binary, bytestring, directory, exceptions
-, filepath, hpack, lens, mtl, prettyprinter, singletons, stdenv
-, tasty, tasty-golden, tasty-hunit, template-haskell
+, filepath, hpack, lens, lib, mtl, prettyprinter, singletons, tasty
+, tasty-golden, tasty-hunit, template-haskell
 }:
 mkDerivation {
   pname = "melf";
@@ -23,5 +23,5 @@ mkDerivation {
   prePatch = "hpack";
   homepage = "https://github.com/aleksey-makarov/melf";
   description = "An Elf parser";
-  license = stdenv.lib.licenses.bsd3;
+  license = lib.licenses.bsd3;
 }
