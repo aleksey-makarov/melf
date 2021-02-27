@@ -1,0 +1,38 @@
+header {
+    Class:      ELFCLASS64
+    Data:       ELFDATA2LSB
+    OSABI:      ELFOSABI_LINUX
+    ABIVersion: 1
+    Type:       ET_REL
+    Machine:    EM_AARCH64
+    Entry:      0x0000000000000000
+    Flags:      0x00000000
+}
+segment table
+section table
+segment {
+    Type:     PT_LOAD
+    Flags:    [PF_R]
+    VirtAddr: 0x0000000000000000
+    PhysAddr: 0x0000000000000000
+    MemSize:  0x0000000000000000
+    Align:    0x0000000000000100
+    Data:     
+        section 1 ".some_other_section" {
+            Type:      SHT_PROGBITS
+            Flags:     [SHF_EXECINSTR]
+            Addr:      0x0000000000000000
+            AddrAlign: 0x0000000000000000
+            EntSize:   0x0000000000000000
+            Data:      48 65 6c 6c 6f 20 57 6f 72 6c 64 21             # Hello World!
+        }
+}
+section 3 ".some_section" {
+    Type:      SHT_PROGBITS
+    Flags:     [SHF_EXECINSTR]
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000000
+    EntSize:   0x0000000000000000
+    Data:      42 79 65 20 57 6f 72 6c 64 21                   # Bye World!
+}
+string table section 2 ".some_string_section"
