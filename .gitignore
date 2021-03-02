@@ -1,7 +1,3 @@
 dist-*
 .stack-work/
 tests/testdata/**/*.out
-examples/*.dis
-examples/*.dump
-examples/*.layout
-examples/*.o

@@ -1,0 +1,6 @@
+*.dis
+*.dump
+*.layout
+*.o
+libc
+syscallc
