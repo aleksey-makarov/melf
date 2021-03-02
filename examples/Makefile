@@ -1,18 +1,26 @@
 PREFIX = aarch64-unknown-linux-gnu-
 CFLAGS = -Wall
 
-all : libc.o libc.dis libc.layout libc.dump libc
+EXECS   = libc syscallc
+OBJS    = libc.o syscallc.o lib_main.o
+DISASMS = $(addsuffix .dis,    $(OBJS) $(EXECS))
+LAYOUTS = $(addsuffix .layout, $(OBJS) $(EXECS))
+DUMPS   = $(addsuffix .dump,   $(OBJS) $(EXECS))
+BUILD   = $(EXECS) $(OBJS) $(DISASMS) $(LAYOUTS) $(DUMPS)
+
+all : $(BUILD)
 
 libc: libc.o lib_main.o
+syscallc: LDFLAGS += -nostdlib
 
-%.dis : %.o
+%.dis : %
 	$(PREFIX)objdump -d $< > $@
 
-%.layout : %.o
+%.layout : %
 	hobjlayout $< > $@
 
-%.dump : %.o
+%.dump : %
 	hobjdump $< > $@
 
 clean:
-	rm -rf *.o *.dis *.layout *.dump libc
+	rm -rf $(BUILD)
