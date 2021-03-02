@@ -1,6 +1,8 @@
 
 let
-    pkgs = import (fetchTarball https://github.com/NixOS/nixpkgs/archive/64b4617883844efe0cc20163e007ee636462eb18.tar.gz) {
+    pkgsf = import (fetchTarball https://github.com/NixOS/nixpkgs/archive/64b4617883844efe0cc20163e007ee636462eb18.tar.gz);
+    pkgs = pkgsf {};
+    pkgsCross = pkgsf {
         crossSystem.config = "aarch64-unknown-linux-gnu";
     };
 
@@ -21,7 +23,7 @@ let
 
 in
 
-    pkgs.mkShell {
-      nativeBuildInputs = [ melf ];
+    pkgsCross.mkShell {
+      nativeBuildInputs = [ melf pkgs.qemu ];
       LANG = "C.UTF-8" ;
     }

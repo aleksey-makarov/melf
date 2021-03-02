@@ -1,7 +1,9 @@
 PREFIX = aarch64-unknown-linux-gnu-
 CFLAGS = -Wall
 
-all : libc.o libc.dis libc.layout libc.dump
+all : libc.o libc.dis libc.layout libc.dump libc
+
+libc: libc.o lib_main.o
 
 %.dis : %.o
 	$(PREFIX)objdump -d $< > $@
@@ -13,4 +15,4 @@ all : libc.o libc.dis libc.layout libc.dump
 	hobjdump $< > $@
 
 clean:
-	rm -rf *.o *.dis *.layout *.dump
+	rm -rf *.o *.dis *.layout *.dump libc
