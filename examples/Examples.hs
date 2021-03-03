@@ -1,6 +1,7 @@
 module Main (main) where
 
 import Data.ByteString.Lazy as BSL
+import System.FilePath
 import Test.Tasty
 import Test.Tasty.Golden
 import Test.Tasty.HUnit
@@ -16,16 +17,22 @@ mkElf elf path = do
     e <- serializeElf elf
     BSL.writeFile path e
 
-main :: IO ()
-main = defaultMain $ testGroup "examples"
-    [ testCase "lib" (mkElf lib "examples/lib.o")
-    , after AllSucceed "lib" $ testGroup "checkLib"
-        [ goldenVsFile "dump"   "examples/lib.o.dump.golden"   "examples/lib.o.dump"   (writeElfDump   "examples/lib.o" "examples/lib.o.dump")
-        , goldenVsFile "layout" "examples/lib.o.layout.golden" "examples/lib.o.layout" (writeElfLayout "examples/lib.o" "examples/lib.o.layout")
-        ]
-    , testCase "syscall" (mkElf syscall "examples/syscall")
-    , after AllSucceed "syscall" $ testGroup "checkSysCall"
-        [ goldenVsFile "dump"   "examples/syscall.dump.golden"   "examples/syscall.dump"   (writeElfDump   "examples/syscall" "examples/syscall.dump")
-        , goldenVsFile "layout" "examples/syscall.layout.golden" "examples/syscall.layout" (writeElfLayout "examples/syscall" "examples/syscall.layout")
+testElf :: String -> Elf' -> [ TestTree ]
+testElf elfFileName elf =
+    [ testCase elfFileName (mkElf elf f)
+    , after AllSucceed ("$1 == \"" ++ elfFileName ++ "\"") $ testGroup ("check " ++ elfFileName)
+        [ goldenVsFile "dump"   (d <.> "golden") d (writeElfDump   f d)
+        , goldenVsFile "layout" (l <.> "golden") l (writeElfLayout f l)
         ]
     ]
+    where
+        t = "examples"
+        f = t </> elfFileName
+        d = t </> elfFileName <.> "dump"
+        l = t </> elfFileName <.> "layout"
+
+main :: IO ()
+main = defaultMain $ testGroup "examples"
+    (  testElf "lib.o"   lib
+    ++ testElf "syscall" syscall
+    )
