@@ -621,7 +621,7 @@ parseElf bs = do
 --
 -------------------------------------------------------------------------------
 
-data WBuilderData (a :: ElfClass) -- FIXME: do we really need this 'a'?
+data WBuilderData
     = WBuilderDataHeader
     | WBuilderDataByteStream { wbdData :: BSL.ByteString }
     | WBuilderDataSectionTable
@@ -631,7 +631,7 @@ data WBuilderState (a :: ElfClass) =
     WBuilderState
         { wbsSections         :: [(Word16, SectionXX a)]
         , wbsSegmentsReversed :: [SegmentXX a]
-        , wbsDataReversed     :: [WBuilderData a]
+        , wbsDataReversed     :: [WBuilderData]
         , wbsOffset           :: WordXX a
         , wbsPhOff            :: WordXX a
         , wbsShOff            :: WordXX a
