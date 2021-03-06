@@ -16,8 +16,6 @@ the my copy of the [elf](https://github.com/aleksey-makarov/elf) repo.
 ## Tests
 
 Test data is committed with [git-lfs](https://git-lfs.github.com/).
-If you are going to run tests then checkout the repo with
-`git lfs clone https://github.com/aleksey-makarov/melf.git`
 
 ## Development
 
