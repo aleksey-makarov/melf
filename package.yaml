@@ -64,6 +64,7 @@ tests:
       - bytestring
       - filepath
       - melf
+      - mtl
       - singletons
       - tasty
       - tasty-golden

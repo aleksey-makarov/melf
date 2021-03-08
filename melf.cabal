@@ -86,6 +86,7 @@ test-suite examples
   type: exitcode-stdio-1.0
   main-is: Examples.hs
   other-modules:
+      Asm
       Lib
       SysCall
       Paths_melf
@@ -97,6 +98,7 @@ test-suite examples
     , bytestring
     , filepath
     , melf
+    , mtl
     , singletons
     , tasty
     , tasty-golden
