@@ -1,22 +1,15 @@
 module SysCall (syscall) where
 
+import Control.Monad.Catch
 import Data.Bits
 import qualified Data.ByteString.Lazy as BSL
-import Data.Functor.Identity
 import Data.Singletons.Sigma
 
 import Data.Elf
 import Data.Elf.Headers
 
-import Asm
-
-txt :: BSL.ByteString
-txt = runIdentity $ getCode $ do
-    label "l"
-    adc "a"
-
-syscall :: Elf'
-syscall  =  SELFCLASS64 :&: ElfList
+syscall :: MonadCatch m => m Elf'
+syscall = return $ SELFCLASS64 :&: ElfList
         [ ElfSegment
             { epType     = PT_LOAD
             , epFlags    = PF_X .|. PF_R
@@ -41,7 +34,6 @@ syscall  =  SELFCLASS64 :&: ElfList
                 ]
             }
         ]
-{-
     where
         txt = BSL.pack [
             0x20, 0x00, 0x80, 0xd2,
@@ -63,4 +55,3 @@ syscall  =  SELFCLASS64 :&: ElfList
             0x0d, 0x00, 0x00, 0x00,
             0x00, 0x00, 0x00, 0x00
             ]
--}

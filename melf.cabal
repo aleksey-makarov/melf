@@ -96,7 +96,10 @@ test-suite examples
   build-depends:
       base
     , bytestring
+    , containers
+    , exceptions
     , filepath
+    , lens
     , melf
     , mtl
     , singletons

@@ -12,14 +12,14 @@ import Data.Elf.PrettyPrint
 import Lib
 import SysCall
 
-mkElf :: Elf' -> FilePath -> IO ()
-mkElf elf path = do
+mkElf :: FilePath -> Elf' -> IO ()
+mkElf path elf = do
     e <- serializeElf elf
     BSL.writeFile path e
 
-testElf :: String -> Elf' -> [ TestTree ]
+testElf :: String -> IO Elf' -> [ TestTree ]
 testElf elfFileName elf =
-    [ testCase elfFileName (mkElf elf f)
+    [ testCase elfFileName (elf >>= mkElf f)
     , after AllSucceed ("$1 == \"" ++ elfFileName ++ "\"") $ testGroup ("check " ++ elfFileName)
         [ goldenVsFile "dump"   (d <.> "golden") d (writeElfDump   f d)
         , goldenVsFile "layout" (l <.> "golden") l (writeElfLayout f l)

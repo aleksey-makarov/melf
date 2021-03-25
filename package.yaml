@@ -62,7 +62,10 @@ tests:
     dependencies:
       - base
       - bytestring
+      - containers
+      - exceptions
       - filepath
+      - lens
       - melf
       - mtl
       - singletons

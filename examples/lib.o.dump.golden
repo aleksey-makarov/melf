@@ -33,6 +33,6 @@ section 3 ".some_section" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000000
     EntSize:   0x0000000000000000
-    Data:      42 79 65 20 57 6f 72 6c 64 21                   # Bye World!
+    Data:      00 00 00 00 00 00 00 00 08 00 00 00 00 00 00 00 # ................
 }
 string table section 2 ".some_string_section"

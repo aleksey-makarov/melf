@@ -1,13 +1,25 @@
 module Lib (lib) where
 
+import Control.Monad.Catch
 import qualified Data.ByteString.Lazy.Char8 as BSLC
 import Data.Singletons.Sigma
 
 import Data.Elf
 import Data.Elf.Headers
 
-lib :: Elf'
-lib  =  SELFCLASS64 :&: ElfList
+import Asm
+
+lib :: MonadCatch m => m Elf'
+lib  =  do
+
+    txt <- getCode $ do
+        -- adc "l"
+        label "l"
+        adc "l"
+        label "m"
+        adc "m"
+
+    return $ SELFCLASS64 :&: ElfList
         [ ElfHeader
             { ehData       = ELFDATA2LSB
             , ehOSABI      = ELFOSABI_LINUX
@@ -49,7 +61,7 @@ lib  =  SELFCLASS64 :&: ElfList
             , esEntSize   = 0
             , esN         = 3
             , esLink      = 0
-            , esData      = ElfSectionData $ BSLC.pack "Bye World!"
+            , esData      = ElfSectionData txt
             }
         , ElfSection
             { esName      = ".some_string_section"

@@ -9,6 +9,6 @@
 │╙ 0x0000020b
 └─ 0x0000020b
  ╓ 0x0000020c S3 ".some_section" SHT_PROGBITS [SHF_EXECINSTR]
- ╙ 0x00000215
- ╓ 0x00000216 S2 ".some_string_section" SHT_SYMTAB []
- ╙ 0x0000024d
+ ╙ 0x0000021b
+ ╓ 0x0000021c S2 ".some_string_section" SHT_SYMTAB []
+ ╙ 0x00000253
