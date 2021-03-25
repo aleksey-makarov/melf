@@ -8,9 +8,9 @@ let
 
     # local store:
     #
-    melf = /nix/store/m018j93qw518gn1hsh3w49djgp8b7xdw-melf-0.1;
+    # melf = /nix/store/m018j93qw518gn1hsh3w49djgp8b7xdw-melf-0.1;
 
-    # FIXME: this does not work
+    # FIXME: works, but I doubt it's correct
     # cachix:
     #
     # 1. install cachix:
@@ -19,7 +19,9 @@ let
     # 2. add 'aleksey-makarov' cachix cache
     # cachix use aleksey-makarov
     #
-    # melf = /nix/store/bl376nkfcnf8w41a1k7ymy3bzv1s8cbd-melf-0.1;
+    # 3. nix-store -r /nix/store/bl376nkfcnf8w41a1k7ymy3bzv1s8cbd-melf-0.1
+
+    melf = /nix/store/bl376nkfcnf8w41a1k7ymy3bzv1s8cbd-melf-0.1;
 
 in
 
