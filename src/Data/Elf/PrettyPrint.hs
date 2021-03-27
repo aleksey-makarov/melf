@@ -21,6 +21,7 @@ module Data.Elf.PrettyPrint
     , printRBuilder
     , printLayout
     , printElf
+    , printElf_
     , printStringTable
 
     , readFileLazy
@@ -299,6 +300,9 @@ printElfSymbolTable l = align . vsep $
                              ]
         _ -> fmap printElfSymbolTableEntry l
 
+printElfSymbolTableFull :: SingI a => [ElfSymbolTableEntry a] -> Doc ()
+printElfSymbolTableFull l = align . vsep $ fmap printElfSymbolTableEntry l
+
 splitBy :: Int64 -> BSL.ByteString -> [BSL.ByteString]
 splitBy n = L.unfoldr f
     where
@@ -337,9 +341,15 @@ printData bs = align $ vsep $
     where
         cl = BSL.drop (BSL.length bs - 16) bs
 
--- printElf :: MonadThrow m => Sigma ElfClass (TyCon1 ElfList) -> m (Doc ())
+printDataFull :: BSL.ByteString -> Doc ()
+printDataFull bs = align $ vsep $ L.map formatBytestringLine $ splitBy 16 bs
+
 printElf :: MonadThrow m => Elf' -> m (Doc ())
-printElf (classS :&: ElfList elfs) = withSingI classS do
+printElf = printElf_ False
+
+-- printElf :: MonadThrow m => Sigma ElfClass (TyCon1 ElfList) -> m (Doc ())
+printElf_ :: MonadThrow m => Bool -> Elf' -> m (Doc ())
+printElf_ full (classS :&: ElfList elfs) = withSingI classS do
 
     hData' <- do
         header <- elfFindHeader elfs
@@ -369,7 +379,8 @@ printElf (classS :&: ElfList elfs) = withSingI classS do
                     return $ formatPairsBlock ("symbol table section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
                         [ ("Type",       viaShow esType       )
                         , ("Flags",      viaShow $ splitBits esFlags )
-                        , ("Data",       if null stes then "" else line <> (indent 4 $ printElfSymbolTable stes) )
+                        , ("Data",       if null stes then "" else line <>
+                            (indent 4 $ (if full then printElfSymbolTableFull else printElfSymbolTable) stes) )
                         ]
                 else
                     return $ formatPairsBlock ("section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
@@ -378,7 +389,7 @@ printElf (classS :&: ElfList elfs) = withSingI classS do
                         , ("Addr",       printWordXX esAddr      )
                         , ("AddrAlign",  printWordXX esAddrAlign )
                         , ("EntSize",    printWordXX esEntSize   )
-                        , ("Data",       printData bs            )
+                        , ("Data",       (if full then printDataFull else printData) bs )
                         ]
         printElf'' ElfSection{ esData = ElfSectionDataStringTable, ..} =
             return $ "string table section" <+> (viaShow esN) <+> (dquotes $ pretty esName)
@@ -401,7 +412,7 @@ printElf (classS :&: ElfList elfs) = withSingI classS do
         printElf'' ElfSegmentTable = return "segment table"
         printElf'' ElfRawData{..} =
             return $ formatPairsBlock "raw data"
-                [ ("Data",       printData erData)
+                [ ("Data",       (if full then printDataFull else printData) erData)
                 ]
         printElf'' ElfRawAlign{..} =
             return $ formatPairsBlock "raw align"

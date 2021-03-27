@@ -82,6 +82,7 @@ executables:
       - melf
       - binary
       - bytestring
+      - optparse-applicative
       - prettyprinter
   hobjlayout:
     main: hObjLayout.hs

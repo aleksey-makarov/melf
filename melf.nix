@@ -1,6 +1,7 @@
 { mkDerivation, base, binary, bytestring, containers, directory
-, exceptions, filepath, hpack, lens, lib, mtl, prettyprinter
-, singletons, tasty, tasty-golden, tasty-hunit, template-haskell
+, exceptions, filepath, hpack, lens, lib, mtl, optparse-applicative
+, prettyprinter, singletons, tasty, tasty-golden, tasty-hunit
+, template-haskell
 }:
 mkDerivation {
   pname = "melf";
@@ -14,7 +15,8 @@ mkDerivation {
   ];
   libraryToolDepends = [ hpack ];
   executableHaskellDepends = [
-    base binary bytestring exceptions prettyprinter
+    base binary bytestring exceptions optparse-applicative
+    prettyprinter
   ];
   testHaskellDepends = [
     base binary bytestring containers directory exceptions filepath

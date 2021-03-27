@@ -1,21 +1,45 @@
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ApplicativeDo #-}
+
 import qualified Data.ByteString as BS
 import Data.ByteString.Lazy as BSL
 import Data.Text.Prettyprint.Doc
 import Data.Text.Prettyprint.Doc.Util
-import System.Environment
+import Options.Applicative
 
 import Data.Elf
 import Data.Elf.PrettyPrint
 
+data Options = Options
+    { optArgs :: [String]
+    , optFull :: Bool
+    }
+
+opts' :: Parser Options
+opts' = do
+  optFull <- switch (  short 'f'
+                    <> long "full"
+                    <> help "Don't shorten data and symbol tables"
+                    )
+  optArgs <- some $ argument str (  metavar "FILE" )
+  pure Options {..}
+
+opts :: ParserInfo Options
+opts = info (opts' <**> helper)
+  (  fullDesc
+  <> progDesc "Dump ELF files FILEs"
+  <> header "hobjdump - dump ELF files"
+  )
+
 -- FIXME: use instance Binary Elf'
-printFile :: String -> IO ()
-printFile fileName = do
+printFile :: Bool -> String -> IO ()
+printFile full fileName = do
     bs <- fromStrict <$> BS.readFile fileName
     elf <- parseElf bs
-    doc <- printElf elf
+    doc <- printElf_ full elf
     putDocW 80 (doc  <> line)
 
 main :: IO ()
 main = do
-    args <- getArgs
-    mapM_ printFile args
+    Options {..} <- execParser opts
+    mapM_ (printFile optFull) optArgs
