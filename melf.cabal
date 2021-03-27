@@ -87,7 +87,7 @@ test-suite examples
   main-is: Examples.hs
   other-modules:
       Asm
-      Lib
+      Obj
       SysCall
       Paths_melf
   hs-source-dirs:

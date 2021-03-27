@@ -1,4 +1,4 @@
-module Lib (lib) where
+module Obj (obj) where
 
 import Control.Monad.Catch
 import qualified Data.ByteString.Lazy.Char8 as BSLC
@@ -9,8 +9,8 @@ import Data.Elf.Headers
 
 import Asm
 
-lib :: MonadCatch m => m Elf'
-lib  =  do
+obj :: MonadCatch m => m Elf'
+obj  =  do
 
     txt <- getCode $ do
         -- adc "l"

@@ -9,7 +9,7 @@ import Test.Tasty.HUnit
 import Data.Elf
 import Data.Elf.PrettyPrint
 
-import Lib
+import Obj
 import SysCall
 
 mkElf :: FilePath -> Elf' -> IO ()
@@ -33,6 +33,6 @@ testElf elfFileName elf =
 
 main :: IO ()
 main = defaultMain $ testGroup "examples"
-    (  testElf "lib.o"   lib
+    (  testElf "obj.o"   obj
     ++ testElf "syscall" syscall
     )
