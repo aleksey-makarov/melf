@@ -19,9 +19,14 @@ let
     # 2. add 'aleksey-makarov' cachix cache
     # cachix use aleksey-makarov
     #
-    # 3. nix-store -r /nix/store/bl376nkfcnf8w41a1k7ymy3bzv1s8cbd-melf-0.1
+    # 3. nix-store -r /nix/store/7mrgil4cwwdy33nbgmi5ljs3awwf916x-melf-0.1
+    #
+    # How to upgrade to the late build from cache:
+    # - Copy the last line of "Run nix-build" from gihub's actions
+    # - Issue this command
+    # find . -type f -print0 | xargs -0 sed -i 's$/nix/store/7mrgil4cwwdy33nbgmi5ljs3awwf916x-melf-0.1$<insert new path here>$g'
 
-    melf = /nix/store/bl376nkfcnf8w41a1k7ymy3bzv1s8cbd-melf-0.1;
+    melf = /nix/store/7mrgil4cwwdy33nbgmi5ljs3awwf916x-melf-0.1;
 
 in
 

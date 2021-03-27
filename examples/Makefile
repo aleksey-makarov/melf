@@ -20,7 +20,7 @@ syscalls: LDFLAGS += -nostdlib
 	hobjlayout $< > $@
 
 %.dump : %
-	hobjdump $< > $@
+	hobjdump -f $< > $@
 
 clean:
 	rm -rf $(BUILD)
