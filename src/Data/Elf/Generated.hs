@@ -207,3 +207,172 @@ $(mkDeclarations BaseWord16 "ElfSectionIndex" "SHN" "SHN_EXT"
     , ("_Abs",    0xFFF1)
     , ("_Common", 0xFFF2)
     ])
+
+$(mkDeclarations BaseWord32 "ElfRelocationType_AARCH64" "R_AARCH64" "R_AARCH64_EXT"
+
+    -- Null relocation codes
+
+    [ ("_NONE",  0  ) -- None
+    , ("_NONE_", 256) -- None
+
+    -- Data relocations
+
+    , ("_ABS64",  257) -- S + A     | No overflow check
+    , ("_ABS32",  258) -- S + A     | Check that -2^31 <= X < 2^32
+    , ("_ABS16",  259) -- S + A     | Check that -2^15 <= X < 2^16
+    , ("_PREL64", 260) -- S + A - P | No overflow check
+    , ("_PREL32", 261) -- S + A - P | Check that -2^31 <= X < 2^32
+    , ("_PREL16", 262) -- S + A - P | Check that -2^15 <= X < 2^16
+    , ("_PLT32",  314) -- S + A - P | Check that -2^31 <= X < 2^31 see call and jump relocations
+
+    -- Group relocations to create a 16-, 32-, 48-, or 64-bit unsigned data value or address inline
+
+    , ("_MOVW_UABS_G0",    263) -- S + A | Set a MOV[KZ] immediate field to bits [15: 0] of X; check that 0 <= X < 2^16
+    , ("_MOVW_UABS_G0_NC", 264) -- S + A | Set a MOV[KZ] immediate field to bits [15: 0] of X. No overflow check
+    , ("_MOVW_UABS_G1",    265) -- S + A | Set a MOV[KZ] immediate field to bits [31:16] of X; check that 0 <= X < 2^32
+    , ("_MOVW_UABS_G1_NC", 266) -- S + A | Set a MOV[KZ] immediate field to bits [31:16] of X. No overflow check
+    , ("_MOVW_UABS_G2",    267) -- S + A | Set a MOV[KZ] immediate field to bits [47:32] of X; check that 0 <= X < 2^48
+    , ("_MOVW_UABS_G2_NC", 268) -- S + A | Set a MOV[KZ] immediate field to bits [47:32] of X. No overflow check
+    , ("_MOVW_UABS_G3",    269) -- S + A | Set a MOV[KZ] immediate field to bits [63:48] of X (no overflow check needed)
+
+    -- Group relocations to create a 16, 32, 48, or 64 bit signed data or offset value inline
+
+    , ("_MOVW_SABS_G0", 270) --  S + A | Set a MOV[NZ] immediate field using bits [15: 0] of X; check -2^16 <= X < 2^16
+    , ("_MOVW_SABS_G1", 271) --  S + A | Set a MOV[NZ] immediate field using bits [31:16] of X; check -2^32 <= X < 2^32
+    , ("_MOVW_SABS_G2", 272) --  S + A | Set a MOV[NZ] immediate field using bits [47:32] of X; check -2^48 <= X < 2^48
+
+    -- Relocations to generate 19, 21 and 33 bit PC-relative addresses
+
+    , ("_LD_PREL_LO19",        273) -- S + A - P             | Set a load-literal immediate value to bits [20:2] of X; check that -2^20 <= X < 2^20
+    , ("_ADR_PREL_LO21",       274) -- S + A - P             | Set an ADR immediate value to bits [20:0] of X; check that -2^20 <= X < 2^20
+    , ("_ADR_PREL_PG_HI21",    275) -- Page(S + A) - Page(P) | Set an ADRP immediate value to bits [32:12] of the X; check that -2^32 <= X < 2^32
+    , ("_ADR_PREL_PG_HI21_NC", 276) -- Page(S + A) - Page(P) | Set an ADRP immediate value to bits [32:12] of the X. No overflow check
+    , ("_ADD_ABS_LO12_NC",     277) -- S + A                 | Set an ADD immediate value to bits [11:0] of X. No overflow check. Used with relocations ADR_PREL_PG_HI21 and ADR_PREL_PG_HI21_NC
+    , ("_LDST8_ABS_LO12_NC",   278) -- S + A                 | Set an LD/ST immediate value to bits [11:0] of X. No overflow check. Used with relocations ADR_PREL_PG_HI21 and ADR_PREL_PG_HI21_NC
+    , ("_LDST16_ABS_LO12_NC",  284) -- S + A                 | Set an LD/ST immediate value to bits [11:1] of X. No overflow check
+    , ("_LDST32_ABS_LO12_NC",  285) -- S + A                 | Set the LD/ST immediate value to bits [11:2] of X. No overflow check
+    , ("_LDST64_ABS_LO12_NC",  286) -- S + A                 | Set the LD/ST immediate value to bits [11:3] of X. No overflow check
+    , ("_LDST128_ABS_LO12_NC", 299) -- S + A                 | Set the LD/ST immediate value to bits [11:4] of X. No overflow check
+
+    -- Relocations for control-flow instructions - all offsets are a multiple of 4
+
+    , ("_TSTBR14",  279) -- S + A - P | Set the immediate field of a TBZ/TBNZ instruction to bits [15:2] of X; check -2^15 <= X < 2^15
+    , ("_CONDBR19", 280) -- S + A - P | Set the immediate field of a conditional branch instruction to bits [20:2] of X; check -2^20 <= X< 2^20
+    , ("_JUMP26",   282) -- S + A - P | Set a B immediate field to bits [27:2] of X; check that -2^27 <= X < 2^27
+    , ("_CALL26",   283) -- S + A - P | Set a CALL immediate field to bits [27:2] of X; check that -2^27 <= X < 2^27
+
+    -- Group relocations to create a 16, 32, 48, or 64 bit PC-relative offset inline
+
+    , ("_MOVW_PREL_G0",    287) -- S + A - P | Set a MOV[NZ]immediate field to bits [15:0] of X
+    , ("_MOVW_PREL_G0_NC", 288) -- S + A - P | Set a MOVK immediate field to bits [15:0] of X. No overflow check
+    , ("_MOVW_PREL_G1",    289) -- S + A - P | Set a MOV[NZ]immediate field to bits [31:16] of X
+    , ("_MOVW_PREL_G1_NC", 290) -- S + A - P | Set a MOVK immediate field to bits [31:16] of X. No overflow check
+    , ("_MOVW_PREL_G2",    291) -- S + A - P | Set a MOV[NZ]immediate value to bits [47:32] of X
+    , ("_MOVW_PREL_G2_NC", 292) -- S + A - P | Set a MOVK immediate field to bits [47:32] of X. No overflow check
+    , ("_MOVW_PREL_G3",    293) -- S + A - P | Set a MOV[NZ]immediate value to bits [63:48] of X
+
+    -- Group relocations to create a 16, 32, 48, or 64 bit GOT-relative offsets inline
+
+    , ("_MOVW_GOTOFF_G0",    300) -- G(GDAT(S + A)) - GOT | Set a MOV[NZ] immediate field to bits [15:0] of X
+    , ("_MOVW_GOTOFF_G0_NC", 301) -- G(GDAT(S + A)) - GOT | Set a MOVK immediate field to bits [15:0] of X. No overflow check
+    , ("_MOVW_GOTOFF_G1",    302) -- G(GDAT(S + A)) - GOT | Set a MOV[NZ] immediate value to bits [31:16] of X
+    , ("_MOVW_GOTOFF_G1_NC", 303) -- G(GDAT(S + A)) - GOT | Set a MOVK immediate value to bits [31:16] of X. No overflow check
+    , ("_MOVW_GOTOFF_G2",    304) -- G(GDAT(S + A)) - GOT | Set a MOV[NZ] immediate value to bits [47:32] of X
+    , ("_MOVW_GOTOFF_G2_NC", 305) -- G(GDAT(S + A)) - GOT | Set a MOVK immediate value to bits [47:32] of X. No overflow check
+    , ("_MOVW_GOTOFF_G3",    306) -- G(GDAT(S + A)) - GOT | Set a MOV[NZ] immediate value to bits [63:48] of X
+
+    -- GOT-relative data relocations
+
+    , ("_GOTREL64", 307) -- S + A - GOT | Set the data to a 64-bit offset relative to the GOT.
+    , ("_GOTREL32", 308) -- S + A - GOT | Set the data to a 32-bit offset relative to GOT, treated as signed; check that -2^31 <= X < 2^31
+
+    -- GOT-relative instruction relocations
+
+    , ("_GOT_LD_PREL19",     309) -- G(GDAT(S + A))- P             | Set a load-literal immediate field to bits [20:2] of X; check –2^20 <= X < 2^20
+    , ("_LD64_GOTOFF_LO15",  310) -- G(GDAT(S + A))- GOT           | Set a LD/ST immediate field to bits [14:3] of X; check that 0 <= X < 2^15 , X&7 = 0
+    , ("_ADR_GOT_PAGE",      311) -- Page(G(GDAT(S + A)))- Page(P) | Set the immediate value of an ADRP to bits [32:12] of X; check that –2^32 <= X < 2^32
+    , ("_LD64_GOT_LO12_NC",  312) -- G(GDAT(S + A))                | Set the LD/ST immediate field to bits [11:3] of X. No overflow check; check that X&7 = 0
+    , ("_LD64_GOTPAGE_LO15", 313) -- G(GDAT(S + A))- Page(GOT)     | Set the LD/ST immediate field to bits [14:3] of X; check that 0 <= X < 2^15, X&7 = 0
+
+    -- Local Dynamic TLS relocations
+
+    , ("_TLSLD_ADR_PREL21",             517) -- G(GLDM(S))) - P            | Set an ADR immediate field to  bits [20:0] of X; check –2^20 <= X < 2^20
+    , ("_TLSLD_ADR_PAGE21",             518) -- Page(G(GLDM(S))) - Page(P) | Set an ADRP immediate field to bits [32:12] of X; check –2^32 <= X < 2^32
+    , ("_TLSLD_ADD_LO12_NC",            519) -- G(GLDM(S))                 | Set an ADD immediate field to bits [11:0] of X. No overflow check
+    , ("_TLSLD_MOVW_G1",                520) -- G(GLDM(S)) - GOT           | Set a MOV[NZ] immediate field to bits [31:16] of X
+    , ("_TLSLD_MOVW_G0_NC",             521) -- G(GLDM(S)) - GOT           | Set a MOVK immediate field to bits [15:0] of X. No overflow check
+    , ("_TLSLD_LD_PREL19",              522) -- G(GLDM(S)) - P             | Set a load-literal immediate field to bits [20:2] of X; check –2^20 <= X < 2^20
+    , ("_TLSLD_MOVW_DTPREL_G2",         523) -- DTPREL(S+A)                | Set a MOV[NZ] immediate field to bits [47:32] of X
+    , ("_TLSLD_MOVW_DTPREL_G1",         524) -- DTPREL(S+A)                | Set a MOV[NZ] immediate field to bits [31:16] of X
+    , ("_TLSLD_MOVW_DTPREL_G1_NC",      525) -- DTPREL(S+A)                | Set a MOVK immediate field to bits [31:16] of X. No overflow check
+    , ("_TLSLD_MOVW_DTPREL_G0",         526) -- DTPREL(S+A)                | Set a MOV[NZ] immediate field to bits [15:0] of X
+    , ("_TLSLD_MOVW_DTPREL_G0_NC",      527) -- DTPREL(S+A)                | Set a MOVK immediate field to bits [15:0] of X. No overflow check
+    , ("_TLSLD_ADD_DTPREL_HI12",        528) -- DTPREL(S+A)                | Set an ADD immediate field to bits [23:12] of X; check 0 <= X < 2^24
+    , ("_TLSLD_ADD_DTPREL_LO12",        529) -- DTPREL(S+A)                | Set an ADD immediate field to bits [11:0] of X; check 0 <= X < 2^12
+    , ("_TLSLD_ADD_DTPREL_LO12_NC",     530) -- DTPREL(S+A)                | Set an ADD immediate field to bits [11:0] of X. No overflow check
+    , ("_TLSLD_LDST8_DTPREL_LO12",      531) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:0] of X; check 0 <= X < 2^12
+    , ("_TLSLD_LDST8_DTPREL_LO12_NC",   532) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:0] of X. No overflow check
+    , ("_TLSLD_LDST16_DTPREL_LO12",     533) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:1] of X; check 0 <= X < 2^12
+    , ("_TLSLD_LDST16_DTPREL_LO12_NC",  534) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:1] of X. No overflow check
+    , ("_TLSLD_LDST32_DTPREL_LO12",     535) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:2] of X; check 0 <= X < 2^12
+    , ("_TLSLD_LDST32_DTPREL_LO12_NC",  536) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:2] of X. No overflow check
+    , ("_TLSLD_LDST64_DTPREL_LO12",     537) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:3] of X; check 0 <= X < 2^12
+    , ("_TLSLD_LDST64_DTPREL_LO12_NC",  538) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:3] of X. No overflow check
+    , ("_TLSLD_LDST128_DTPREL_LO12",    572) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:4] of X; check 0 <= X < 2^12
+    , ("_TLSLD_LDST128_DTPREL_LO12_NC", 573) -- DTPREL(S+A)                | Set a LD/ST offset field to bits [11:4] of X. No overflow check
+
+    -- Initial Exec TLS relocations
+
+    , ("_TLSIE_MOVW_GOTTPREL_G1",      539) -- G(GTPREL(S+A)) -               | GOT Set a MOV[NZ] immediate field to bits [31:16] of X
+    , ("_TLSIE_MOVW_GOTTPREL_G0_NC",   540) -- G(GTPREL(S+A)) -               | GOT Set MOVK immediate to bits [15:0] of X. No overflow check
+    , ("_TLSIE_ADR_GOTTPREL_PAGE21",   541) -- Page(G(GTPREL(S+A))) - Page(P) | Set an ADRP immediate field to bits [32:12] of X; check –2^32 <= X < 2^32
+    , ("_TLSIE_LD64_GOTTPREL_LO12_NC", 542) -- G(GTPREL(S+A))                 | Set an LD offset field to bits [11:3] of X. No overflow check; check that X&7=0
+    , ("_TLSIE_LD_GOTTPREL_PREL19",    543) -- G(GTPREL(S+A)) - P             | Set a load-literal immediate to bits [20:2] of X; check –2^20 <= X < 2^20
+
+    -- Local Exec TLS relocations
+
+    , ("_TLSLE_MOVW_TPREL_G2",         544) -- TPREL(S+A) | Set a MOV[NZ] immediate field to bits [47:32] of X
+    , ("_TLSLE_MOVW_TPREL_G1",         545) -- TPREL(S+A) | Set a MOV[NZ] immediate field to bits [31:16] of X
+    , ("_TLSLE_MOVW_TPREL_G1_NC",      546) -- TPREL(S+A) | Set a MOVK immediate field to bits [31:16] of X. No overflow check
+    , ("_TLSLE_MOVW_TPREL_G0",         547) -- TPREL(S+A) | Set a MOV[NZ] immediate field to bits [15:0] of X
+    , ("_TLSLE_MOVW_TPREL_G0_NC",      548) -- TPREL(S+A) | Set a MOVK immediate field to bits [15:0] of X. No overflow check
+    , ("_TLSLE_ADD_TPREL_HI12",        549) -- TPREL(S+A) | Set an ADD immediate field to bits [23:12] of X; check 0 <= X < 2^24
+    , ("_TLSLE_ADD_TPREL_LO12",        550) -- TPREL(S+A) | Set an ADD immediate field to bits [11:0] of X; check 0 <= X < 2^12
+    , ("_TLSLE_ADD_TPREL_LO12_NC",     551) -- TPREL(S+A) | Set an ADD immediate field to bits [11:0] of X. No overflow check
+    , ("_TLSLE_LDST8_TPREL_LO12",      552) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:0] of X; check 0 <= X < 2^12
+    , ("_TLSLE_LDST8_TPREL_LO12_NC",   553) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:0] of X. No overflow check
+    , ("_TLSLE_LDST16_TPREL_LO12",     554) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:1] of X; check 0 <= X < 2^12
+    , ("_TLSLE_LDST16_TPREL_LO12_NC",  555) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:1] of X. No overflow check
+    , ("_TLSLE_LDST32_TPREL_LO12",     556) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:2] of X; check 0 <= X < 2^12
+    , ("_TLSLE_LDST32_TPREL_LO12_NC",  557) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:2] of X. No overflow check
+    , ("_TLSLE_LDST64_TPREL_LO12",     558) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:3] of X; check 0 <= X < 2^12
+    , ("_TLSLE_LDST64_TPREL_LO12_NC",  559) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:3] of X. No overflow check
+    , ("_TLSLE_LDST128_TPREL_LO12",    570) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:4] of X; check 0 <= X < 2^12
+    , ("_TLSLE_LDST128_TPREL_LO12_NC", 571) -- TPREL(S+A) | Set a LD/ST offset field to bits [11:4] of X. No overflow check
+
+    -- TLS descriptor relocations
+
+    , ("_TLSDESC_LD_PREL19",  560) -- G(GTLSDESC(S+A)) - P             | Set a load-literal immediate to bits [20:2]; check -2^20 <= X < 2^20 ; check X & 3 = 0
+    , ("_TLSDESC_ADR_PREL21", 561) -- G(GTLSDESC(S+A)) - P             | Set an ADR immediate field to bits [20:0]; check -2^20 <= X < 2^20
+    , ("_TLSDESC_ADR_PAGE21", 562) -- Page(G(GTLSDESC(S+A))) - Page(P) | Set an ADRP immediate field to bits [32:12] of X; check -2^32 <= X < 2^32
+    , ("_TLSDESC_LD64_LO12",  563) -- G(GTLSDESC(S+A))                 | Set an LD offset field to bits [11:3] of X. No overflow check; check X & 7 = 0.
+    , ("_TLSDESC_ADD_LO12",   564) -- G(GTLSDESC(S+A))                 | Set an ADD immediate field to bits [11:0] of X. No overflow check.
+    , ("_TLSDESC_OFF_G1",     565) -- G(GTLSDESC(S+A)) - GOT           | Set a MOV[NZ] immediate field to bits [31:16] of X; check -2^32 <= X < 2^32.
+    , ("_TLSDESC_OFF_G0_NC",  566) -- G(GTLSDESC(S+A)) - GOT           | Set a MOVK immediate field to bits [15:0] of X. No overflow check.
+    , ("_TLSDESC_LDR",        567) -- None                             | For relaxation only. Must be used to identify an LDR instruction which loads the TLS descriptor function pointer for S + A if it has no other relocation.
+    , ("_TLSDESC_ADD",        568) -- None                             | For relaxation only. Must be used to identify an ADD instruction which computes the address of the TLS Descriptor for S + A if it has no other relocation.
+    , ("_TLSDESC_CALL",       569) -- None                             | For relaxation only. Must be used to identify a BLR instruction which performs an indirect call to the TLS descriptor function for S + A.
+
+    -- Dynamic relocations
+
+    , ("_COPY",       1024) --
+    , ("_GLOB_DAT",   1025) -- S + A
+    , ("_JUMP_SLOT",  1026) -- S + A
+    , ("_RELATIVE",   1027) -- Delta(S + A)
+    , ("_TLS_DTPMOD", 1028) -- DTPREL(S + A)
+    , ("_TLS_DTPREL", 1029) -- LDM(S)
+    , ("_TLS_TPREL",  1030) -- TPREL(S + A)
+    , ("_TLSDESC",    1031) -- TLSDESC(S + A)
+    , ("_IRELATIVE",  1032) -- Indirect(Delta(S) + A)
+
+    ])
