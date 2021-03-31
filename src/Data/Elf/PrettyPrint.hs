@@ -289,19 +289,19 @@ printElfSymbolTableEntry ElfSymbolTableEntry{..} =
         , ("Size",  printWordXX steSize  ) -- WordXX c
         ]
 
-printElfSymbolTable :: SingI a => [ElfSymbolTableEntry a] -> Doc ()
-printElfSymbolTable l = align . vsep $
-    case l of
-        (e1 : e2 : _ : _) -> [ printElfSymbolTableEntry e1
-                             , printElfSymbolTableEntry e2
-                             , "..."
-                             , printElfSymbolTableEntry $ last l
-                             , "total:" <+> viaShow (L.length l)
-                             ]
-        _ -> fmap printElfSymbolTableEntry l
-
-printElfSymbolTableFull :: SingI a => [ElfSymbolTableEntry a] -> Doc ()
-printElfSymbolTableFull l = align . vsep $ fmap printElfSymbolTableEntry l
+printElfSymbolTable :: SingI a => Bool -> [ElfSymbolTableEntry a] -> Doc ()
+printElfSymbolTable full l = if full then printElfSymbolTableFull else printElfSymbolTable'
+    where
+        printElfSymbolTableFull = align . vsep $ fmap printElfSymbolTableEntry l
+        printElfSymbolTable' = align . vsep $
+            case l of
+                (e1 : e2 : _ : _) -> [ printElfSymbolTableEntry e1
+                                    , printElfSymbolTableEntry e2
+                                    , "..."
+                                    , printElfSymbolTableEntry $ last l
+                                    , "total:" <+> viaShow (L.length l)
+                                    ]
+                _ -> fmap printElfSymbolTableEntry l
 
 splitBy :: Int64 -> BSL.ByteString -> [BSL.ByteString]
 splitBy n = L.unfoldr f
@@ -328,21 +328,21 @@ formatBytestringLine s = (fill (16 * 2 + 15) $ formatBytestringHex s)
                       <+> pretty '#'
                       <+> formatBytestringChar s
 
-printData :: BSL.ByteString -> Doc ()
-printData bs = align $ vsep $
-    case splitBy 16 bs of
-        (c1 : c2 : _ : _) -> [ formatBytestringLine c1
-                             , formatBytestringLine c2
-                             , "..."
-                             , formatBytestringLine cl
-                             , "total:" <+> viaShow (BSL.length bs)
-                             ]
-        chunks -> L.map formatBytestringLine chunks
+printData :: Bool -> BSL.ByteString -> Doc ()
+printData full bs = if full then printDataFull else printData'
     where
+        printDataFull = align $ vsep $ L.map formatBytestringLine $ splitBy 16 bs
+        printData' = align $ vsep $
+            case splitBy 16 bs of
+                (c1 : c2 : _ : _) -> [ formatBytestringLine c1
+                                    , formatBytestringLine c2
+                                    , "..."
+                                    , formatBytestringLine cl
+                                    , "total:" <+> viaShow (BSL.length bs)
+                                    ]
+                chunks -> L.map formatBytestringLine chunks
         cl = BSL.drop (BSL.length bs - 16) bs
 
-printDataFull :: BSL.ByteString -> Doc ()
-printDataFull bs = align $ vsep $ L.map formatBytestringLine $ splitBy 16 bs
 
 printElf :: MonadThrow m => Elf' -> m (Doc ())
 printElf = printElf_ False
@@ -379,8 +379,7 @@ printElf_ full (classS :&: ElfList elfs) = withSingI classS do
                     return $ formatPairsBlock ("symbol table section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
                         [ ("Type",       viaShow esType       )
                         , ("Flags",      viaShow $ splitBits esFlags )
-                        , ("Data",       if null stes then "" else line <>
-                            (indent 4 $ (if full then printElfSymbolTableFull else printElfSymbolTable) stes) )
+                        , ("Data",       if null stes then "" else line <> (indent 4 $ printElfSymbolTable full stes) )
                         ]
                 else
                     return $ formatPairsBlock ("section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
@@ -389,7 +388,7 @@ printElf_ full (classS :&: ElfList elfs) = withSingI classS do
                         , ("Addr",       printWordXX esAddr      )
                         , ("AddrAlign",  printWordXX esAddrAlign )
                         , ("EntSize",    printWordXX esEntSize   )
-                        , ("Data",       (if full then printDataFull else printData) bs )
+                        , ("Data",       printData full bs       )
                         ]
         printElf'' ElfSection{ esData = ElfSectionDataStringTable, ..} =
             return $ "string table section" <+> (viaShow esN) <+> (dquotes $ pretty esName)
@@ -412,7 +411,7 @@ printElf_ full (classS :&: ElfList elfs) = withSingI classS do
         printElf'' ElfSegmentTable = return "segment table"
         printElf'' ElfRawData{..} =
             return $ formatPairsBlock "raw data"
-                [ ("Data",       (if full then printDataFull else printData) erData)
+                [ ("Data",       printData full erData)
                 ]
         printElf'' ElfRawAlign{..} =
             return $ formatPairsBlock "raw align"
