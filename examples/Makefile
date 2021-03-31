@@ -14,7 +14,7 @@ objc: objc.o obj_main.o
 syscalls: LDFLAGS += -nostdlib
 
 %.dis : %
-	$(PREFIX)objdump -d $< > $@
+	$(PREFIX)objdump -D $< > $@
 
 %.layout : %
 	hobjlayout $< > $@
