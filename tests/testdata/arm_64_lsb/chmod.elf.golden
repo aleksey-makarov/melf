@@ -93,9 +93,12 @@ segment {
                        00 00 00 00 00 00 00 00 00 00 00 00             # ............
         }
         symbol table section 5 ".dynsym" {
-            Type:  SHT_DYNSYM
-            Flags: [SHF_ALLOC]
-            Data:  
+            Type:      SHT_DYNSYM
+            Flags:     [SHF_ALLOC]
+            Addr:      0x00000000000002b8
+            AddrAlign: 0x0000000000000008
+            EntSize:   0x0000000000000018
+            Data:      
                 symbol "" {
                     Bind:  STB_Local
                     Type:  STT_NoType

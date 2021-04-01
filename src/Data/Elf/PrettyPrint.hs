@@ -372,24 +372,21 @@ printElf_ full (classS :&: ElfList elfs) = withSingI classS do
                 , ("Entry",      printWordXX ehEntry  ) -- WordXX c
                 , ("Flags",      printWord32 ehFlags  ) -- Word32
                 ]
-        printElf'' s@ElfSection{ esData = (ElfSectionData bs), ..} =
-            if sectionIsSymbolTable esType
+        printElf'' s@ElfSection{ esData = (ElfSectionData bs), ..} = do
+            (sectionName, dataDoc) <- if sectionIsSymbolTable esType
                 then do
                     stes <- parseSymbolTable hData' s elfs
-                    return $ formatPairsBlock ("symbol table section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
-                        [ ("Type",       viaShow esType       )
-                        , ("Flags",      viaShow $ splitBits esFlags )
-                        , ("Data",       if null stes then "" else line <> (indent 4 $ printElfSymbolTable full stes) )
-                        ]
+                    return ("symbol table section", if null stes then "" else line <> (indent 4 $ printElfSymbolTable full stes))
                 else
-                    return $ formatPairsBlock ("section" <+> (viaShow esN) <+> (dquotes $ pretty esName))
-                        [ ("Type",       viaShow esType          )
-                        , ("Flags",      viaShow $ splitBits esFlags )
-                        , ("Addr",       printWordXX esAddr      )
-                        , ("AddrAlign",  printWordXX esAddrAlign )
-                        , ("EntSize",    printWordXX esEntSize   )
-                        , ("Data",       printData full bs       )
-                        ]
+                    return ("section", printData full bs)
+            return $ formatPairsBlock (sectionName <+> (viaShow esN) <+> (dquotes $ pretty esName))
+                [ ("Type",       viaShow esType          )
+                , ("Flags",      viaShow $ splitBits esFlags )
+                , ("Addr",       printWordXX esAddr      )
+                , ("AddrAlign",  printWordXX esAddrAlign )
+                , ("EntSize",    printWordXX esEntSize   )
+                , ("Data",       dataDoc )
+                ]
         printElf'' ElfSection{ esData = ElfSectionDataStringTable, ..} =
             return $ "string table section" <+> (viaShow esN) <+> (dquotes $ pretty esName)
         printElf'' ElfSegment{..} = do

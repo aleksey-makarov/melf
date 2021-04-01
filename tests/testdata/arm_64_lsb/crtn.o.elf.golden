@@ -57,9 +57,12 @@ section 6 ".note.GNU-stack" {
     Data:      
 }
 symbol table section 7 ".symtab" {
-    Type:  SHT_SYMTAB
-    Flags: []
-    Data:  
+    Type:      SHT_SYMTAB
+    Flags:     []
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Data:      
         symbol "" {
             Bind:  STB_Local
             Type:  STT_NoType

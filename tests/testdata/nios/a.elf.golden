@@ -196,9 +196,12 @@ section 15 ".debug_ranges" {
                total: 7376
 }
 symbol table section 16 ".symtab" {
-    Type:  SHT_SYMTAB
-    Flags: []
-    Data:  
+    Type:      SHT_SYMTAB
+    Flags:     []
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000010
+    Data:      
         symbol "" {
             Bind:  STB_Local
             Type:  STT_NoType

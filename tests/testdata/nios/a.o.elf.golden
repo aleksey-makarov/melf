@@ -126,9 +126,12 @@ section 15 ".debug_frame" {
                total: 56
 }
 symbol table section 17 ".symtab" {
-    Type:  SHT_SYMTAB
-    Flags: []
-    Data:  
+    Type:      SHT_SYMTAB
+    Flags:     []
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000010
+    Data:      
         symbol "" {
             Bind:  STB_Local
             Type:  STT_NoType

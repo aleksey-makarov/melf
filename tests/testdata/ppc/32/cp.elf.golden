@@ -80,9 +80,12 @@ segment {
                        20 00 20 00 00 00 00 00 00 00 00 8e c0 e3 4b ad #  . ...........K.
         }
         symbol table section 4 ".dynsym" {
-            Type:  SHT_DYNSYM
-            Flags: [SHF_ALLOC]
-            Data:  
+            Type:      SHT_DYNSYM
+            Flags:     [SHF_ALLOC]
+            Addr:      0x000001a4
+            AddrAlign: 0x00000004
+            EntSize:   0x00000010
+            Data:      
                 symbol "" {
                     Bind:  STB_Local
                     Type:  STT_NoType

@@ -58,9 +58,12 @@ section 6 ".comment" {
                32 2e 30 20 70 31 2e 31 29 20 37 2e 32 2e 30 00 # 2.0 p1.1) 7.2.0.
 }
 symbol table section 7 ".symtab" {
-    Type:  SHT_SYMTAB
-    Flags: []
-    Data:  
+    Type:      SHT_SYMTAB
+    Flags:     []
+    Addr:      0x00000000
+    AddrAlign: 0x00000004
+    EntSize:   0x00000010
+    Data:      
         symbol "" {
             Bind:  STB_Local
             Type:  STT_NoType
