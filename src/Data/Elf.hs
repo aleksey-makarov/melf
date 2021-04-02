@@ -332,6 +332,7 @@ data Elf (c :: ElfClass)
         , esAddrAlign :: WordXX c
         , esEntSize   :: WordXX c
         , esN         :: Word16 -- FIXME: why these types differ?
+        , esInfo      :: Word32
         , esLink      :: Word32 --
         , esData      :: ElfSectionData
         }
@@ -584,6 +585,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 , esAddrAlign = sAddrAlign
                 , esEntSize   = sEntSize
                 , esN         = rbsN
+                , esInfo      = sInfo
                 , esLink      = sLink
                 , esData      = if rbsN == hShStrNdx
                     then
@@ -816,7 +818,7 @@ serializeElf' elfs = do
                 sOffset = wbsOffset                    -- WXX c
                 sSize = fromIntegral $ BSL.length d    -- WXX c
                 sLink = esLink                         -- Word32
-                sInfo = 0                              -- Word32 FIXME
+                sInfo = esInfo                         -- Word32
                 sAddrAlign = esAddrAlign               -- WXX c
                 sEntSize = esEntSize                   -- WXX c
             return WBuilderState

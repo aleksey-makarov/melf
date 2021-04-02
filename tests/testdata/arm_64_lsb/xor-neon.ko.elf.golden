@@ -14,6 +14,8 @@ section 1 ".note.gnu.build-id" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      04 00 00 00 14 00 00 00 03 00 00 00 47 4e 55 00 # ............GNU.
                d8 39 b1 9b cf bd 00 a6 e9 19 9c 02 a1 d8 47 30 # .9............G0
                ...
@@ -26,6 +28,8 @@ section 2 ".note.Linux" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      06 00 00 00 01 00 00 00 00 01 00 00 4c 69 6e 75 # ............Linu
                78 00 00 00 00 00 00 00                         # x.......
 }
@@ -35,6 +39,8 @@ section 3 ".text" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      1f 20 03 d5 1f 20 03 d5 00 fc 46 d3 1f 20 03 d5 # . ... ....F.. ..
                43 08 40 ad 00 04 00 d1 27 18 40 ad 1f 00 00 f1 # C.@.....'.@.....
                ...
@@ -47,6 +53,8 @@ section 4 "__ksymtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 00 00 00 00 00 00 00 00 00 00 00             # ............
 }
 section 6 ".rodata.str1.8" {
@@ -55,6 +63,8 @@ section 6 ".rodata.str1.8" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000001
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      5f 5f 69 6e 6e 65 72 5f 6e 65 6f 6e 5f 5f 00    # __inner_neon__.
 }
 section 7 ".rodata" {
@@ -63,6 +73,8 @@ section 7 ".rodata" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
                00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
                ...
@@ -75,6 +87,8 @@ section 9 ".modinfo" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      6c 69 63 65 6e 73 65 3d 47 50 4c 00 64 65 73 63 # license=GPL.desc
                72 69 70 74 69 6f 6e 3d 41 52 4d 76 38 20 58 4f # ription=ARMv8 XO
                ...
@@ -87,6 +101,8 @@ section 10 "__ksymtab_strings" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 78 6f 72 5f 62 6c 6f 63 6b 5f 69 6e 6e 65 72 # .xor_block_inner
                5f 6e 65 6f 6e 00                               # _neon.
 }
@@ -96,6 +112,8 @@ section 11 ".eh_frame" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      10 00 00 00 00 00 00 00 01 7a 52 00 04 78 1e 01 # .........zR..x..
                1b 0c 1f 00 10 00 00 00 18 00 00 00 00 00 00 00 # ................
                ...
@@ -108,6 +126,8 @@ section 13 ".data" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 14 "__patchable_function_entries" {
@@ -116,6 +136,8 @@ section 14 "__patchable_function_entries" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
                00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
 }
@@ -125,6 +147,8 @@ section 16 ".gnu.linkonce.this_module" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000040
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
                00 00 00 00 00 00 00 00 78 6f 72 5f 6e 65 6f 6e # ........xor_neon
                ...
@@ -137,6 +161,8 @@ section 17 ".plt" {
     Addr:      0x0000000000000340
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 18 ".init.plt" {
@@ -145,6 +171,8 @@ section 18 ".init.plt" {
     Addr:      0x0000000000000341
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 19 ".text.ftrace_trampoline" {
@@ -153,6 +181,8 @@ section 19 ".text.ftrace_trampoline" {
     Addr:      0x0000000000000342
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 20 ".bss" {
@@ -161,6 +191,8 @@ section 20 ".bss" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 21 ".comment" {
@@ -169,6 +201,8 @@ section 21 ".comment" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 47 43 43 3a 20 28 63 72 6f 73 73 74 6f 6f 6c # .GCC: (crosstool
                2d 4e 47 20 31 2e 32 33 2e 30 2e 34 31 38 2d 64 # -NG 1.23.0.418-d
                ...
@@ -181,6 +215,8 @@ section 22 ".note.GNU-stack" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 symbol table section 23 ".symtab" {
@@ -189,6 +225,8 @@ symbol table section 23 ".symtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x00000028
+    Link:      0x00000018
     Data:      
         symbol "" {
             Bind:  STB_Local
@@ -220,6 +258,8 @@ section 24 ".strtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 78 6f 72 2d 6e 65 6f 6e 2e 6d 6f 64 2e 63 00 # .xor-neon.mod.c.
                24 64 00 5f 5f 55 4e 49 51 55 45 5f 49 44 5f 64 # $d.__UNIQUE_ID_d
                ...
@@ -232,6 +272,8 @@ section 5 ".rela__ksymtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x00000004
+    Link:      0x00000017
     Data:      00 00 00 00 00 00 00 00 05 01 00 00 2b 00 00 00 # ............+...
                00 00 00 00 00 00 00 00 04 00 00 00 00 00 00 00 # ................
                ...
@@ -244,6 +286,8 @@ section 8 ".rela.rodata" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x00000007
+    Link:      0x00000017
     Data:      08 00 00 00 00 00 00 00 01 01 00 00 05 00 00 00 # ................
                00 00 00 00 00 00 00 00 18 00 00 00 00 00 00 00 # ................
                ...
@@ -256,6 +300,8 @@ section 12 ".rela.eh_frame" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x0000000b
+    Link:      0x00000017
     Data:      1c 00 00 00 00 00 00 00 05 01 00 00 03 00 00 00 # ................
                08 00 00 00 00 00 00 00 30 00 00 00 00 00 00 00 # ........0.......
                ...
@@ -268,6 +314,8 @@ section 15 ".rela__patchable_function_entries" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x0000000e
+    Link:      0x00000017
     Data:      00 00 00 00 00 00 00 00 01 01 00 00 03 00 00 00 # ................
                00 00 00 00 00 00 00 00 08 00 00 00 00 00 00 00 # ................
                ...

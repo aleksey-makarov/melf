@@ -14,6 +14,8 @@ section 1 ".text" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      40 03 00 b4 fd 7b be a9 fd 03 00 91 f3 0b 00 f9 # @....{..........
                f3 03 00 aa 00 10 40 39 a0 00 00 35 01 00 00 90 # ......@9...5....
                ...
@@ -26,6 +28,8 @@ section 3 ".data" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 4 ".bss" {
@@ -34,6 +38,8 @@ section 4 ".bss" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 5 ".comment" {
@@ -42,6 +48,8 @@ section 5 ".comment" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 47 43 43 3a 20 28 63 72 6f 73 73 74 6f 6f 6c # .GCC: (crosstool
                2d 4e 47 20 31 2e 32 33 2e 30 2e 34 31 38 2d 64 # -NG 1.23.0.418-d
                ...
@@ -54,6 +62,8 @@ section 6 ".note.GNU-stack" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 7 ".eh_frame" {
@@ -62,6 +72,8 @@ section 7 ".eh_frame" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      10 00 00 00 00 00 00 00 01 7a 52 00 04 78 1e 01 # .........zR..x..
                1b 0c 1f 00 20 00 00 00 18 00 00 00 00 00 00 00 # .... ...........
                ...
@@ -74,6 +86,8 @@ symbol table section 9 ".symtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x00000009
+    Link:      0x0000000a
     Data:      
         symbol "" {
             Bind:  STB_Local
@@ -105,6 +119,8 @@ section 10 ".strtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 24 78 00 24 64 00 61 73 6d 5f 61 62 6f 72 74 # .$x.$d.asm_abort
                00 65 6c 66 5f 65 6e 64 00 75 6e 6c 69 6e 6b 00 # .elf_end.unlink.
                ...
@@ -117,6 +133,8 @@ section 2 ".rela.text" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x00000001
+    Link:      0x00000009
     Data:      1c 00 00 00 00 00 00 00 37 01 00 00 0a 00 00 00 # ........7.......
                00 00 00 00 00 00 00 00 24 00 00 00 00 00 00 00 # ........$.......
                ...
@@ -129,6 +147,8 @@ section 8 ".rela.eh_frame" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x00000007
+    Link:      0x00000009
     Data:      1c 00 00 00 00 00 00 00 05 01 00 00 01 00 00 00 # ................
                00 00 00 00 00 00 00 00                         # ........
 }

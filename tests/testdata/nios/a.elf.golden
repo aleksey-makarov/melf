@@ -23,6 +23,8 @@ segment {
             Addr:      0x00001078
             AddrAlign: 0x00000008
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      04 ff ff de 84 01 00 01 15 00 c0 df c0 63 0a 00 # .............c..
                        44 00 00 01 40 a7 0d 00 04 fe ff de 3a 88 0b 00 # D...@.......:...
                        ...
@@ -35,6 +37,8 @@ segment {
             Addr:      0x0000dc18
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      48 65 6c 6c 6f 20 77 6f 72 6c 64 00 49 4e 46 00 # Hello world.INF.
                        69 6e 66 00 4e 41 4e 00 6e 61 6e 00 30 31 32 33 # inf.NAN.nan.0123
                        ...
@@ -56,6 +60,8 @@ segment {
             Addr:      0x0000f23c
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      00 00 00 00 28 f5 00 00 90 f5 00 00 f8 f5 00 00 # ....(...........
                        00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # ................
                        ...
@@ -68,6 +74,8 @@ segment {
             Addr:      0x0000fbd4
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      3c f2 00 00 3c f2 00 00 ff ff ff ff 00 00 02 00 # <...<...........
         }
 }
@@ -77,6 +85,8 @@ section 5 ".sbss" {
     Addr:      0x0000fbe4
     AddrAlign: 0x00000004
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 6 ".bss" {
@@ -85,6 +95,8 @@ section 6 ".bss" {
     Addr:      0x0000fbfc
     AddrAlign: 0x00000004
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 7 ".comment" {
@@ -93,6 +105,8 @@ section 7 ".comment" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      47 43 43 3a 20 28 41 6c 74 65 72 61 20 32 30 2e # GCC: (Altera 20.
                33 20 42 75 69 6c 64 20 31 30 37 29 20 39 2e 33 # 3 Build 107) 9.3
                ...
@@ -105,6 +119,8 @@ section 8 ".debug_aranges" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      1c 00 00 00 02 00 00 00 00 00 04 00 00 00 00 00 # ................
                f8 10 00 00 34 00 00 00 00 00 00 00 00 00 00 00 # ....4...........
                ...
@@ -117,6 +133,8 @@ section 9 ".debug_info" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      23 09 00 00 04 00 00 00 00 00 04 01 0c 00 00 00 # #...............
                0c 61 2e 63 00 8b 03 00 00 f8 10 00 00 34 00 00 # .a.c.........4..
                ...
@@ -129,6 +147,8 @@ section 10 ".debug_abbrev" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      01 11 01 25 0e 13 0b 03 08 1b 0e 11 01 12 06 10 # ...%............
                17 00 00 02 24 00 0b 0b 3e 0b 03 0e 00 00 03 24 # ....$...>......$
                ...
@@ -141,6 +161,8 @@ section 11 ".debug_line" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      77 01 00 00 03 00 59 01 00 00 01 01 fb 0e 0d 00 # w.....Y.........
                01 01 01 01 00 00 00 01 00 00 01 2f 6e 66 73 2f # .........../nfs/
                ...
@@ -153,6 +175,8 @@ section 12 ".debug_frame" {
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      0c 00 00 00 ff ff ff ff 01 00 01 7c 1f 0c 1b 00 # ...........|....
                24 00 00 00 00 00 00 00 f8 10 00 00 34 00 00 00 # $...........4...
                ...
@@ -165,6 +189,8 @@ section 13 ".debug_str" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      5f 64 73 6f 5f 68 61 6e 64 6c 65 00 47 4e 55 20 # _dso_handle.GNU 
                43 31 37 20 39 2e 33 2e 31 20 32 30 32 30 30 34 # C17 9.3.1 202004
                ...
@@ -177,6 +203,8 @@ section 14 ".debug_loc" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 00 00 00 00 00 5c 11 00 00 84 11 00 00 01 00 # ......\.........
                54 84 11 00 00 87 11 00 00 01 00 55 87 11 00 00 # T..........U....
                ...
@@ -189,6 +217,8 @@ section 15 ".debug_ranges" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      2c 11 00 00 5c 11 00 00 5c 11 00 00 94 11 00 00 # ,...\...\.......
                00 00 00 00 00 00 00 00 e8 11 00 00 f4 11 00 00 # ................
                ...
@@ -201,6 +231,8 @@ symbol table section 16 ".symtab" {
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x00000010
+    Info:      0x0000006d
+    Link:      0x00000011
     Data:      
         symbol "" {
             Bind:  STB_Local
@@ -232,6 +264,8 @@ section 17 ".strtab" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 61 62 6f 72 74 2e 63 00 76 66 70 72 69 6e 74 # .abort.c.vfprint
                66 2e 63 00 5f 5f 73 62 70 72 69 6e 74 66 00 62 # f.c.__sbprintf.b
                ...

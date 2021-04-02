@@ -14,6 +14,8 @@ section 1 ".text" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 2 ".data" {
@@ -22,6 +24,8 @@ section 2 ".data" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 3 ".bss" {
@@ -30,6 +34,8 @@ section 3 ".bss" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 4 ".comment" {
@@ -38,6 +44,8 @@ section 4 ".comment" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 47 43 43 3a 20 28 47 65 6e 74 6f 6f 20 39 2e # .GCC: (Gentoo 9.
                33 2e 30 2d 72 31 20 70 33 29 20 39 2e 33 2e 30 # 3.0-r1 p3) 9.3.0
                ...
@@ -50,6 +58,8 @@ section 5 ".note.GNU-stack" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 string table section 6 ".shstrtab"

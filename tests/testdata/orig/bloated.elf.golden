@@ -49,6 +49,8 @@ segment {
                     Addr:      0x08048154
                     AddrAlign: 0x00000001
                     EntSize:   0x00000000
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      2f 6c 69 62 2f 6c 64 2d 6c 69 6e 75 78 2e 73 6f # /lib/ld-linux.so
                                2e 32 00                                        # .2.
                 }
@@ -67,6 +69,8 @@ segment {
                     Addr:      0x08048168
                     AddrAlign: 0x00000004
                     EntSize:   0x00000000
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      04 00 00 00 10 00 00 00 01 00 00 00 47 4e 55 00 # ............GNU.
                                00 00 00 00 02 00 00 00 06 00 00 00 20 00 00 00 # ............ ...
                 }
@@ -76,6 +80,8 @@ segment {
                     Addr:      0x08048188
                     AddrAlign: 0x00000004
                     EntSize:   0x00000000
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      04 00 00 00 14 00 00 00 03 00 00 00 47 4e 55 00 # ............GNU.
                                58 e3 4f e8 bc 03 f9 db 4b 07 fa e5 03 1e fd d0 # X.O.....K.......
                                ...
@@ -89,6 +95,8 @@ segment {
             Addr:      0x080481ac
             AddrAlign: 0x00000004
             EntSize:   0x00000004
+            Info:      0x00000000
+            Link:      0x00000005
             Data:      03 00 00 00 0a 00 00 00 01 00 00 00 05 00 00 00 # ................
                        01 23 10 20 00 00 00 00 0a 00 00 00 0c 00 00 00 # .#. ............
                        ...
@@ -101,6 +109,8 @@ segment {
             Addr:      0x080481dc
             AddrAlign: 0x00000004
             EntSize:   0x00000010
+            Info:      0x00000001
+            Link:      0x00000006
             Data:      
                 symbol "" {
                     Bind:  STB_Local
@@ -132,6 +142,8 @@ segment {
             Addr:      0x080482bc
             AddrAlign: 0x00000001
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      00 6c 69 62 73 74 64 63 2b 2b 2e 73 6f 2e 36 00 # .libstdc++.so.6.
                        5f 5f 67 6d 6f 6e 5f 73 74 61 72 74 5f 5f 00 5f # __gmon_start__._
                        ...
@@ -144,6 +156,8 @@ segment {
             Addr:      0x08048456
             AddrAlign: 0x00000002
             EntSize:   0x00000002
+            Info:      0x00000000
+            Link:      0x00000005
             Data:      00 00 02 00 00 00 00 00 03 00 04 00 00 00 03 00 # ................
                        00 00 03 00 01 00 03 00 03 00 03 00             # ............
         }
@@ -153,6 +167,8 @@ segment {
             Addr:      0x08048474
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000002
+            Link:      0x00000006
             Data:      01 00 01 00 01 00 00 00 10 00 00 00 20 00 00 00 # ............ ...
                        74 29 92 08 00 00 03 00 77 01 00 00 00 00 00 00 # t)......w.......
                        ...
@@ -165,6 +181,8 @@ segment {
             Addr:      0x080484c4
             AddrAlign: 0x00000004
             EntSize:   0x00000008
+            Info:      0x00000000
+            Link:      0x00000005
             Data:      fc 9f 04 08 06 02 00 00 40 a0 04 08 05 0d 00 00 # ........@.......
         }
         section 10 ".rel.plt" {
@@ -173,6 +191,8 @@ segment {
             Addr:      0x080484d4
             AddrAlign: 0x00000004
             EntSize:   0x00000008
+            Info:      0x00000018
+            Link:      0x00000005
             Data:      0c a0 04 08 07 01 00 00 10 a0 04 08 07 04 00 00 # ................
                        14 a0 04 08 07 05 00 00 18 a0 04 08 07 0c 00 00 # ................
                        ...
@@ -185,6 +205,8 @@ segment {
             Addr:      0x0804850c
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      53 83 ec 08 e8 2b 01 00 00 81 c3 eb 1a 00 00 8b # S....+..........
                        83 fc ff ff ff 85 c0 74 05 e8 86 00 00 00 83 c4 # .......t........
                        ...
@@ -197,6 +219,8 @@ segment {
             Addr:      0x08048530
             AddrAlign: 0x00000010
             EntSize:   0x00000004
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      ff 35 04 a0 04 08 ff 25 08 a0 04 08 00 00 00 00 # .5.....%........
                        ff 25 0c a0 04 08 68 00 00 00 00 e9 e0 ff ff ff # .%....h.........
                        ...
@@ -209,6 +233,8 @@ segment {
             Addr:      0x080485b0
             AddrAlign: 0x00000008
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      ff 25 fc 9f 04 08 66 90                         # .%....f.
         }
         section 14 ".text" {
@@ -217,6 +243,8 @@ segment {
             Addr:      0x080485c0
             AddrAlign: 0x00000010
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      55 89 e5 83 ec 18 8d 05 cd a0 04 08 89 04 24 e8 # U.............$.
                        7c ff ff ff 8d 05 70 85 04 08 8d 0d cd a0 04 08 # |.....p.........
                        ...
@@ -229,6 +257,8 @@ segment {
             Addr:      0x080487d4
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      53 83 ec 08 e8 63 fe ff ff 81 c3 23 18 00 00 83 # S....c.....#....
                        c4 08 5b c3                                     # ..[.
         }
@@ -238,6 +268,8 @@ segment {
             Addr:      0x080487e8
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      03 00 00 00 01 00 02 00 00 00 00 00 48 65 6c 6c # ............Hell
                        6f 20 77 6f 72 6c 64 21 00                      # o world!.
         }
@@ -255,6 +287,8 @@ segment {
                     Addr:      0x08048804
                     AddrAlign: 0x00000004
                     EntSize:   0x00000000
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      01 1b 03 3b 38 00 00 00 06 00 00 00 2c fd ff ff # ...;8.......,...
                                54 00 00 00 bc fd ff ff 78 00 00 00 fc fd ff ff # T.......x.......
                                ...
@@ -268,6 +302,8 @@ segment {
             Addr:      0x08048840
             AddrAlign: 0x00000004
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      14 00 00 00 00 00 00 00 01 7a 52 00 01 7c 08 01 # .........zR..|..
                        1b 0c 04 04 88 01 00 00 20 00 00 00 1c 00 00 00 # ........ .......
                        ...
@@ -297,6 +333,8 @@ segment {
                     Addr:      0x08049eec
                     AddrAlign: 0x00000004
                     EntSize:   0x00000000
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      e0 86 04 08 00 86 04 08                         # ........
                 }
                 section 20 ".fini_array" {
@@ -305,6 +343,8 @@ segment {
                     Addr:      0x08049ef4
                     AddrAlign: 0x00000004
                     EntSize:   0x00000000
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      c0 86 04 08                                     # ....
                 }
                 section 21 ".jcr" {
@@ -313,6 +353,8 @@ segment {
                     Addr:      0x08049ef8
                     AddrAlign: 0x00000004
                     EntSize:   0x00000000
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      00 00 00 00                                     # ....
                 }
                 segment {
@@ -329,6 +371,8 @@ segment {
                             Addr:      0x08049efc
                             AddrAlign: 0x00000004
                             EntSize:   0x00000008
+                            Info:      0x00000000
+                            Link:      0x00000006
                             Data:      01 00 00 00 01 00 00 00 01 00 00 00 27 01 00 00 # ............'...
                                        01 00 00 00 31 01 00 00 01 00 00 00 3f 01 00 00 # ....1.......?...
                                        ...
@@ -342,6 +386,8 @@ segment {
                     Addr:      0x08049ffc
                     AddrAlign: 0x00000004
                     EntSize:   0x00000004
+                    Info:      0x00000000
+                    Link:      0x00000000
                     Data:      00 00 00 00                                     # ....
                 }
         }
@@ -351,6 +397,8 @@ segment {
             Addr:      0x0804a000
             AddrAlign: 0x00000004
             EntSize:   0x00000004
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      fc 9e 04 08 00 00 00 00 00 00 00 00 46 85 04 08 # ............F...
                        56 85 04 08 66 85 04 08 76 85 04 08 86 85 04 08 # V...f...v.......
                        ...
@@ -363,6 +411,8 @@ segment {
             Addr:      0x0804a028
             AddrAlign: 0x00000001
             EntSize:   0x00000000
+            Info:      0x00000000
+            Link:      0x00000000
             Data:      00 00 00 00                                     # ....
         }
 }
@@ -372,6 +422,8 @@ section 26 ".bss" {
     Addr:      0x0804a040
     AddrAlign: 0x00000020
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 27 ".comment" {
@@ -380,6 +432,8 @@ section 27 ".comment" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      47 43 43 3a 20 28 47 4e 55 29 20 36 2e 33 2e 31 # GCC: (GNU) 6.3.1
                20 32 30 31 36 31 32 32 31 20 28 52 65 64 20 48 #  20161221 (Red H
                ...
@@ -392,6 +446,8 @@ symbol table section 29 ".symtab" {
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x00000010
+    Info:      0x00000032
+    Link:      0x0000001e
     Data:      
         symbol "" {
             Bind:  STB_Local
@@ -423,6 +479,8 @@ section 30 ".strtab" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 5f 47 4c 4f 42 41 4c 5f 5f 73 75 62 5f 49 5f # ._GLOBAL__sub_I_
                62 6c 6f 61 74 65 64 2e 63 70 70 00 5f 5a 53 74 # bloated.cpp._ZSt
                ...

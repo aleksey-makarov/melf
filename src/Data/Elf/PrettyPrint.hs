@@ -385,6 +385,8 @@ printElf_ full (classS :&: ElfList elfs) = withSingI classS do
                 , ("Addr",       printWordXX esAddr      )
                 , ("AddrAlign",  printWordXX esAddrAlign )
                 , ("EntSize",    printWordXX esEntSize   )
+                , ("Info",       printWord32 esInfo      )
+                , ("Link",       printWord32 esLink      )
                 , ("Data",       dataDoc )
                 ]
         printElf'' ElfSection{ esData = ElfSectionDataStringTable, ..} =

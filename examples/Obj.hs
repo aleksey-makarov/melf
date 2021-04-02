@@ -48,6 +48,7 @@ obj  =  do
                     , esEntSize   = 0
                     , esN         = 1
                     , esLink      = 0
+                    , esInfo      = 0
                     , esData      = ElfSectionData $ BSLC.pack "Hello World!"
                     }
                 ]
@@ -61,6 +62,7 @@ obj  =  do
             , esEntSize   = 0
             , esN         = 3
             , esLink      = 0
+            , esInfo      = 0
             , esData      = ElfSectionData txt
             }
         , ElfSection
@@ -72,6 +74,7 @@ obj  =  do
             , esEntSize   = 0
             , esN         = 2
             , esLink      = 0
+            , esInfo      = 0
             , esData      = ElfSectionDataStringTable
             }
         ]

@@ -14,6 +14,8 @@ section 1 ".text" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 2 ".data" {
@@ -22,6 +24,8 @@ section 2 ".data" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 3 ".bss" {
@@ -30,6 +34,8 @@ section 3 ".bss" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 4 ".init" {
@@ -38,6 +44,8 @@ section 4 ".init" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      fd 7b c1 a8 c0 03 5f d6                         # .{...._.
 }
 section 5 ".fini" {
@@ -46,6 +54,8 @@ section 5 ".fini" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      fd 7b c1 a8 c0 03 5f d6                         # .{...._.
 }
 section 6 ".note.GNU-stack" {
@@ -54,6 +64,8 @@ section 6 ".note.GNU-stack" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 symbol table section 7 ".symtab" {
@@ -62,6 +74,8 @@ symbol table section 7 ".symtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
+    Info:      0x00000009
+    Link:      0x00000008
     Data:      
         symbol "" {
             Bind:  STB_Local
@@ -93,6 +107,8 @@ section 8 ".strtab" {
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      00 24 78 00                                     # .$x.
 }
 string table section 9 ".shstrtab"

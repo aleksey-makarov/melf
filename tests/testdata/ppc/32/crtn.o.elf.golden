@@ -14,6 +14,8 @@ section 1 ".text" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 2 ".data" {
@@ -22,6 +24,8 @@ section 2 ".data" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 3 ".bss" {
@@ -30,6 +34,8 @@ section 3 ".bss" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 section 4 ".init" {
@@ -38,6 +44,8 @@ section 4 ".init" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      80 01 00 14 7c 08 03 a6 83 c1 00 08 38 21 00 10 # ....|.......8!..
                4e 80 00 20                                     # N.. 
 }
@@ -47,6 +55,8 @@ section 5 ".fini" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      80 01 00 14 7c 08 03 a6 83 c1 00 08 38 21 00 10 # ....|.......8!..
                4e 80 00 20                                     # N.. 
 }
@@ -56,6 +66,8 @@ section 6 ".note.GNU-stack" {
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000000
+    Info:      0x00000000
+    Link:      0x00000000
     Data:      
 }
 string table section 7 ".shstrtab"
