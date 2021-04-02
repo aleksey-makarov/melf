@@ -252,9 +252,7 @@ segment {
             Link:      0x00000000
             Data:      0f ae f0 0f ae e8 0f ae f0 0f ae e8 0f ae f0 0f # ................
                        ae e8 0f ae f0 0f ae e8 0f ae f0 0f ae e8 f3 0f # ................
-                       ...
-                       0f ae f0 0f ae e8 0f ae f0 0f ae e8 f3 0f c7 f8 # ................
-                       total: 34
+                       c7 f8                                           # ..
         }
 }
 section 15 ".comment" {
@@ -267,9 +265,7 @@ section 15 ".comment" {
     Link:      0x00000000
     Data:      47 43 43 3a 20 28 55 62 75 6e 74 75 20 37 2e 33 # GCC: (Ubuntu 7.3
                2e 30 2d 31 36 75 62 75 6e 74 75 33 29 20 37 2e # .0-16ubuntu3) 7.
-               ...
-               36 75 62 75 6e 74 75 33 29 20 37 2e 33 2e 30 00 # 6ubuntu3) 7.3.0.
-               total: 36
+               33 2e 30 00                                     # 3.0.
 }
 string table section 16 ".shstrtab"
 section table

@@ -7,6 +7,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
@@ -295,12 +296,13 @@ printElfSymbolTable full l = if full then printElfSymbolTableFull else printElfS
         printElfSymbolTableFull = align . vsep $ fmap printElfSymbolTableEntry l
         printElfSymbolTable' = align . vsep $
             case l of
-                (e1 : e2 : _ : _) -> [ printElfSymbolTableEntry e1
-                                    , printElfSymbolTableEntry e2
-                                    , "..."
-                                    , printElfSymbolTableEntry $ last l
-                                    , "total:" <+> viaShow (L.length l)
-                                    ]
+                (e1 : e2 : _ : _ : _) ->
+                    [ printElfSymbolTableEntry e1
+                    , printElfSymbolTableEntry e2
+                    , "..."
+                    , printElfSymbolTableEntry $ last l
+                    , "total:" <+> viaShow (L.length l)
+                    ]
                 _ -> fmap printElfSymbolTableEntry l
 
 splitBy :: Int64 -> BSL.ByteString -> [BSL.ByteString]
@@ -334,27 +336,63 @@ printData full bs = if full then printDataFull else printData'
         printDataFull = align $ vsep $ L.map formatBytestringLine $ splitBy 16 bs
         printData' = align $ vsep $
             case splitBy 16 bs of
-                (c1 : c2 : _ : _) -> [ formatBytestringLine c1
-                                    , formatBytestringLine c2
-                                    , "..."
-                                    , formatBytestringLine cl
-                                    , "total:" <+> viaShow (BSL.length bs)
-                                    ]
+                (c1 : c2 : _ : _ : _) ->
+                    [ formatBytestringLine c1
+                    , formatBytestringLine c2
+                    , "..."
+                    , formatBytestringLine cl
+                    , "total:" <+> viaShow (BSL.length bs)
+                    ]
                 chunks -> L.map formatBytestringLine chunks
         cl = BSL.drop (BSL.length bs - 16) bs
 
+printElfSymbolTableEntryLine :: SingI a => ElfSymbolTableEntry a -> Doc ()
+printElfSymbolTableEntryLine ElfSymbolTableEntry{..} =  parens ((dquotes $ pretty steName)
+                                                    <+> "bind:"   <+> viaShow steBind
+                                                    <+> "type:"   <+> viaShow steType
+                                                    <+> "sindex:" <+> viaShow steShNdx
+                                                    <+> "value:"  <+> printWordXX steValue
+                                                    <+> "size:"   <+> printWordXX steSize)
+
+printRelocationTableA_AARCH64 :: MonadThrow m => Bool -> Word32 -> [Elf 'ELFCLASS64] -> BSL.ByteString -> m (Doc ())
+printRelocationTableA_AARCH64 full sLink elfs bs = do
+    symTableSection <- elfFindSection elfs sLink
+    symTable <- parseSymbolTable ELFDATA2LSB symTableSection elfs
+    let
+        getSymbolTableEntry' []     _  = $elfError "wrong symbol table index"
+        getSymbolTableEntry' (x:_)  0  = return x
+        getSymbolTableEntry' (_:xs) n  = getSymbolTableEntry' xs (n - 1)
+
+        getSymbolTableEntry :: MonadThrow m => Word32 -> m (ElfSymbolTableEntry 'ELFCLASS64)
+        getSymbolTableEntry = getSymbolTableEntry' symTable
+
+        f :: MonadThrow m => RelocationTableAEntryXX 'ELFCLASS64 -> m (Doc ())
+        f RelocationTableAEntryXX{..} = do
+            symbolTableEntry <- getSymbolTableEntry relaSym
+            return $  printWord64 relaOffset
+                  <+> printWord64 relaAddend
+                  <+> viaShow (ElfRelocationType_AARCH64 relaType)
+                  <+> printElfSymbolTableEntryLine symbolTableEntry
+
+        split xs = if full then xs else
+            case xs of
+                (x1 : x2 : _ : _ : _) ->
+                    [ x1, x2, "...", last xs, "total:" <+> viaShow (length xs) ]
+                _ -> xs
+
+    relas <- parseListA ELFDATA2LSB bs
+    (align . vsep . split) <$> mapM f relas
 
 printElf :: MonadThrow m => Elf' -> m (Doc ())
 printElf = printElf_ False
 
--- printElf :: MonadThrow m => Sigma ElfClass (TyCon1 ElfList) -> m (Doc ())
 printElf_ :: MonadThrow m => Bool -> Elf' -> m (Doc ())
-printElf_ full (classS :&: ElfList elfs) = withSingI classS do
+printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
 
-    hData' <- do
+    (hData, hMachine) <- do
         header <- elfFindHeader elfs
         case header of
-            ElfHeader{..} -> return ehData
+            ElfHeader{..} -> return (ehData, ehMachine)
             _ -> $elfError "not a header" -- FIXME
 
     let
@@ -375,8 +413,15 @@ printElf_ full (classS :&: ElfList elfs) = withSingI classS do
         printElf'' s@ElfSection{ esData = (ElfSectionData bs), ..} = do
             (sectionName, dataDoc) <- if sectionIsSymbolTable esType
                 then do
-                    stes <- parseSymbolTable hData' s elfs
+                    stes <- parseSymbolTable hData s elfs
                     return ("symbol table section", if null stes then "" else line <> (indent 4 $ printElfSymbolTable full stes))
+                else if hMachine == EM_AARCH64
+                        && hData == ELFDATA2LSB
+                       && esType == SHT_RELA
+                    && esEntSize == withElfClass classS relocationTableAEntrySize then
+                        case classS of
+                            SELFCLASS64 -> ("section", ) <$> printRelocationTableA_AARCH64 full esLink elfs bs
+                            SELFCLASS32 -> $elfError "invalid ELF: EM_AARCH64 and ELFCLASS32"
                 else
                     return ("section", printData full bs)
             return $ formatPairsBlock (sectionName <+> (viaShow esN) <+> (dquotes $ pretty esName))

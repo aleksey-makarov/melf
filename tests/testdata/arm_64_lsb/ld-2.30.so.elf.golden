@@ -44,9 +44,7 @@ segment {
                     Link:      0x00000000
                     Data:      04 00 00 00 14 00 00 00 03 00 00 00 47 4e 55 00 # ............GNU.
                                e2 b8 99 88 40 34 d5 b2 39 8d d0 9b a3 a0 63 a0 # ....@4..9.....c.
-                               ...
-                               40 34 d5 b2 39 8d d0 9b a3 a0 63 a0 0e 88 42 8a # @4..9.....c...B.
-                               total: 36
+                               0e 88 42 8a                                     # ..B.
                 }
         }
         section 2 ".hash" {
@@ -160,11 +158,11 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000000
             Link:      0x00000004
-            Data:      88 f5 02 00 00 00 00 00 03 04 00 00 00 00 00 00 # ................
-                       20 bd 01 00 00 00 00 00 98 f5 02 00 00 00 00 00 #  ...............
+            Data:      0x000000000002f588 0x000000000001bd20 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000002f598 0x000000000001bd70 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                        ...
-                       01 04 00 00 1a 00 00 00 00 00 00 00 00 00 00 00 # ................
-                       total: 1224
+                       0x000000000002fff8 0x0000000000000000 R_AARCH64_GLOB_DAT ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
+                       total: 51
         }
         section 9 ".rela.plt" {
             Type:      SHT_RELA
@@ -174,11 +172,11 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000011
             Link:      0x00000004
-            Data:      78 ff 02 00 00 00 00 00 02 04 00 00 06 00 00 00 # x...............
-                       00 00 00 00 00 00 00 00 80 ff 02 00 00 00 00 00 # ................
+            Data:      0x000000000002ff78 0x0000000000000000 R_AARCH64_JUMP_SLOT ("_dl_catch_exception" bind: STB_Global type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015880 size: 0x0000000000000088)
+                       0x000000000002ff80 0x0000000000000000 R_AARCH64_JUMP_SLOT ("malloc" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x00000000000150d8 size: 0x0000000000000124)
                        ...
-                       02 04 00 00 1a 00 00 00 00 00 00 00 00 00 00 00 # ................
-                       total: 216
+                       0x000000000002ffb8 0x0000000000000000 R_AARCH64_JUMP_SLOT ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
+                       total: 9
         }
         section 10 ".plt" {
             Type:      SHT_PROGBITS

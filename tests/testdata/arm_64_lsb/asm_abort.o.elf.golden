@@ -52,9 +52,7 @@ section 5 ".comment" {
     Link:      0x00000000
     Data:      00 47 43 43 3a 20 28 63 72 6f 73 73 74 6f 6f 6c # .GCC: (crosstool
                2d 4e 47 20 31 2e 32 33 2e 30 2e 34 31 38 2d 64 # -NG 1.23.0.418-d
-               ...
-               34 31 38 2d 64 35 39 30 29 20 38 2e 33 2e 30 00 # 418-d590) 8.3.0.
-               total: 43
+               35 39 30 29 20 38 2e 33 2e 30 00                # 590) 8.3.0.
 }
 section 6 ".note.GNU-stack" {
     Type:      SHT_PROGBITS
@@ -135,11 +133,11 @@ section 2 ".rela.text" {
     EntSize:   0x0000000000000018
     Info:      0x00000001
     Link:      0x00000009
-    Data:      1c 00 00 00 00 00 00 00 37 01 00 00 0a 00 00 00 # ........7.......
-               00 00 00 00 00 00 00 00 24 00 00 00 00 00 00 00 # ........$.......
+    Data:      0x000000000000001c 0x0000000000000000 R_AARCH64_ADR_GOT_PAGE ("elf_end" bind: STB_Global type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+               0x0000000000000024 0x0000000000000000 R_AARCH64_LD64_GOT_LO12_NC ("elf_end" bind: STB_Global type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                ...
-               38 01 00 00 0c 00 00 00 00 00 00 00 00 00 00 00 # 8...............
-               total: 144
+               0x0000000000000050 0x0000000000000000 R_AARCH64_LD64_GOT_LO12_NC ("__libasm_finictx" bind: STB_Global type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+               total: 6
 }
 section 8 ".rela.eh_frame" {
     Type:      SHT_RELA
@@ -149,8 +147,7 @@ section 8 ".rela.eh_frame" {
     EntSize:   0x0000000000000018
     Info:      0x00000007
     Link:      0x00000009
-    Data:      1c 00 00 00 00 00 00 00 05 01 00 00 01 00 00 00 # ................
-               00 00 00 00 00 00 00 00                         # ........
+    Data:      0x000000000000001c 0x0000000000000000 R_AARCH64_PREL32 ("" bind: STB_Local type: STT_Section sindex: SHN_EXT 1 value: 0x0000000000000000 size: 0x0000000000000000)
 }
 string table section 11 ".shstrtab"
 section table

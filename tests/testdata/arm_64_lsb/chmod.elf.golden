@@ -73,9 +73,7 @@ segment {
                     Link:      0x00000000
                     Data:      04 00 00 00 14 00 00 00 03 00 00 00 47 4e 55 00 # ............GNU.
                                7b 1b 53 47 5a 5a 00 54 a9 db a9 e0 23 7f 90 1e # {.SGZZ.T....#...
-                               ...
-                               5a 5a 00 54 a9 db a9 e0 23 7f 90 1e 8d 4b bc 68 # ZZ.T....#....K.h
-                               total: 36
+                               8d 4b bc 68                                     # .K.h
                 }
                 section 3 ".note.ABI-tag" {
                     Type:      SHT_NOTE
@@ -183,11 +181,11 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000000
             Link:      0x00000005
-            Data:      08 e8 01 00 00 00 00 00 03 04 00 00 00 00 00 00 # ................
-                       10 2f 00 00 00 00 00 00 10 e8 01 00 00 00 00 00 # ./..............
+            Data:      0x000000000001e808 0x0000000000002f10 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000001e810 0x0000000000002ec8 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                        ...
-                       01 04 00 00 4b 00 00 00 00 00 00 00 00 00 00 00 # ....K...........
-                       total: 3960
+                       0x000000000001eff8 0x0000000000000000 R_AARCH64_GLOB_DAT ("__fxstatat" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       total: 165
         }
         section 10 ".rela.plt" {
             Type:      SHT_RELA
@@ -197,11 +195,9 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000016
             Link:      0x00000005
-            Data:      e8 eb 01 00 00 00 00 00 02 04 00 00 1d 00 00 00 # ................
-                       00 00 00 00 00 00 00 00 f0 eb 01 00 00 00 00 00 # ................
-                       ...
-                       02 04 00 00 2c 00 00 00 00 00 00 00 00 00 00 00 # ....,...........
-                       total: 72
+            Data:      0x000000000001ebe8 0x0000000000000000 R_AARCH64_JUMP_SLOT ("__libc_start_main" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000001ebf0 0x0000000000000000 R_AARCH64_JUMP_SLOT ("__gmon_start__" bind: STB_Weak type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000001ebf8 0x0000000000000000 R_AARCH64_JUMP_SLOT ("abort" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
         }
         section 11 ".init" {
             Type:      SHT_PROGBITS

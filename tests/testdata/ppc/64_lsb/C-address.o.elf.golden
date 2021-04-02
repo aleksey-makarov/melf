@@ -76,9 +76,7 @@ section 7 ".comment" {
     Link:      0x00000000
     Data:      00 47 43 43 3a 20 28 47 65 6e 74 6f 6f 20 39 2e # .GCC: (Gentoo 9.
                33 2e 30 2d 72 31 20 70 33 29 20 39 2e 33 2e 30 # 3.0-r1 p3) 9.3.0
-               ...
-               2e 30 2d 72 31 20 70 33 29 20 39 2e 33 2e 30 00 # .0-r1 p3) 9.3.0.
-               total: 33
+               00                                              # .
 }
 section 8 ".note.GNU-stack" {
     Type:      SHT_PROGBITS
@@ -133,9 +131,7 @@ section 10 ".strtab" {
     Link:      0x00000000
     Data:      00 5f 6e 6c 5f 43 5f 4c 43 5f 41 44 44 52 45 53 # ._nl_C_LC_ADDRES
                53 00 5f 6e 6c 5f 43 5f 6e 61 6d 65 00 5f 6e 6c # S._nl_C_name._nl
-               ...
-               65 00 5f 6e 6c 5f 43 5f 63 6f 64 65 73 65 74 00 # e._nl_C_codeset.
-               total: 43
+               5f 43 5f 63 6f 64 65 73 65 74 00                # _C_codeset.
 }
 section 6 ".rela.data.rel.ro.local" {
     Type:      SHT_RELA

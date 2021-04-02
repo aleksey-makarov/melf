@@ -84,9 +84,7 @@ segment {
                     Link:      0x00000000
                     Data:      04 00 00 00 14 00 00 00 03 00 00 00 47 4e 55 00 # ............GNU.
                                58 29 d3 10 58 b0 f0 dd 63 8a 8f e4 10 14 42 87 # X)..X...c.....B.
-                               ...
-                               58 b0 f0 dd 63 8a 8f e4 10 14 42 87 ef fc ec 06 # X...c.....B.....
-                               total: 36
+                               ef fc ec 06                                     # ....
                 }
         }
         section 4 ".gnu.hash" {

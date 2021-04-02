@@ -73,9 +73,7 @@ segment {
                     Link:      0x00000000
                     Data:      04 00 00 00 14 00 00 00 03 00 00 00 47 4e 55 00 # ............GNU.
                                bd 90 61 a2 9c b4 dc 55 e4 a3 1c ea aa 55 7e 57 # ..a....U.....U~W
-                               ...
-                               9c b4 dc 55 e4 a3 1c ea aa 55 7e 57 9b cc 35 3b # ...U.....U~W..5;
-                               total: 36
+                               9b cc 35 3b                                     # ..5;
                 }
         }
         section 3 ".hash" {

@@ -73,9 +73,7 @@ segment {
                     Link:      0x00000000
                     Data:      04 00 00 00 14 00 00 00 03 00 00 00 47 4e 55 00 # ............GNU.
                                80 c3 08 25 4a 18 e5 9e ac 3e c5 e8 9a 79 fc 62 # ...%J....>...y.b
-                               ...
-                               4a 18 e5 9e ac 3e c5 e8 9a 79 fc 62 36 d5 95 2a # J....>...y.b6..*
-                               total: 36
+                               36 d5 95 2a                                     # 6..*
                 }
                 section 3 ".note.ABI-tag" {
                     Type:      SHT_NOTE

@@ -44,9 +44,7 @@ segment {
                     Link:      0x00000000
                     Data:      2f 6c 69 62 2f 6c 64 2d 6c 69 6e 75 78 2d 72 69 # /lib/ld-linux-ri
                                73 63 76 33 32 2d 69 6c 70 33 32 64 2e 73 6f 2e # scv32-ilp32d.so.
-                               ...
-                               76 33 32 2d 69 6c 70 33 32 64 2e 73 6f 2e 31 00 # v32-ilp32d.so.1.
-                               total: 34
+                               31 00                                           # 1.
                 }
         }
         segment {
@@ -246,9 +244,7 @@ segment {
                     Link:      0x00000000
                     Data:      01 1b 03 3b 20 00 00 00 03 00 00 00 e8 c5 fe ff # ...; ...........
                                38 00 00 00 94 bd ff ff 4c 00 00 00 36 c1 ff ff # 8.......L...6...
-                               ...
-                               94 bd ff ff 4c 00 00 00 36 c1 ff ff 60 00 00 00 # ....L...6...`...
-                               total: 36
+                               60 00 00 00                                     # `...
                 }
         }
         section 14 ".eh_frame" {
