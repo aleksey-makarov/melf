@@ -36,9 +36,9 @@ import Test.Tasty
 import Test.Tasty.Golden
 import Test.Tasty.HUnit
 
+import Control.Exception.ChainedException
 import Data.Elf
 import Data.Elf.PrettyPrint
-import Data.Elf.Exception
 import Data.Elf.Headers
 import Data.Endian
 
@@ -121,8 +121,8 @@ mkGoldenTestOSuffix name osuffix formatFunction file = mkGoldenTest' g o formatF
 index' :: (Integral i, MonadThrow m) => [a] -> i -> m a
 index' (x:_) 0 = return x
 index' (_:xs) n | n > 0     = index' xs (n-1)
-                | otherwise = $elfError "index': negative argument."
-index' _ _                  = $elfError "index': index too large."
+                | otherwise = $chainedError "index': negative argument."
+index' _ _                  = $chainedError "index': index too large."
 
 getStringTable :: MonadThrow m => (Sigma ElfClass (TyCon1 HeadersXX)) -> BSL.ByteString -> m BSL.ByteString
 getStringTable (classS :&: HeadersXX (HeaderXX{..}, ss, _)) bs = withElfClass classS

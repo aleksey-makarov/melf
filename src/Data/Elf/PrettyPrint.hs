@@ -47,8 +47,8 @@ import Data.Word
 import Numeric
 import System.IO
 
+import Control.Exception.ChainedException
 import Data.Elf
-import Data.Elf.Exception
 import Data.Elf.Headers
 import Data.Interval
 
@@ -359,7 +359,7 @@ printRelocationTableA_AARCH64 full sLink elfs bs = do
     symTableSection <- elfFindSection elfs sLink
     symTable <- parseSymbolTable ELFDATA2LSB symTableSection elfs
     let
-        getSymbolTableEntry' []     _  = $elfError "wrong symbol table index"
+        getSymbolTableEntry' []     _  = $chainedError "wrong symbol table index"
         getSymbolTableEntry' (x:_)  0  = return x
         getSymbolTableEntry' (_:xs) n  = getSymbolTableEntry' xs (n - 1)
 
@@ -393,7 +393,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
         header <- elfFindHeader elfs
         case header of
             ElfHeader{..} -> return (ehData, ehMachine)
-            _ -> $elfError "not a header" -- FIXME
+            _ -> $chainedError "not a header" -- FIXME
 
     let
 
@@ -421,7 +421,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                     && esEntSize == withElfClass classS relocationTableAEntrySize then
                         case classS of
                             SELFCLASS64 -> ("section", ) <$> printRelocationTableA_AARCH64 full esLink elfs bs
-                            SELFCLASS32 -> $elfError "invalid ELF: EM_AARCH64 and ELFCLASS32"
+                            SELFCLASS32 -> $chainedError "invalid ELF: EM_AARCH64 and ELFCLASS32"
                 else
                     return ("section", printData full bs)
             return $ formatPairsBlock (sectionName <+> (viaShow esN) <+> (dquotes $ pretty esName))
@@ -474,7 +474,7 @@ printStringTable bs =
     case BSL.unsnoc bs of
         Nothing -> return ""
         Just (bs', e) -> do
-            when (e /= 0) $ $elfError "string table should end with 0"
+            when (e /= 0) $ $chainedError "string table should end with 0"
             return if (BSL.length bs' == 0)
                 then angles ""
                 else vsep $ map (angles . pretty) $ L.sort $ map BSL8.unpack $ BSL.splitWith (== 0) $ bs'

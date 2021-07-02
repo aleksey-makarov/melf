@@ -30,7 +30,7 @@ library
       Data.Elf
       Data.Elf.Headers
       Data.Elf.PrettyPrint
-      Data.Elf.Exception
+      Control.Exception.ChainedException
   other-modules:
       Data.Elf.TH
       Data.Elf.Generated
