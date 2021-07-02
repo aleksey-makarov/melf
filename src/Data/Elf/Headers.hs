@@ -90,9 +90,9 @@ import Data.Typeable (Typeable)
 
 -- https://stackoverflow.com/questions/10672981/export-template-haskell-generated-definitions
 
+import Control.Exception.ChainedException
 import Data.BList
 import Data.Endian
-import Data.Elf.Exception
 import Data.Elf.Generated
 
 $(singletons [d|
@@ -617,7 +617,7 @@ newtype HeadersXX a = HeadersXX (HeaderXX a, [SectionXX a], [SegmentXX a])
 
 elfDecodeOrFail' :: (Binary a, MonadThrow m) => BSL.ByteString -> m (ByteOffset, a)
 elfDecodeOrFail' bs = case decodeOrFail bs of
-    Left (_, off, err) -> $elfError $ err ++ " @" ++ show off
+    Left (_, off, err) -> $chainedError $ err ++ " @" ++ show off
     Right (_, off, a) -> return (off, a)
 
 elfDecodeOrFail :: (Binary a, MonadThrow m) => BSL.ByteString -> m a
@@ -626,7 +626,7 @@ elfDecodeOrFail bs = snd <$> elfDecodeOrFail' bs
 elfDecodeAllOrFail :: (Binary a, MonadThrow m) => BSL.ByteString -> m a
 elfDecodeAllOrFail bs = do
     (off, a) <- elfDecodeOrFail' bs
-    if off == (BSL.length bs) then return a else $elfError $ "leftover != 0 @" ++ show off
+    if off == (BSL.length bs) then return a else $chainedError $ "leftover != 0 @" ++ show off
 
 parseListA :: (MonadThrow m, Binary (Le a), Binary (Be a)) => ElfData -> BSL.ByteString -> m [a]
 parseListA d bs = case d of

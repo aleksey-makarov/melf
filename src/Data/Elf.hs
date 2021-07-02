@@ -44,7 +44,7 @@ module Data.Elf
     , parseSymbolTable
     ) where
 
-import Data.Elf.Exception
+import Control.Exception.ChainedException
 import Data.Elf.Generated
 import Data.Elf.Headers
 import Data.Interval as I
@@ -186,7 +186,7 @@ addRBuilders newts =
                     return $ toList $ LZip l (Just RBuilderSegment{ rbpData = d, .. }) r
                 Just c ->
                     if offset (rBuilderInterval c) /= to then
-                        $elfError $ intersectMessage t c
+                        $chainedError $ intersectMessage t c
                     else
                         let
                             (ce, re) = allEmptyStartingAt to (c : r)
@@ -209,7 +209,7 @@ addRBuilders newts =
                 addRBuildersNonEmpty ts' RBuilderSegment{..} = do
                     d <- $addContext' $ addRBuilders' addRBuilderNonEmpty ts' rbpData
                     return RBuilderSegment{ rbpData = d, .. }
-                addRBuildersNonEmpty (x:_) y = $elfError $ intersectMessage x y
+                addRBuildersNonEmpty (x:_) y = $chainedError $ intersectMessage x y
 
             in case c' of
 
@@ -265,13 +265,13 @@ addRBuilders newts =
 
                                     -- add this:     ......[t_________________].............................
                                     -- to this list: ......[c_________]......[c2___]......[________]........
-                                    $elfError $ intersectMessage t c2
+                                    $chainedError $ intersectMessage t c2
 
                     else
 
                         -- add this:     ..........[t________].............................
                         -- to this list: ......[c_________]......[_____]......[________]...
-                        $elfError $ intersectMessage t c
+                        $chainedError $ intersectMessage t c
 
                 Nothing ->
 
@@ -301,7 +301,7 @@ addRBuilders newts =
 
                                 -- add this:     ....[t_______________________________]..........
                                 -- to this list: ..........[l2__]..[l2__].....[c2_______]........
-                                $elfError $ intersectMessage t c2
+                                $chainedError $ intersectMessage t c2
 
         (emptyRBs, nonEmptyRBs) = L.partition (I.empty . rBuilderInterval) newts
 
@@ -408,15 +408,15 @@ foldMapElfList f l = fold $ fmap (foldMapElf f) l
 
 elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b) => [Elf a] -> b -> m (Elf a)
 elfFindSection elfs n = if n == 0
-    then $elfError "no section 0"
-    else maybe ($elfError $ "no section " ++ show n) return maybeSection
+    then $chainedError "no section 0"
+    else maybe ($chainedError $ "no section " ++ show n) return maybeSection
         where
             maybeSection = getFirst $ foldMapElfList f elfs
             f s@ElfSection{..} | esN == fromIntegral n = First $ Just s
             f _ = First Nothing
 
 elfFindHeader :: forall a m . (SingI a, MonadThrow m) => [Elf a] -> m (Elf a)
-elfFindHeader elfs = maybe ($elfError $ "no header") return maybeHeader
+elfFindHeader elfs = maybe ($chainedError $ "no header") return maybeHeader
     where
         maybeHeader = getFirst $ foldMapElfList f elfs
         f h@ElfHeader{} = First $ Just h
@@ -715,7 +715,7 @@ serializeElf' elfs = do
         header <- elfFindHeader elfs
         case header of
             ElfHeader{..} -> return (header, ehData)
-            _ -> $elfError "not a header" -- FIXME
+            _ -> $chainedError "not a header" -- FIXME
 
     let
 
@@ -750,7 +750,7 @@ serializeElf' elfs = do
         align :: MonadThrow n => WordXX a -> WordXX a -> WBuilderState a -> n (WBuilderState a)
         align _ 0 x = return x
         align _ 1 x = return x
-        align t m WBuilderState{..} | m .&. (m - 1) /= 0 = $elfError $ "align module is not power of two " ++ (show m)
+        align t m WBuilderState{..} | m .&. (m - 1) /= 0 = $chainedError $ "align module is not power of two " ++ (show m)
                                     | otherwise =
             let
                 wbsOffset' = nextOffset t m wbsOffset
@@ -800,7 +800,7 @@ serializeElf' elfs = do
                 }
         elf2WBuilder' ElfSection{esFlags = ElfSectionFlag f, ..} s = do
             when (f .&. (fromIntegral $ complement (maxBound @ (WordXX a))) /= 0)
-                ($elfError $ "section flags at section " ++ show esN ++ "don't fit")
+                ($chainedError $ "section flags at section " ++ show esN ++ "don't fit")
             WBuilderState{..} <- if esType == SHT_NOBITS
                 then return s
                 else align 0 esAddrAlign s
@@ -876,7 +876,7 @@ serializeElf' elfs = do
                 next (ln, _) (rn, _) = ln + 1 == rn
                 checkNeibours = L.all id $ neighbours sorted next
 
-            when (not checkNeibours) ($elfError "sections are not consistent")
+            when (not checkNeibours) ($chainedError "sections are not consistent")
             return $ fmap snd sorted
 
         wbState2ByteString :: WBuilderState a -> m BSL.ByteString
@@ -962,7 +962,7 @@ parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = d
         ElfSection{ esData = ElfSectionData stringTable } -> do
             st <- parseListA d symbolTable
             return (mkElfSymbolTableEntry stringTable <$> st)
-        _ -> $elfError "not a section" -- FIXME
-parseSymbolTable _ _ _ = $elfError "incorrect args to parseSymbolTable" -- FIXME
+        _ -> $chainedError "not a section" -- FIXME
+parseSymbolTable _ _ _ = $chainedError "incorrect args to parseSymbolTable" -- FIXME
 
 -- FIXME: serializeSymbolTable
