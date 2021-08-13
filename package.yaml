@@ -56,6 +56,13 @@ tests:
       - tasty
       - tasty-golden
       - tasty-hunit
+  exceptions:
+    main: Exceptions.hs
+    source-dirs: tests/exceptions
+    dependencies:
+      - base
+      - tasty
+      - tasty-hunit
   examples:
     main: Examples.hs
     source-dirs: examples

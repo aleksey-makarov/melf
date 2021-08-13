@@ -34,6 +34,8 @@ data ChainedExceptionNext = Null                         -- ^ Null, when the exc
                           | NextChained ChainedException -- ^ Null, when the exception was initiated by an exception other than `ChainedException`
                           | Next SomeException           -- ^ next location in the stack
 
+-- FIXME: use Text
+-- FIXME: use file and line separately
 -- | Exception that keeps track of error locations
 data ChainedException = ChainedException
     { err   :: String                    -- ^ description of the error
