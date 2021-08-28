@@ -13,6 +13,11 @@
 For the early history look at the branch "[amakarov](https://github.com/aleksey-makarov/elf/tree/amakarov)" of
 the my copy of the [elf](https://github.com/aleksey-makarov/elf) repo.
 
+## How to build
+
+- [Install](https://nixos.org/manual/nix/stable/#chap-installation) Nix
+- Make sure you have path to Nix binaries set in the user environment.  (Installation process modifies .bash_profile)
+
 ## Tests
 
 Test data is committed with [git-lfs](https://git-lfs.github.com/).
