@@ -63,6 +63,7 @@ tests:
       - base
       - tasty
       - tasty-hunit
+      - melf
   examples:
     main: Examples.hs
     source-dirs: examples
