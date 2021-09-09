@@ -61,6 +61,7 @@ tests:
     source-dirs: tests/exceptions
     dependencies:
       - base
+      - exceptions
       - tasty
       - tasty-hunit
       - melf

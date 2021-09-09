@@ -29,37 +29,17 @@ import Control.Exception hiding (try, catch)
 import Control.Monad.Catch
 import Language.Haskell.TH
 
--- | Data to organize the stack of locations
-data ChainedExceptionNext = Null                         -- ^ Null, when the exception was initiated by `chainedError`
-                          | NextChained ChainedException -- ^ Null, when the exception was initiated by an exception other than `ChainedException`
-                          | Next SomeException           -- ^ next location in the stack
+-- | Structure to organize the stack of exceptions with locations
+data ChainedExceptionNext = Null                         -- ^ exception was initiated by @`chainedError`@
+                          | Next SomeException           -- ^ some context was added to @`SomeException`@ by @`addContext`@
+                          | NextChained ChainedException -- ^ some context was added to a @`ChainedException`@ by @`addContext`@
 
--- FIXME: use Text
--- FIXME: use file and line separately
 -- | Exception that keeps track of error locations
 data ChainedException = ChainedException
-    { err   :: String                    -- ^ description of the error
-    , ctxt  :: String                    -- ^ location
-    , stack :: ChainedExceptionNext      -- ^ stack of locations
+    { err   :: String               -- ^ description of the error
+    , loc   :: Loc                  -- ^ location
+    , stack :: ChainedExceptionNext -- ^ stack of locations
     }
-
-instance Show ChainedException where
-    show ChainedException{..} = case stack of
-        Null           -> showThis
-        NextChained ce -> f ce
-        Next e         -> f e
-
-        where
-            showThis = (if null err then [] else err) ++ " (" ++ ctxt ++ ")"
-            f st = show st ++ " // " ++ showThis
-
-instance Exception ChainedException
-
-withFileLine :: Q Exp -> Q Exp
-withFileLine f = let loc = fileLine =<< location in appE f loc
-
-fileLine :: Loc -> Q Exp
-fileLine loc = let floc = formatLoc loc in [| $(litE $ stringL floc) |]
 
 formatLoc :: Loc -> String
 formatLoc loc =
@@ -68,30 +48,49 @@ formatLoc loc =
         (line, _) = loc_start loc
     in concat [file, ":", show line]
 
-chainedErrorX :: MonadThrow m => String -> String -> m a
+instance Show ChainedException where
+    show ChainedException{..} = showThis ++ case stack of
+        Null           -> ""
+        NextChained ce -> " // " ++ show ce
+        Next e         -> " // " ++ show e
+        where
+            showThis = concat [err, if null err then "" else " ", "(", formatLoc loc, ")" ]
+
+instance Exception ChainedException
+
+withLoc :: Q Exp -> Q Exp
+withLoc f = appE f (location >>= liftLoc)
+
+liftLoc :: Loc -> Q Exp
+liftLoc Loc {..} = [| Loc loc_filename loc_package loc_module loc_start loc_end |]
+
+--------------------------------------------------------
+
+chainedErrorX :: MonadThrow m => Loc -> String -> m a
 chainedErrorX loc s = throwM $ ChainedException s loc Null
 
--- | @$chainedError "error description"@ results to a `MonadThrow` monad
+-- | @$chainedError "error description"@ results in a `MonadThrow` monad
 -- that throws `ChainedException` with @"error description"@.
 chainedError :: Q Exp
-chainedError = withFileLine [| chainedErrorX |]
+chainedError = withLoc [| chainedErrorX |]
 
--- | @$chainedError'@ is the same as @$chainedError ""@.
+-- | @$chainedError'@ is the same as @$`chainedError` ""@
 chainedError' :: Q Exp
-chainedError' = withFileLine [| \ x -> chainedErrorX x [] |]
+chainedError' = withLoc [| \ x -> chainedErrorX x [] |]
 
-addContextX :: MonadCatch m => String -> String -> m a -> m a
-addContextX loc s m = m `catch` fc `catch` f
+addContextX :: MonadCatch m => Loc -> String -> m a -> m a
+addContextX loc s m = m `catch` f
     where
-        fc :: MonadThrow m => ChainedException -> m a
-        fc e = throwM $ ChainedException s loc $ NextChained e
         f :: MonadThrow m => SomeException -> m a
-        f e = throwM $ ChainedException s loc $ Next e
+        f e = throwM $ ChainedException s loc $ case fromException e of
+            Just ce -> NextChained ce
+            Nothing -> Next e
 
--- | @addContext@
+-- | @addContext "context description" m@ where @m@ is a `MonadCatch` will run @m@ and 
+-- | append a context to any exception thrown from @m@
 addContext :: Q Exp
-addContext = withFileLine [| addContextX |]
+addContext = withLoc [| addContextX |]
 
--- | @addContext'@
+-- | @addContext'@ is the same as @addContext ""@
 addContext' :: Q Exp
-addContext' = withFileLine [| \ x -> addContextX x [] |]
+addContext' = withLoc [| \ x -> addContextX x [] |]

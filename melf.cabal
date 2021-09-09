@@ -119,6 +119,7 @@ test-suite exceptions
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
   build-depends:
       base
+    , exceptions
     , melf
     , tasty
     , tasty-hunit
