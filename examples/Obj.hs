@@ -5,6 +5,7 @@ import qualified Data.ByteString.Lazy.Char8 as BSLC
 import Data.Singletons.Sigma
 
 import Data.Elf
+import Data.Elf.Constants
 import Data.Elf.Headers
 
 import Asm

@@ -29,12 +29,13 @@ library:
   source-dirs: src
   other-modules:
     - Data.Elf.TH
-    - Data.Elf.Generated
+    - Data.Elf.Constants.TH
     - Data.Interval
     - Data.BList
   exposed-modules:
     - Data.Endian
     - Data.Elf
+    - Data.Elf.Constants
     - Data.Elf.Headers
     - Data.Elf.PrettyPrint
     - Control.Exception.ChainedException

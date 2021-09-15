@@ -1,3 +1,14 @@
+-- |
+-- Module      : Data.Endian
+-- Description : Newtypes for little- and big-endian values
+-- Copyright   : (c) Aleksey Makarov, 2021
+-- License     : BSD 3-Clause License
+-- Maintainer  : aleksey.makarov@gmail.com
+-- Stability   : experimental
+-- Portability : portable
+--
+-- Newtypes for little- and big-endian instances of `Binary`
+
 {-# LANGUAGE FlexibleInstances #-}
 
 module Data.Endian (Be(..), Le(..)) where
@@ -6,7 +17,10 @@ import Data.Binary.Put
 import Data.Binary.Get
 import Data.Binary
 
+-- | @Be a@ is an instance of `Binary` such that @a@ is serialized as big-endian
 newtype Be a = Be { fromBe :: a } deriving Eq
+
+-- | @Le a@ is an instance of `Binary` such that @a@ is serialized as little-endian
 newtype Le a = Le { fromLe :: a } deriving Eq
 
 instance Binary (Be Word16) where

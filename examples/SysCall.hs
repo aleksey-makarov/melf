@@ -6,6 +6,7 @@ import qualified Data.ByteString.Lazy as BSL
 import Data.Singletons.Sigma
 
 import Data.Elf
+import Data.Elf.Constants
 import Data.Elf.Headers
 
 syscall :: MonadCatch m => m Elf'

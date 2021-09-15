@@ -1,3 +1,14 @@
+-- |
+-- Module      : Data.ELF
+-- Description : Parse/serialize ELF files into structured data
+-- Copyright   : (c) Aleksey Makarov, 2021
+-- License     : BSD 3-Clause License
+-- Maintainer  : aleksey.makarov@gmail.com
+-- Stability   : experimental
+-- Portability : portable
+--
+-- Parse/serialize ELF files into structured data
+
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE EmptyCase #-}
@@ -22,10 +33,8 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
--- | Data.Elf is a module for parsing a ByteString of an ELF file into an Elf record.
 module Data.Elf
-    ( module Data.Elf.Generated
-    , ElfSectionData (..)
+    ( ElfSectionData (..)
     , Elf (..)
     , ElfList (..)
     , Elf'
@@ -45,7 +54,7 @@ module Data.Elf
     ) where
 
 import Control.Exception.ChainedException
-import Data.Elf.Generated
+import Data.Elf.Constants
 import Data.Elf.Headers
 import Data.Interval as I
 

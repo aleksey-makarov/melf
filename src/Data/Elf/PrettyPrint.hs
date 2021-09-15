@@ -1,3 +1,14 @@
+-- |
+-- Module      : Data.Elf.PrettyPrint
+-- Description : Pretty printing the data parsed by Data.Elf
+-- Copyright   : (c) Aleksey Makarov, 2021
+-- License     : BSD 3-Clause License
+-- Maintainer  : aleksey.makarov@gmail.com
+-- Stability   : experimental
+-- Portability : portable
+--
+-- Pretty print the data parsed by @Data.Elf@.  Basically these functions are used for golden testing.
+
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
@@ -12,17 +23,10 @@
 {-# LANGUAGE TypeFamilies #-}
 
 module Data.Elf.PrettyPrint
-    ( formatPairs
-    , formatList
-    , formatPairsBlock
-    , printHeader
-    , printSection
-    , printSegment
-    , printHeaders
-    , printRBuilder
+    ( printHeaders
     , printLayout
-    , printElf
     , printElf_
+    , printElf
     , printStringTable
 
     , readFileLazy
@@ -49,6 +53,7 @@ import System.IO
 
 import Control.Exception.ChainedException
 import Data.Elf
+import Data.Elf.Constants
 import Data.Elf.Headers
 import Data.Interval
 
@@ -136,6 +141,7 @@ printSegment (n, SegmentXX{..}) =
         , ("Align",    printWordXX pAlign    ) -- WordXX c
         ]
 
+-- | Print parsed headers.  It's used in golden tests
 printHeaders :: SingI a => HeaderXX a -> [SectionXX a] -> [SegmentXX a] -> Doc ()
 printHeaders hdr ss ps =
     let
@@ -263,6 +269,8 @@ findStringSection rbs = do
     HeaderXX{..} <- findHeader rbs
     findSection hShStrNdx rbs
 
+-- | Print ELF layout.  First parse ELF with `parseHeaders`, then use this function to
+--   format the layout.
 printLayout :: MonadCatch m => (Sigma ElfClass (TyCon1 HeadersXX)) -> BSL.ByteString -> m (Doc ())
 printLayout (classS :&: HeadersXX (hdr, ss, ps)) bs = withElfClass classS do
     rbs <- parseRBuilder hdr ss ps bs
@@ -383,9 +391,11 @@ printRelocationTableA_AARCH64 full sLink elfs bs = do
     relas <- parseListA ELFDATA2LSB bs
     (align . vsep . split) <$> mapM f relas
 
+-- | Same as @`printElf_` False@
 printElf :: MonadThrow m => Elf' -> m (Doc ())
 printElf = printElf_ False
 
+-- | Print ELF.  If first argument is False, don't dump all the data, print just the first two and the last lines.
 printElf_ :: MonadThrow m => Bool -> Elf' -> m (Doc ())
 printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
 
@@ -469,6 +479,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
 --
 --------------------------------------------------------------------
 
+-- | Print string table.  It's used in golden tests
 printStringTable :: MonadThrow m => BSL.ByteString -> m (Doc ())
 printStringTable bs =
     case BSL.unsnoc bs of
@@ -483,9 +494,11 @@ printStringTable bs =
 --
 --------------------------------------------------------------------
 
+-- | Read the file strictly but return lazy bytestring
 readFileLazy :: FilePath -> IO BSL.ByteString
 readFileLazy path = BSL.fromStrict <$> BS.readFile path
 
+-- | Read ELF from one file, `printElf` it into another.
 writeElfDump :: FilePath -> FilePath -> IO ()
 writeElfDump i o = do
     bs <- readFileLazy i
@@ -493,6 +506,7 @@ writeElfDump i o = do
     doc <- printElf e
     withFile o WriteMode (\ h -> hPutDoc h (doc <> line))
 
+-- | Read ELF from one file, `printLayout` it into another.
 writeElfLayout :: FilePath -> FilePath -> IO ()
 writeElfLayout i o = do
     bs <- readFileLazy i

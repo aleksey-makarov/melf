@@ -1,3 +1,14 @@
+-- |
+-- Module      : Data.ELF.Headers
+-- Description : Parse headers and table entries of ELF files
+-- Copyright   : (c) Aleksey Makarov, 2021
+-- License     : BSD 3-Clause License
+-- Maintainer  : aleksey.makarov@gmail.com
+-- Stability   : experimental
+-- Portability : portable
+--
+-- Parse headers and table entries of ELF files
+
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE EmptyCase #-}
@@ -23,7 +34,6 @@
 
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
--- | Data.Elf is a module for parsing a ByteString of an ELF file into an Elf record.
 module Data.Elf.Headers
     ( ElfClass(..)
     , ElfData(..)
@@ -40,9 +50,6 @@ module Data.Elf.Headers
 
     , HeaderXX(..)
     , Header
-
-    , BList(..)
-
     , SectionXX(..)
     , SegmentXX(..)
     , SymbolTableEntryXX(..)
@@ -62,8 +69,7 @@ module Data.Elf.Headers
     , serializeListA
 
     , elfMagic
-
-    , module Data.Elf.Generated) where
+    ) where
 
 -- import Control.Lens hiding (at)
 -- import Control.Arrow
@@ -88,12 +94,10 @@ import Data.Typeable (Typeable)
 -- import Numeric.Interval as I
 -- import Numeric.Interval.NonEmpty as INE
 
--- https://stackoverflow.com/questions/10672981/export-template-haskell-generated-definitions
-
 import Control.Exception.ChainedException
 import Data.BList
 import Data.Endian
-import Data.Elf.Generated
+import Data.Elf.Constants
 
 $(singletons [d|
     data ElfClass

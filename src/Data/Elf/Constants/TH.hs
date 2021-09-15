@@ -3,7 +3,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
-module Data.Elf.Generated where
+module Data.Elf.Constants.TH where
 
 import Data.Binary
 import Data.Binary.Put
