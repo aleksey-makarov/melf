@@ -33,22 +33,27 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Data.Elf
-    ( ElfSectionData (..)
+module Data.Elf (
+    -- * Elf
+      ElfSectionData (..)
     , ElfXX (..)
     , ElfList (..)
     , Elf
-    , RBuilder (..)
     , parseElf
+    , serializeElf
+
+    -- * RBuilder
+    , RBuilder (..)
     , parseRBuilder
+
+    -- * Misc
     , getSectionData
     , getString
     , elfFindSection
     , elfFindHeader
     , rBuilderInterval
-    , serializeElf'
-    , serializeElf
 
+    -- * Symbol table
     , ElfSymbolXX(..)
     , parseSymbolTable
     ) where
