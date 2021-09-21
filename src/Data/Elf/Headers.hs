@@ -35,40 +35,51 @@
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 module Data.Elf.Headers
-    ( ElfClass(..)
+    ( 
+    -- * Data definition
+      elfMagic
+    , ElfClass(..)
+    , SElfClass (..)
     , ElfData(..)
 
     , IsElfClass(..)
+    , wordSize
     , withElfClass
 
-    , headerSize
-    , sectionTableEntrySize
-    , segmentTableEntrySize
-    , symbolTableEntrySize
-    , relocationTableAEntrySize
-    , wordAlign
-
+    -- * ELF header
     , HeaderXX(..)
+    , headerSize
     , Header
+
+    -- * ELF tables
+
+    -- ** Section table
     , SectionXX(..)
+    , sectionTableEntrySize
+
+    -- ** Segment table
     , SegmentXX(..)
+    , segmentTableEntrySize
+
+    -- ** Sybmol table
     , SymbolTableEntryXX(..)
+    , symbolTableEntrySize
+
+    -- ** Relocation table
     , RelocationTableAEntryXX(..)
+    , relocationTableAEntrySize
 
-    ---------------------------------
-
-    , sectionIsSymbolTable
-
-    , SElfClass (..)
-
-    , splitBits
-
+    -- * Parse header and section and segment tables
     , HeadersXX (..)
     , parseHeaders
+
+    -- * Misc helpers
+    , sectionIsSymbolTable
+    , splitBits
+
     , parseListA
     , serializeListA
 
-    , elfMagic
     ) where
 
 -- import Control.Lens hiding (at)
@@ -99,6 +110,7 @@ import Data.BList
 import Data.Endian
 import Data.Elf.Constants
 
+-- | ELF class.  Tells if ELF defines of 32-bit or 64-bit objects
 $(singletons [d|
     data ElfClass
         = ELFCLASS32 -- ^ 32-bit ELF format
@@ -115,6 +127,7 @@ instance Binary ElfClass where
     put ELFCLASS32 = putWord8 1
     put ELFCLASS64 = putWord8 2
 
+-- | ELF data. Specifies the endianness of the ELF data
 data ElfData
     = ELFDATA2LSB -- ^ Little-endian ELF format
     | ELFDATA2MSB -- ^ Big-endian ELF format
@@ -144,6 +157,7 @@ elfSupportedVersion = 1
 -- cut :: BS.ByteString -> Int -> Int -> BS.ByteString
 -- cut content offset size = BS.take size $ BS.drop offset content
 
+-- | The first 4 bytes of the ELF file
 elfMagic :: Be Word32
 elfMagic = Be 0x7f454c46 -- "\DELELF"
 
@@ -182,6 +196,9 @@ putBe = putEndian ELFDATA2MSB
 putLe :: (Binary (Le b), Binary (Be b)) => b -> Put
 putLe = putEndian ELFDATA2LSB
 
+-- | Splits an integer into list of integers such that its sum equals to the argument,
+--   and each element of the list if of the form @(1 << x)@ for some @x@.
+--   @splitBits 5@ produces @[ 1, 4 ]@
 splitBits :: (Num w, FiniteBits w) => w -> [w]
 splitBits w = fmap (shiftL 1) $ L.filter (testBit w) $ fmap (subtract 1) [ 1 .. (finiteBitSize w) ]
 
@@ -189,6 +206,8 @@ splitBits w = fmap (shiftL 1) $ L.filter (testBit w) $ fmap (subtract 1) [ 1 .. 
 -- WordXX
 --------------------------------------------------------------------------
 
+-- | @IsElfClass a@ is defined for each constructor of `ElfClass`.
+--   It defines @WordXX a@, which is `Word32` for `ELFCLASS32` and `Word64` for `ELFCLASS64`.
 type IsElfClass :: ElfClass -> Constraint
 class ( SingI c
       , Typeable c
@@ -220,6 +239,7 @@ instance IsElfClass 'ELFCLASS64 where
 -- Header
 --------------------------------------------------------------------------
 
+-- | Parsed ELF header
 type HeaderXX :: ElfClass -> Type
 data HeaderXX c =
     HeaderXX
@@ -239,28 +259,35 @@ data HeaderXX c =
         , hShStrNdx   :: Word16
         }
 
+-- | Sigma type where `ElfClass` defines the type of `HeaderXX`
 type Header = Sigma ElfClass (TyCon1 HeaderXX)
 
+-- | Size of ELF header.
 headerSize :: Num a => ElfClass -> a
 headerSize ELFCLASS64 = 64
 headerSize ELFCLASS32 = 52
 
+-- | Size of section table entry.
 sectionTableEntrySize :: Num a => ElfClass -> a
 sectionTableEntrySize ELFCLASS64 = 64
 sectionTableEntrySize ELFCLASS32 = 40
 
+-- | Size of segment table entry.
 segmentTableEntrySize :: Num a => ElfClass -> a
 segmentTableEntrySize ELFCLASS64 = 56
 segmentTableEntrySize ELFCLASS32 = 32
 
+-- | Size of symbol table entry.
 symbolTableEntrySize :: Num a => ElfClass -> a
 symbolTableEntrySize ELFCLASS64 = 24
 symbolTableEntrySize ELFCLASS32 = 16
 
-wordAlign :: Num a => ElfClass -> a
-wordAlign ELFCLASS64 = 8
-wordAlign ELFCLASS32 = 4
+-- | Size of @WordXX a@ in bytes.
+wordSize :: Num a => ElfClass -> a
+wordSize ELFCLASS64 = 8
+wordSize ELFCLASS32 = 4
 
+-- | Convenience function for creating a context with an implicit ElfClass available.
 withElfClass :: Sing c -> (IsElfClass c => a) -> a
 withElfClass SELFCLASS64 x = x
 withElfClass SELFCLASS32 x = x
@@ -347,6 +374,7 @@ instance Binary Header where
 -- Section
 --------------------------------------------------------------------------
 
+-- | Parsed ELF section table entry
 data SectionXX (c :: ElfClass) =
     SectionXX
         { sName      :: Word32
@@ -406,6 +434,7 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SectionXX a)) where
 -- Segment
 --------------------------------------------------------------------------
 
+-- | Parsed ELF segment table entry
 data SegmentXX (c :: ElfClass) =
     SegmentXX
         { pType     :: ElfSegmentType
@@ -481,12 +510,15 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SegmentXX a)) where
     get = Le <$> getSegment sing getLe
 
 --------------------------------------------------------------------------
--- symbol table entry
+-- Symbol table entry
 --------------------------------------------------------------------------
 
+-- | Test if the section with such integer value of section type field
+--   contains symbol table
 sectionIsSymbolTable :: ElfSectionType -> Bool
 sectionIsSymbolTable sType  = sType `L.elem` [SHT_SYMTAB, SHT_DYNSYM]
 
+-- | Parsed ELF symbol table entry
 data SymbolTableEntryXX (c :: ElfClass) =
     SymbolTableEntryXX
         { stName  :: Word32
@@ -554,6 +586,7 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SymbolTableEntryXX a)) 
 -- relocation table entry
 --------------------------------------------------------------------------
 
+-- | Parsed relocation table entry (@ElfXX_Rela@)
 data RelocationTableAEntryXX (c :: ElfClass) =
     RelocationTableAEntryXX
         { relaOffset :: WordXX c
@@ -608,16 +641,13 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (RelocationTableAEntryXX
     put = (withElfClass (sing @ a) (putRelocationTableAEntry putLe)) . fromLe
     get = Le <$> (withElfClass (sing @ a) (getRelocationTableAEntry getLe))
 
+-- | Size of @RelocationTableAEntryXX a@ in bytes.
 relocationTableAEntrySize :: forall a . IsElfClass a => WordXX a
 relocationTableAEntrySize = fromIntegral $ BSL.length $ encode $ Le $ RelocationTableAEntryXX @ a 0 0 0 0
 
 --------------------------------------------------------------------------
 -- parseHeaders
 --------------------------------------------------------------------------
-
--- FIXME: how to get rid of this? (use some combinators for Sigma)
-newtype HeadersXX a = HeadersXX (HeaderXX a, [SectionXX a], [SegmentXX a])
--- type ElfHeadersXX a = (HeaderXX a, SectionXX a, SegmentXX a)
 
 elfDecodeOrFail' :: (Binary a, MonadThrow m) => BSL.ByteString -> m (ByteOffset, a)
 elfDecodeOrFail' bs = case decodeOrFail bs of
@@ -642,6 +672,11 @@ serializeListA d as = case d of
     ELFDATA2LSB -> encode $ Le $ BList as
     ELFDATA2MSB -> encode $ Be $ BList as
 
+-- FIXME: how to get rid of this? (Can we use some combinators for Sigma)
+-- | The type that helps to make the sigma type of the result
+--   of the `parseHeaders` function
+newtype HeadersXX a = HeadersXX (HeaderXX a, [SectionXX a], [SegmentXX a])
+
 parseHeaders' :: (IsElfClass a, MonadThrow m) => HeaderXX a -> BSL.ByteString -> m (Sigma ElfClass (TyCon1 HeadersXX))
 parseHeaders' hxx@HeaderXX{..} bs =
     let
@@ -653,6 +688,7 @@ parseHeaders' hxx@HeaderXX{..} bs =
         ps <- parseListA hData bsSegments
         return $ sing :&: HeadersXX (hxx, ss, ps)
 
+-- | Parse ELF file and produce header and section and segment tables
 parseHeaders :: MonadThrow m => BSL.ByteString -> m (Sigma ElfClass (TyCon1 HeadersXX))
 parseHeaders bs = do
     ((classS :&: hxx) :: Header) <- elfDecodeOrFail bs

@@ -523,7 +523,7 @@ addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
                         eAddrAlign = case rbs' of
                             (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pAlign
                             (RBuilderSection{rbsHeader = SectionXX{..}} : _) -> sAddrAlign
-                            _ -> wordAlign $ fromSing $ sing @a
+                            _ -> wordSize $ fromSing $ sing @a
                         -- e' here is the address of the next section/segment
                         -- according to the regular alignment rules
                         e' = nextOffset eAddr eAddrAlign b
@@ -772,7 +772,7 @@ serializeElf' elfs = do
                     }
 
         alignWord :: MonadThrow n => WBuilderState a -> n (WBuilderState a)
-        alignWord = align 0 $ wordAlign $ fromSing $ sing @a
+        alignWord = align 0 $ wordSize $ fromSing $ sing @a
 
         dataIsEmpty :: ElfSectionData -> Bool
         dataIsEmpty (ElfSectionData bs)       = BSL.null bs
