@@ -86,11 +86,11 @@ addContextX loc s m = m `catch` f
             Just ce -> NextChained ce
             Nothing -> Next e
 
--- | @addContext "context description" m@ where @m@ is a `MonadCatch` will run @m@ and
--- | append a context to any exception thrown from @m@.
+-- | @$addContext "context description" m@ where @m@ is a `MonadCatch` will run @m@ and
+-- append context @"constext description"@ to any exception thrown from @m@.
 addContext :: Q Exp
 addContext = withLoc [| addContextX |]
 
--- | @addContext'@ is the same as @addContext ""@
+-- | @$addContext'@ is the same as @$addContext ""@
 addContext' :: Q Exp
 addContext' = withLoc [| \ x -> addContextX x [] |]

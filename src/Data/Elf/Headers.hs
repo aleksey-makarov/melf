@@ -115,7 +115,7 @@ import Data.BList
 import Data.Endian
 import Data.Elf.Constants
 
--- | ELF class.  Tells if ELF defines of 32-bit or 64-bit objects
+-- | ELF class.  Tells if ELF defines 32- or 64-bit objects
 $(singletons [d|
     data ElfClass
         = ELFCLASS32 -- ^ 32-bit ELF format
@@ -202,7 +202,7 @@ putLe :: (Binary (Le b), Binary (Be b)) => b -> Put
 putLe = putEndian ELFDATA2LSB
 
 -- | Splits an integer into list of integers such that its sum equals to the argument,
---   and each element of the list if of the form @(1 << x)@ for some @x@.
+--   and each element of the list is of the form @(1 << x)@ for some @x@.
 --   @splitBits 5@ produces @[ 1, 4 ]@
 splitBits :: (Num w, FiniteBits w) => w -> [w]
 splitBits w = fmap (shiftL 1) $ L.filter (testBit w) $ fmap (subtract 1) [ 1 .. (finiteBitSize w) ]
