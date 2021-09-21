@@ -35,7 +35,7 @@
 
 module Data.Elf
     ( ElfSectionData (..)
-    , Elf (..)
+    , ElfXX (..)
     , ElfList (..)
     , Elf'
     , RBuilder (..)
@@ -321,7 +321,7 @@ data ElfSectionData
     = ElfSectionData BSL.ByteString
     | ElfSectionDataStringTable
 
-data Elf (c :: ElfClass)
+data ElfXX (c :: ElfClass)
     = ElfHeader
         { ehData       :: ElfData
         , ehOSABI      :: ElfOSABI
@@ -352,7 +352,7 @@ data Elf (c :: ElfClass)
         , epPhysAddr :: WordXX c
         , epMemSize  :: WordXX c
         , epAlign    :: WordXX c
-        , epData     :: [Elf c]
+        , epData     :: [ElfXX c]
         }
     | ElfRawData
         { erData :: BSL.ByteString
@@ -408,14 +408,14 @@ data Elf (c :: ElfClass)
 -- type ElfNode :: ElfClass -> Type
 -- data ElfNode c = forall t' . ElfNode { getElf :: Elf c t' }
 
-foldMapElf :: Monoid m => (Elf a -> m) -> Elf a -> m
+foldMapElf :: Monoid m => (ElfXX a -> m) -> ElfXX a -> m
 foldMapElf f e@ElfSegment{..} = f e <> foldMapElfList f epData
 foldMapElf f e = f e
 
-foldMapElfList :: Monoid m => (Elf a -> m) -> [Elf a] -> m
+foldMapElfList :: Monoid m => (ElfXX a -> m) -> [ElfXX a] -> m
 foldMapElfList f l = fold $ fmap (foldMapElf f) l
 
-elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b) => [Elf a] -> b -> m (Elf a)
+elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b) => [ElfXX a] -> b -> m (ElfXX a)
 elfFindSection elfs n = if n == 0
     then $chainedError "no section 0"
     else maybe ($chainedError $ "no section " ++ show n) return maybeSection
@@ -424,7 +424,7 @@ elfFindSection elfs n = if n == 0
             f s@ElfSection{..} | esN == fromIntegral n = First $ Just s
             f _ = First Nothing
 
-elfFindHeader :: forall a m . (SingI a, MonadThrow m) => [Elf a] -> m (Elf a)
+elfFindHeader :: forall a m . (SingI a, MonadThrow m) => [ElfXX a] -> m (ElfXX a)
 elfFindHeader elfs = maybe ($chainedError $ "no header") return maybeHeader
     where
         maybeHeader = getFirst $ foldMapElfList f elfs
@@ -432,7 +432,7 @@ elfFindHeader elfs = maybe ($chainedError $ "no header") return maybeHeader
         f _ = First Nothing
 
 -- FIXME: Elf' should be just Elf
-newtype ElfList c = ElfList [Elf c]
+newtype ElfList c = ElfList [ElfXX c]
 type Elf' = Sigma ElfClass (TyCon1 ElfList)
 
 getString :: BSL.ByteString -> Int64 -> String
@@ -570,7 +570,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
         maybeStringData = firstJust isStringTable $ tail' $ Prelude.zip [0 .. ] ss
         stringData = maybe BSL.empty id maybeStringData
 
-        rBuilderToElf :: RBuilder a -> m (Elf a)
+        rBuilderToElf :: RBuilder a -> m (ElfXX a)
         rBuilderToElf RBuilderHeader{} =
             return ElfHeader
                 { ehData       = hData
@@ -717,7 +717,7 @@ mkStringTable sectionNames = (stringTable, os)
                             else (iosff, (i', n') : insff)
 
 -- FIXME: rewrite all this using lenses
-serializeElf' :: forall a m . (IsElfClass a, MonadThrow m) => [Elf a] -> m BSL.ByteString
+serializeElf' :: forall a m . (IsElfClass a, MonadThrow m) => [ElfXX a] -> m BSL.ByteString
 serializeElf' elfs = do
 
     (header', hData') <- do
@@ -778,13 +778,13 @@ serializeElf' elfs = do
         dataIsEmpty (ElfSectionData bs)       = BSL.null bs
         dataIsEmpty ElfSectionDataStringTable = BSL.null stringTable
 
-        lastSectionIsEmpty :: [Elf a] -> Bool
+        lastSectionIsEmpty :: [ElfXX a] -> Bool
         lastSectionIsEmpty [] = False
         lastSectionIsEmpty l = case L.last l of
             ElfSection{..} -> esType == SHT_NOBITS || dataIsEmpty esData
             _ -> False
 
-        elf2WBuilder' :: MonadThrow n => Elf a -> WBuilderState a -> n (WBuilderState a)
+        elf2WBuilder' :: MonadThrow n => ElfXX a -> WBuilderState a -> n (WBuilderState a)
         elf2WBuilder' ElfHeader{} WBuilderState{..} =
             return WBuilderState
                 { wbsDataReversed = WBuilderDataHeader : wbsDataReversed
@@ -873,7 +873,7 @@ serializeElf' elfs = do
                 }
         elf2WBuilder' ElfRawAlign{..} s = align raOffset raAlign s
 
-        elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => Elf a -> n ()
+        elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => ElfXX a -> n ()
         elf2WBuilder elf = MS.get >>= elf2WBuilder' elf >>= MS.put
 
         fixSections :: [(Word16, SectionXX a)] -> m [SectionXX a]
@@ -964,7 +964,7 @@ mkElfSymbolTableEntry stringTable SymbolXX{..} =
     in
         ElfSymbolXX{..}
 
-parseSymbolTable :: (MonadThrow m, SingI a) => ElfData -> Elf a -> [Elf a] -> m [ElfSymbolXX a]
+parseSymbolTable :: (MonadThrow m, SingI a) => ElfData -> ElfXX a -> [ElfXX a] -> m [ElfSymbolXX a]
 parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = do
     section <- elfFindSection elfs esLink
     case section of

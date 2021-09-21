@@ -362,7 +362,7 @@ printElfSymbolTableEntryLine ElfSymbolXX{..} =  parens ((dquotes $ pretty steNam
                                                     <+> "value:"  <+> printWordXX steValue
                                                     <+> "size:"   <+> printWordXX steSize)
 
-printRelocationTableA_AARCH64 :: MonadThrow m => Bool -> Word32 -> [Elf 'ELFCLASS64] -> BSL.ByteString -> m (Doc ())
+printRelocationTableA_AARCH64 :: MonadThrow m => Bool -> Word32 -> [ElfXX 'ELFCLASS64] -> BSL.ByteString -> m (Doc ())
 printRelocationTableA_AARCH64 full sLink elfs bs = do
     symTableSection <- elfFindSection elfs sLink
     symTable <- parseSymbolTable ELFDATA2LSB symTableSection elfs
