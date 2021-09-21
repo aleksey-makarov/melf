@@ -10,7 +10,7 @@ import Data.Elf.Headers
 
 import Asm
 
-obj :: MonadCatch m => m Elf'
+obj :: MonadCatch m => m Elf
 obj  =  do
 
     txt <- getCode $ do

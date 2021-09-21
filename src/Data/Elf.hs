@@ -37,7 +37,7 @@ module Data.Elf
     ( ElfSectionData (..)
     , ElfXX (..)
     , ElfList (..)
-    , Elf'
+    , Elf
     , RBuilder (..)
     , parseElf
     , parseRBuilder
@@ -431,9 +431,8 @@ elfFindHeader elfs = maybe ($chainedError $ "no header") return maybeHeader
         f h@ElfHeader{} = First $ Just h
         f _ = First Nothing
 
--- FIXME: Elf' should be just Elf
 newtype ElfList c = ElfList [ElfXX c]
-type Elf' = Sigma ElfClass (TyCon1 ElfList)
+type Elf = Sigma ElfClass (TyCon1 ElfList)
 
 getString :: BSL.ByteString -> Int64 -> String
 getString bs offset = BSL8.unpack $ BSL.takeWhile (/= 0) $ BSL.drop offset bs
@@ -558,7 +557,7 @@ parseElf' :: forall a m . (IsElfClass a, MonadCatch m) =>
                                             HeaderXX a ->
                                          [SectionXX a] ->
                                          [SegmentXX a] ->
-                                        BSL.ByteString -> m (Elf')
+                                        BSL.ByteString -> m (Elf)
 parseElf' hdr@HeaderXX{..} ss ps bs = do
 
     rbs <- parseRBuilder hdr ss ps bs
@@ -623,7 +622,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
     el <- mapM rBuilderToElf rbs
     return $ sing :&: ElfList el
 
-parseElf :: MonadCatch m => BSL.ByteString -> m Elf'
+parseElf :: MonadCatch m => BSL.ByteString -> m Elf
 parseElf bs = do
     classS :&: HeadersXX (hdr, ss, ps) <- parseHeaders bs
     (withElfClass classS parseElf') hdr ss ps bs
@@ -928,10 +927,10 @@ serializeElf' elfs = do
 
     execStateT (mapM elf2WBuilder elfs) wbStateInit{ wbsNameIndexes = nameIndexes } >>= wbState2ByteString
 
-serializeElf :: MonadThrow m => Elf' -> m BSL.ByteString
+serializeElf :: MonadThrow m => Elf -> m BSL.ByteString
 serializeElf (classS :&: ElfList ls) = (withElfClass classS serializeElf') ls
 
--- FIXME: instance Binary Elf'
+-- FIXME: instance Binary Elf
 
 -------------------------------------------------------------------------------
 --

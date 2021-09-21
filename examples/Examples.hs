@@ -12,12 +12,12 @@ import Data.Elf.PrettyPrint
 import Obj
 import SysCall
 
-mkElf :: FilePath -> Elf' -> IO ()
+mkElf :: FilePath -> Elf -> IO ()
 mkElf path elf = do
     e <- serializeElf elf
     BSL.writeFile path e
 
-testElf :: String -> IO Elf' -> [ TestTree ]
+testElf :: String -> IO Elf -> [ TestTree ]
 testElf elfFileName elf =
     [ testCase elfFileName (elf >>= mkElf f)
     , after AllSucceed ("$1 == \"" ++ elfFileName ++ "\"") $ testGroup ("check " ++ elfFileName)

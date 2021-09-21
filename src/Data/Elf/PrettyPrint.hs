@@ -392,11 +392,11 @@ printRelocationTableA_AARCH64 full sLink elfs bs = do
     (align . vsep . split) <$> mapM f relas
 
 -- | Same as @`printElf_` False@
-printElf :: MonadThrow m => Elf' -> m (Doc ())
+printElf :: MonadThrow m => Elf -> m (Doc ())
 printElf = printElf_ False
 
 -- | Print ELF.  If first argument is False, don't dump all the data, print just the first two and the last lines.
-printElf_ :: MonadThrow m => Bool -> Elf' -> m (Doc ())
+printElf_ :: MonadThrow m => Bool -> Elf -> m (Doc ())
 printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
 
     (hData, hMachine) <- do

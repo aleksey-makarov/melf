@@ -9,7 +9,7 @@ import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
 
-syscall :: MonadCatch m => m Elf'
+syscall :: MonadCatch m => m Elf
 syscall = return $ SELFCLASS64 :&: ElfList
         [ ElfSegment
             { epType     = PT_LOAD
