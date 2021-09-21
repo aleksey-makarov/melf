@@ -245,7 +245,7 @@ data HeaderXX c =
         , hOSABI      :: ElfOSABI   -- ^ OS/ABI identification
         , hABIVersion :: Word8      -- ^ ABI version
         , hType       :: ElfType    -- ^ Object file type
-        , hMachine    :: ElfMachine -- ^ Object file type
+        , hMachine    :: ElfMachine -- ^ Machine type
         , hEntry      :: WordXX c   -- ^ Entry point address
         , hPhOff      :: WordXX c   -- ^ Program header offset
         , hShOff      :: WordXX c   -- ^ Section header offset

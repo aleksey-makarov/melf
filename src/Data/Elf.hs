@@ -35,10 +35,10 @@
 
 module Data.Elf (
     -- * Elf
-      ElfSectionData (..)
-    , ElfXX (..)
-    , ElfList (..)
+      ElfList (..)
     , Elf
+    , ElfSectionData (..)
+    , ElfXX (..)
     , parseElf
     , serializeElf
 
@@ -322,49 +322,65 @@ addRBuilders newts =
     in
         addRBuilders' addRBuilderNonEmpty nonEmptyRBs [] >>= addRBuilders' addRBuilderEmpty emptyRBs
 
-data ElfSectionData
-    = ElfSectionData BSL.ByteString
-    | ElfSectionDataStringTable
+-- | `Elf` is a forrest of trees of type `ElfXX`.
+-- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
+newtype ElfList c = ElfList [ElfXX c]
 
+-- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
+type Elf = Sigma ElfClass (TyCon1 ElfList)
+
+-- | Section data may contain a string table.
+-- If a section contains a string table with section names, the data
+-- for such a section is generated and `esData` should contain `ElfSectionDataStringTable`
+data ElfSectionData
+    = ElfSectionData BSL.ByteString -- ^ Regular section data
+    | ElfSectionDataStringTable     -- ^ Section data will be generated from section names
+
+-- | The type of node that defines Elf structure.
 data ElfXX (c :: ElfClass)
     = ElfHeader
-        { ehData       :: ElfData
-        , ehOSABI      :: ElfOSABI
-        , ehABIVersion :: Word8
-        , ehType       :: ElfType
-        , ehMachine    :: ElfMachine
-        , ehEntry      :: WordXX c
-        , ehFlags      :: Word32
+        { ehData       :: ElfData    -- ^ Data encoding (big- or little-endian)
+        , ehOSABI      :: ElfOSABI   -- ^ OS/ABI identification
+        , ehABIVersion :: Word8      -- ^ ABI version
+        , ehType       :: ElfType    -- ^ Object file type
+        , ehMachine    :: ElfMachine -- ^ Machine type
+        , ehEntry      :: WordXX c   -- ^ Entry point address
+        , ehFlags      :: Word32     -- ^ Processor-specific flags
         }
     | ElfSectionTable
     | ElfSegmentTable
     | ElfSection
-        { esName      :: String -- NB: different
-        , esType      :: ElfSectionType
-        , esFlags     :: ElfSectionFlag
-        , esAddr      :: WordXX c
-        , esAddrAlign :: WordXX c
-        , esEntSize   :: WordXX c
-        , esN         :: Word16 -- FIXME: why these types differ?
-        , esInfo      :: Word32
-        , esLink      :: Word32 --
-        , esData      :: ElfSectionData
+        { esName      :: String         -- ^ Section name (NB: string, not offset in the string table)
+        , esType      :: ElfSectionType -- ^ Section type
+        , esFlags     :: ElfSectionFlag -- ^ Section attributes
+        , esAddr      :: WordXX c       -- ^ Virtual address in memory
+        , esAddrAlign :: WordXX c       -- ^ Address alignment boundary
+        , esEntSize   :: WordXX c       -- ^ Size of entries, if section has table
+        , esN         :: Word16         -- ^ Section number
+        , esInfo      :: Word32         -- ^ Miscellaneous information
+        , esLink      :: Word32         -- ^ Link to other section
+        , esData      :: ElfSectionData -- ^ The content of the section
         }
     | ElfSegment
-        { epType     :: ElfSegmentType
-        , epFlags    :: ElfSegmentFlag
-        , epVirtAddr :: WordXX c
-        , epPhysAddr :: WordXX c
-        , epMemSize  :: WordXX c
-        , epAlign    :: WordXX c
-        , epData     :: [ElfXX c]
+        { epType     :: ElfSegmentType -- ^ Type of segment
+        , epFlags    :: ElfSegmentFlag -- ^ Segment attributes
+        , epVirtAddr :: WordXX c       -- ^ Virtual address in memory
+        , epPhysAddr :: WordXX c       -- ^ Physical address
+        , epMemSize  :: WordXX c       -- ^ Size of segment in memory
+        , epAlign    :: WordXX c       -- ^ Alignment of segment
+        , epData     :: [ElfXX c]      -- ^ Content of the segment
         }
-    | ElfRawData
-        { edData :: BSL.ByteString
+    | ElfRawData -- ^ Some ELF files (some executables) don't bother to define
+                 -- section for linking and have just raw data in segments.
+                 -- This is for that case.
+        { edData :: BSL.ByteString -- ^ Raw data in ELF file
         }
-    | ElfRawAlign
-        { eaOffset :: WordXX c
-        , eaAlign  :: WordXX c
+    | ElfRawAlign -- ^ Align the next data in the ELF file.
+                  -- The offset of the next data in the ELF file
+                  -- will be the minimal @x@ such that
+                  -- @x mod eaAlign == eaOffset mod eaAlign @
+        { eaOffset :: WordXX c -- ^ Align value
+        , eaAlign  :: WordXX c -- ^ Align module
         }
 
 -- FIXME MyTree nodeT leafT, bifunctor MyTree, Elf -> split to 6 separate types
@@ -435,9 +451,6 @@ elfFindHeader elfs = maybe ($chainedError $ "no header") return maybeHeader
         maybeHeader = getFirst $ foldMapElfList f elfs
         f h@ElfHeader{} = First $ Just h
         f _ = First Nothing
-
-newtype ElfList c = ElfList [ElfXX c]
-type Elf = Sigma ElfClass (TyCon1 ElfList)
 
 getString :: BSL.ByteString -> Int64 -> String
 getString bs offset = BSL8.unpack $ BSL.takeWhile (/= 0) $ BSL.drop offset bs
@@ -627,6 +640,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
     el <- mapM rBuilderToElf rbs
     return $ sing :&: ElfList el
 
+-- | Parse ELF file
 parseElf :: MonadCatch m => BSL.ByteString -> m Elf
 parseElf bs = do
     classS :&: HeadersXX (hdr, ss, ps) <- parseHeaders bs
@@ -720,7 +734,7 @@ mkStringTable sectionNames = (stringTable, os)
                                     ((i', o') : iosff, insff)
                             else (iosff, (i', n') : insff)
 
--- FIXME: rewrite all this using lenses
+-- FIXME: rewrite serializeElf all this using lenses (???)
 serializeElf' :: forall a m . (IsElfClass a, MonadThrow m) => [ElfXX a] -> m BSL.ByteString
 serializeElf' elfs = do
 
@@ -932,6 +946,7 @@ serializeElf' elfs = do
 
     execStateT (mapM elf2WBuilder elfs) wbStateInit{ wbsNameIndexes = nameIndexes } >>= wbState2ByteString
 
+-- | Serialze ELF file
 serializeElf :: MonadThrow m => Elf -> m BSL.ByteString
 serializeElf (classS :&: ElfList ls) = (withElfClass classS serializeElf') ls
 
