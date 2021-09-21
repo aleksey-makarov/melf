@@ -241,20 +241,20 @@ instance IsElfClass 'ELFCLASS64 where
 type HeaderXX :: ElfClass -> Type
 data HeaderXX c =
     HeaderXX
-        { hData       :: ElfData
-        , hOSABI      :: ElfOSABI
-        , hABIVersion :: Word8
-        , hType       :: ElfType
-        , hMachine    :: ElfMachine
-        , hEntry      :: WordXX c
-        , hPhOff      :: WordXX c
-        , hShOff      :: WordXX c
-        , hFlags      :: Word32
-        , hPhEntSize  :: Word16
-        , hPhNum      :: Word16
-        , hShEntSize  :: Word16
-        , hShNum      :: Word16
-        , hShStrNdx   :: Word16
+        { hData       :: ElfData    -- ^ Data encoding (big- or little-endian)
+        , hOSABI      :: ElfOSABI   -- ^ OS/ABI identification
+        , hABIVersion :: Word8      -- ^ ABI version
+        , hType       :: ElfType    -- ^ Object file type
+        , hMachine    :: ElfMachine -- ^ Object file type
+        , hEntry      :: WordXX c   -- ^ Entry point address
+        , hPhOff      :: WordXX c   -- ^ Program header offset
+        , hShOff      :: WordXX c   -- ^ Section header offset
+        , hFlags      :: Word32     -- ^ Processor-specific flags
+        , hPhEntSize  :: Word16     -- ^ Size of program header entry
+        , hPhNum      :: Word16     -- ^ Number of program header entries
+        , hShEntSize  :: Word16     -- ^ Size of section header entry
+        , hShNum      :: Word16     -- ^ Number of section header entries
+        , hShStrNdx   :: Word16     -- ^ Section name string table index
         }
 
 -- | Sigma type where `ElfClass` defines the type of `HeaderXX`
@@ -375,16 +375,16 @@ instance Binary Header where
 -- | Parsed ELF section table entry
 data SectionXX (c :: ElfClass) =
     SectionXX
-        { sName      :: Word32
-        , sType      :: ElfSectionType
-        , sFlags     :: WordXX c
-        , sAddr      :: WordXX c
-        , sOffset    :: WordXX c
-        , sSize      :: WordXX c
-        , sLink      :: Word32
-        , sInfo      :: Word32
-        , sAddrAlign :: WordXX c
-        , sEntSize   :: WordXX c
+        { sName      :: Word32         -- ^ Section name
+        , sType      :: ElfSectionType -- ^ Section type
+        , sFlags     :: WordXX c       -- ^ Section attributes
+        , sAddr      :: WordXX c       -- ^ Virtual address in memory
+        , sOffset    :: WordXX c       -- ^ Offset in file
+        , sSize      :: WordXX c       -- ^ Size of section
+        , sLink      :: Word32         -- ^ Link to other section
+        , sInfo      :: Word32         -- ^ Miscellaneous information
+        , sAddrAlign :: WordXX c       -- ^ Address alignment boundary
+        , sEntSize   :: WordXX c       -- ^ Size of entries, if section has table
         }
 
 getSection ::                               IsElfClass c =>
@@ -435,14 +435,14 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SectionXX a)) where
 -- | Parsed ELF segment table entry
 data SegmentXX (c :: ElfClass) =
     SegmentXX
-        { pType     :: ElfSegmentType
-        , pFlags    :: ElfSegmentFlag
-        , pOffset   :: WordXX c
-        , pVirtAddr :: WordXX c
-        , pPhysAddr :: WordXX c
-        , pFileSize :: WordXX c
-        , pMemSize  :: WordXX c
-        , pAlign    :: WordXX c
+        { pType     :: ElfSegmentType -- ^ Type of segment
+        , pFlags    :: ElfSegmentFlag -- ^ Segment attributes
+        , pOffset   :: WordXX c       -- ^ Offset in file
+        , pVirtAddr :: WordXX c       -- ^ Virtual address in memory
+        , pPhysAddr :: WordXX c       -- ^ Physical address
+        , pFileSize :: WordXX c       -- ^ Size of segment in file
+        , pMemSize  :: WordXX c       -- ^ Size of segment in memory
+        , pAlign    :: WordXX c       -- ^ Alignment of segment
         }
 
 getSegment ::            forall (c :: ElfClass) . Sing c ->
@@ -519,12 +519,12 @@ sectionIsSymbolTable sType  = sType `L.elem` [SHT_SYMTAB, SHT_DYNSYM]
 -- | Parsed ELF symbol table entry
 data SymbolXX (c :: ElfClass) =
     SymbolXX
-        { stName  :: Word32
-        , stInfo  :: Word8
-        , stOther :: Word8
-        , stShNdx :: ElfSectionIndex
-        , stValue :: WordXX c
-        , stSize  :: WordXX c
+        { stName  :: Word32          -- ^ Symbol name
+        , stInfo  :: Word8           -- ^ Type and Binding attributes
+        , stOther :: Word8           -- ^ Reserved
+        , stShNdx :: ElfSectionIndex -- ^ Section table index
+        , stValue :: WordXX c        -- ^ Symbol value
+        , stSize  :: WordXX c        -- ^ Size of object
         }
 
 getSymbolTableEntry ::    forall (c :: ElfClass) . Sing c ->
@@ -587,10 +587,10 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SymbolXX a)) where
 -- | Parsed relocation table entry (@ElfXX_Rela@)
 data RelaXX (c :: ElfClass) =
     RelaXX
-        { relaOffset :: WordXX c
-        , relaSym    :: Word32
-        , relaType   :: Word32
-        , relaAddend :: WordXX c
+        { relaOffset :: WordXX c -- ^ Address of reference
+        , relaSym    :: Word32   -- ^ Symbol table index
+        , relaType   :: Word32   -- ^ Relocation type
+        , relaAddend :: WordXX c -- ^ Constant part of expression
         }
 
 relaSym32 :: Word32 -> Word32
