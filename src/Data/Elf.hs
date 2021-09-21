@@ -49,7 +49,7 @@ module Data.Elf
     , serializeElf'
     , serializeElf
 
-    , ElfSymbolTableEntry(..)
+    , ElfSymbolXX(..)
     , parseSymbolTable
     ) where
 
@@ -939,8 +939,8 @@ serializeElf (classS :&: ElfList ls) = (withElfClass classS serializeElf') ls
 
 -- FIXME: move this to a separate file
 
-data ElfSymbolTableEntry (c :: ElfClass) =
-    ElfSymbolTableEntry
+data ElfSymbolXX (c :: ElfClass) =
+    ElfSymbolXX
         { steName  :: String -- NB: different
         , steBind  :: ElfSymbolBinding
         , steType  :: ElfSymbolType
@@ -952,8 +952,8 @@ data ElfSymbolTableEntry (c :: ElfClass) =
 getStringFromData :: BSL.ByteString -> Word32 -> String
 getStringFromData stringTable offset = BSL8.unpack $ BSL.takeWhile (/= 0) $ BSL.drop (fromIntegral offset) stringTable
 
-mkElfSymbolTableEntry :: SingI a => BSL.ByteString -> SymbolTableEntryXX a -> ElfSymbolTableEntry a
-mkElfSymbolTableEntry stringTable SymbolTableEntryXX{..} =
+mkElfSymbolTableEntry :: SingI a => BSL.ByteString -> SymbolXX a -> ElfSymbolXX a
+mkElfSymbolTableEntry stringTable SymbolXX{..} =
     let
         steName  = getStringFromData stringTable stName
         steBind  = ElfSymbolBinding $ stInfo `shiftR` 4
@@ -962,9 +962,9 @@ mkElfSymbolTableEntry stringTable SymbolTableEntryXX{..} =
         steValue = stValue
         steSize  = stSize
     in
-        ElfSymbolTableEntry{..}
+        ElfSymbolXX{..}
 
-parseSymbolTable :: (MonadThrow m, SingI a) => ElfData -> Elf a -> [Elf a] -> m [ElfSymbolTableEntry a]
+parseSymbolTable :: (MonadThrow m, SingI a) => ElfData -> Elf a -> [Elf a] -> m [ElfSymbolXX a]
 parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = do
     section <- elfFindSection elfs esLink
     case section of

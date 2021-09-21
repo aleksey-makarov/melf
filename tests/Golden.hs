@@ -204,11 +204,11 @@ testSegment64 =  SegmentXX 0 0 0 0 0 0 0 0
 testSegment32 :: SegmentXX 'ELFCLASS32
 testSegment32 =  SegmentXX 0 0 0 0 0 0 0 0
 
-testSymbolTableEntry64 :: SymbolTableEntryXX 'ELFCLASS64
-testSymbolTableEntry64 =  SymbolTableEntryXX 0 0 0 0 0 0
+testSymbolTableEntry64 :: SymbolXX 'ELFCLASS64
+testSymbolTableEntry64 =  SymbolXX 0 0 0 0 0 0
 
-testSymbolTableEntry32 :: SymbolTableEntryXX 'ELFCLASS32
-testSymbolTableEntry32 =  SymbolTableEntryXX 0 0 0 0 0 0
+testSymbolTableEntry32 :: SymbolXX 'ELFCLASS32
+testSymbolTableEntry32 =  SymbolXX 0 0 0 0 0 0
 
 mkSizeTest :: Binary a => String -> a -> Int64 -> TestTree
 mkSizeTest name v s = testCase name (len @?= s)

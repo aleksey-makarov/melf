@@ -288,8 +288,8 @@ printLayout (classS :&: HeadersXX (hdr, ss, ps)) bs = withElfClass classS do
 formatPairsBlock :: Doc a -> [(String, Doc a)] -> Doc a
 formatPairsBlock name pairs = vsep [ name <+> "{", indent 4 $ formatPairs pairs, "}" ]
 
-printElfSymbolTableEntry :: SingI a => ElfSymbolTableEntry a -> Doc ()
-printElfSymbolTableEntry ElfSymbolTableEntry{..} =
+printElfSymbolTableEntry :: SingI a => ElfSymbolXX a -> Doc ()
+printElfSymbolTableEntry ElfSymbolXX{..} =
     formatPairsBlock ("symbol" <+> (dquotes $ pretty steName))
         [ ("Bind",  viaShow steBind      ) -- ElfSymbolBinding
         , ("Type",  viaShow steType      ) -- ElfSymbolType
@@ -298,7 +298,7 @@ printElfSymbolTableEntry ElfSymbolTableEntry{..} =
         , ("Size",  printWordXX steSize  ) -- WordXX c
         ]
 
-printElfSymbolTable :: SingI a => Bool -> [ElfSymbolTableEntry a] -> Doc ()
+printElfSymbolTable :: SingI a => Bool -> [ElfSymbolXX a] -> Doc ()
 printElfSymbolTable full l = if full then printElfSymbolTableFull else printElfSymbolTable'
     where
         printElfSymbolTableFull = align . vsep $ fmap printElfSymbolTableEntry l
@@ -354,8 +354,8 @@ printData full bs = if full then printDataFull else printData'
                 chunks -> L.map formatBytestringLine chunks
         cl = BSL.drop (BSL.length bs - 16) bs
 
-printElfSymbolTableEntryLine :: SingI a => ElfSymbolTableEntry a -> Doc ()
-printElfSymbolTableEntryLine ElfSymbolTableEntry{..} =  parens ((dquotes $ pretty steName)
+printElfSymbolTableEntryLine :: SingI a => ElfSymbolXX a -> Doc ()
+printElfSymbolTableEntryLine ElfSymbolXX{..} =  parens ((dquotes $ pretty steName)
                                                     <+> "bind:"   <+> viaShow steBind
                                                     <+> "type:"   <+> viaShow steType
                                                     <+> "sindex:" <+> viaShow steShNdx
@@ -371,11 +371,11 @@ printRelocationTableA_AARCH64 full sLink elfs bs = do
         getSymbolTableEntry' (x:_)  0  = return x
         getSymbolTableEntry' (_:xs) n  = getSymbolTableEntry' xs (n - 1)
 
-        getSymbolTableEntry :: MonadThrow m => Word32 -> m (ElfSymbolTableEntry 'ELFCLASS64)
+        getSymbolTableEntry :: MonadThrow m => Word32 -> m (ElfSymbolXX 'ELFCLASS64)
         getSymbolTableEntry = getSymbolTableEntry' symTable
 
-        f :: MonadThrow m => RelocationTableAEntryXX 'ELFCLASS64 -> m (Doc ())
-        f RelocationTableAEntryXX{..} = do
+        f :: MonadThrow m => RelaXX 'ELFCLASS64 -> m (Doc ())
+        f RelaXX{..} = do
             symbolTableEntry <- getSymbolTableEntry relaSym
             return $  printWord64 relaOffset
                   <+> printWord64 relaAddend

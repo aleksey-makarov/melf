@@ -61,11 +61,11 @@ module Data.Elf.Headers (
     , segmentTableEntrySize
 
     -- ** Sybmol table
-    , SymbolTableEntryXX(..)
+    , SymbolXX(..)
     , symbolTableEntrySize
 
     -- ** Relocation table
-    , RelocationTableAEntryXX(..)
+    , RelaXX(..)
     , relocationTableAEntrySize
 
     -- * Parse header and section and segment tables
@@ -524,8 +524,8 @@ sectionIsSymbolTable :: ElfSectionType -> Bool
 sectionIsSymbolTable sType  = sType `L.elem` [SHT_SYMTAB, SHT_DYNSYM]
 
 -- | Parsed ELF symbol table entry
-data SymbolTableEntryXX (c :: ElfClass) =
-    SymbolTableEntryXX
+data SymbolXX (c :: ElfClass) =
+    SymbolXX
         { stName  :: Word32
         , stInfo  :: Word8
         , stOther :: Word8
@@ -535,7 +535,7 @@ data SymbolTableEntryXX (c :: ElfClass) =
         }
 
 getSymbolTableEntry ::    forall (c :: ElfClass) . Sing c ->
-     (forall b . (Binary (Le b), Binary (Be b)) => Get b) -> Get (SymbolTableEntryXX c)
+     (forall b . (Binary (Le b), Binary (Be b)) => Get b) -> Get (SymbolXX c)
 getSymbolTableEntry SELFCLASS64 getE = do
 
     stName  <- getE
@@ -545,7 +545,7 @@ getSymbolTableEntry SELFCLASS64 getE = do
     stValue <- getE
     stSize  <- getE
 
-    return SymbolTableEntryXX{..}
+    return SymbolXX{..}
 
 getSymbolTableEntry SELFCLASS32 getE = do
 
@@ -556,12 +556,12 @@ getSymbolTableEntry SELFCLASS32 getE = do
     stOther <- get
     stShNdx <- getE
 
-    return SymbolTableEntryXX{..}
+    return SymbolXX{..}
 
 putSymbolTableEntry ::      forall (c :: ElfClass) . Sing c ->
     (forall b . (Binary (Le b), Binary (Be b)) => b -> Put) ->
-                                       SymbolTableEntryXX c -> Put
-putSymbolTableEntry SELFCLASS64 putE (SymbolTableEntryXX{..}) = do
+                                       SymbolXX c -> Put
+putSymbolTableEntry SELFCLASS64 putE (SymbolXX{..}) = do
 
     putE stName
     put  stInfo
@@ -570,7 +570,7 @@ putSymbolTableEntry SELFCLASS64 putE (SymbolTableEntryXX{..}) = do
     putE stValue
     putE stSize
 
-putSymbolTableEntry SELFCLASS32 putE (SymbolTableEntryXX{..}) = do
+putSymbolTableEntry SELFCLASS32 putE (SymbolXX{..}) = do
 
     putE stName
     putE stValue
@@ -579,11 +579,11 @@ putSymbolTableEntry SELFCLASS32 putE (SymbolTableEntryXX{..}) = do
     put  stOther
     putE stShNdx
 
-instance forall (a :: ElfClass) . SingI a => Binary (Be (SymbolTableEntryXX a)) where
+instance forall (a :: ElfClass) . SingI a => Binary (Be (SymbolXX a)) where
     put = putSymbolTableEntry sing putBe . fromBe
     get = Be <$> getSymbolTableEntry sing getBe
 
-instance forall (a :: ElfClass) . SingI a => Binary (Le (SymbolTableEntryXX a)) where
+instance forall (a :: ElfClass) . SingI a => Binary (Le (SymbolXX a)) where
     put = putSymbolTableEntry sing putLe . fromLe
     get = Le <$> getSymbolTableEntry sing getLe
 
@@ -592,8 +592,8 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SymbolTableEntryXX a)) 
 --------------------------------------------------------------------------
 
 -- | Parsed relocation table entry (@ElfXX_Rela@)
-data RelocationTableAEntryXX (c :: ElfClass) =
-    RelocationTableAEntryXX
+data RelaXX (c :: ElfClass) =
+    RelaXX
         { relaOffset :: WordXX c
         , relaSym    :: Word32
         , relaType   :: Word32
@@ -619,36 +619,36 @@ relaInfo64 :: Word32 -> Word32 -> Word64
 relaInfo64 s t = (fromIntegral t) .|. (fromIntegral s `shiftL` 32)
 
 getRelocationTableAEntry ::      forall c . IsElfClass c =>
-    (forall b . (Binary (Le b), Binary (Be b)) => Get b) -> Get (RelocationTableAEntryXX c)
+    (forall b . (Binary (Le b), Binary (Be b)) => Get b) -> Get (RelaXX c)
 getRelocationTableAEntry getE = do
     relaOffset <- getE
     (relaSym, relaType) <- case sing @ c of
         SELFCLASS64 -> (\x -> (relaSym64 x, relaType64 x)) <$> getE
         SELFCLASS32 -> (\x -> (relaSym32 x, relaType32 x)) <$> getE
     relaAddend <- getE
-    return RelocationTableAEntryXX{..}
+    return RelaXX{..}
 
 putRelocationTableAEntry ::         forall c . IsElfClass c =>
     (forall b . (Binary (Le b), Binary (Be b)) => b -> Put) ->
-                                  RelocationTableAEntryXX c -> Put
-putRelocationTableAEntry putE (RelocationTableAEntryXX{..}) = do
+                                  RelaXX c -> Put
+putRelocationTableAEntry putE (RelaXX{..}) = do
     putE relaOffset
     (case sing @ c of
         SELFCLASS64 -> (putE $ relaInfo64 relaSym relaType)
         SELFCLASS32 -> (putE $ relaInfo32 relaSym relaType)) :: Put
     putE relaAddend
 
-instance forall (a :: ElfClass) . SingI a => Binary (Be (RelocationTableAEntryXX a)) where
+instance forall (a :: ElfClass) . SingI a => Binary (Be (RelaXX a)) where
     put = (withElfClass (sing @ a) (putRelocationTableAEntry putBe)) . fromBe
     get = Be <$> (withElfClass (sing @ a) (getRelocationTableAEntry getBe))
 
-instance forall (a :: ElfClass) . SingI a => Binary (Le (RelocationTableAEntryXX a)) where
+instance forall (a :: ElfClass) . SingI a => Binary (Le (RelaXX a)) where
     put = (withElfClass (sing @ a) (putRelocationTableAEntry putLe)) . fromLe
     get = Le <$> (withElfClass (sing @ a) (getRelocationTableAEntry getLe))
 
--- | Size of @RelocationTableAEntryXX a@ in bytes.
+-- | Size of @RelaXX a@ in bytes.
 relocationTableAEntrySize :: forall a . IsElfClass a => WordXX a
-relocationTableAEntrySize = fromIntegral $ BSL.length $ encode $ Le $ RelocationTableAEntryXX @ a 0 0 0 0
+relocationTableAEntrySize = fromIntegral $ BSL.length $ encode $ Le $ RelaXX @ a 0 0 0 0
 
 --------------------------------------------------------------------------
 -- parseHeaders
