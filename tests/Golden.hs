@@ -75,11 +75,11 @@ mkTest'' HeaderXX{..} bs = do
         bsSections = takeLen hShOff (hShEntSize * hShNum)
         bsSegments = takeLen hPhOff (hPhEntSize * hPhNum)
 
-    (ss :: [SectionXX a]) <- parseListA hData bsSections
-    assertEqual "Section table round trip does not work" bsSections $ serializeListA hData ss
+    (ss :: [SectionXX a]) <- parseBList hData bsSections
+    assertEqual "Section table round trip does not work" bsSections $ serializeBList hData ss
 
-    (ps :: [SegmentXX a]) <- parseListA hData bsSegments
-    assertEqual "Segment table round trip does not work" bsSegments $ serializeListA hData ps
+    (ps :: [SegmentXX a]) <- parseBList hData bsSegments
+    assertEqual "Segment table round trip does not work" bsSegments $ serializeBList hData ps
 
 mkTest' :: ByteString -> Assertion
 mkTest' bs = do

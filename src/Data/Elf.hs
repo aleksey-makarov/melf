@@ -920,9 +920,9 @@ serializeElf' elfs = do
                         _ -> error "this should be ElfHeader" -- FIXME
                 f WBuilderDataByteStream {..} = wbdData
                 f WBuilderDataSectionTable =
-                    serializeListA hData' $ zeroSection : sections
+                    serializeBList hData' $ zeroSection : sections
                 f WBuilderDataSegmentTable =
-                    serializeListA hData' $ L.reverse wbsSegmentsReversed
+                    serializeBList hData' $ L.reverse wbsSegmentsReversed
 
             return $ foldMap f $ L.reverse wbsDataReversed
 
@@ -969,7 +969,7 @@ parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = d
     section <- elfFindSection elfs esLink
     case section of
         ElfSection{ esData = ElfSectionData stringTable } -> do
-            st <- parseListA d symbolTable
+            st <- parseBList d symbolTable
             return (mkElfSymbolTableEntry stringTable <$> st)
         _ -> $chainedError "not a section" -- FIXME
 parseSymbolTable _ _ _ = $chainedError "incorrect args to parseSymbolTable" -- FIXME

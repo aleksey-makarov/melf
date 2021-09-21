@@ -388,7 +388,7 @@ printRelocationTableA_AARCH64 full sLink elfs bs = do
                     [ x1, x2, "...", last xs, "total:" <+> viaShow (length xs) ]
                 _ -> xs
 
-    relas <- parseListA ELFDATA2LSB bs
+    relas <- parseBList ELFDATA2LSB bs
     (align . vsep . split) <$> mapM f relas
 
 -- | Same as @`printElf_` False@

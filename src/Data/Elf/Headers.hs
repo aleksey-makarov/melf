@@ -34,8 +34,7 @@
 
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module Data.Elf.Headers
-    ( 
+module Data.Elf.Headers (
     -- * Data definition
       elfMagic
     , ElfClass(..)
@@ -46,12 +45,12 @@ module Data.Elf.Headers
     , wordSize
     , withElfClass
 
-    -- * ELF header
+    -- * Types of ELF header
     , HeaderXX(..)
     , headerSize
     , Header
 
-    -- * ELF tables
+    -- * Types of ELF tables
 
     -- ** Section table
     , SectionXX(..)
@@ -73,12 +72,18 @@ module Data.Elf.Headers
     , HeadersXX (..)
     , parseHeaders
 
+    -- * Parse/serialize array of data
+
+    -- | BList is an internal newtype for @[a]@ that is an instance of `Data.Binary.Binary`.
+    -- When serializing, the @Binary@ instance for BList does not write the length of the array to the stream.
+    -- Instead, parser just reads all the stream till the end.
+
+    , parseBList
+    , serializeBList
+
     -- * Misc helpers
     , sectionIsSymbolTable
     , splitBits
-
-    , parseListA
-    , serializeListA
 
     ) where
 
@@ -662,13 +667,21 @@ elfDecodeAllOrFail bs = do
     (off, a) <- elfDecodeOrFail' bs
     if off == (BSL.length bs) then return a else $chainedError $ "leftover != 0 @" ++ show off
 
-parseListA :: (MonadThrow m, Binary (Le a), Binary (Be a)) => ElfData -> BSL.ByteString -> m [a]
-parseListA d bs = case d of
+-- | Parse an array
+parseBList :: (MonadThrow m, Binary (Le a), Binary (Be a))
+           => ElfData        -- ^ Tells if parser should expect big or little endian data
+           -> BSL.ByteString -- ^ Data for parsing
+           -> m [a]
+parseBList d bs = case d of
     ELFDATA2LSB -> fromBList . fromLe <$> elfDecodeAllOrFail bs
     ELFDATA2MSB -> fromBList . fromBe <$> elfDecodeAllOrFail bs
 
-serializeListA :: (Binary (Le a), Binary (Be a)) => ElfData -> [a] -> BSL.ByteString
-serializeListA d as = case d of
+-- | Serialize an array
+serializeBList :: (Binary (Le a), Binary (Be a))
+               => ElfData -- ^ Tells if serializer should tread the data as bit or little endian
+               -> [a]     -- ^ The array to serialize
+               -> BSL.ByteString
+serializeBList d as = case d of
     ELFDATA2LSB -> encode $ Le $ BList as
     ELFDATA2MSB -> encode $ Be $ BList as
 
@@ -684,8 +697,8 @@ parseHeaders' hxx@HeaderXX{..} bs =
         bsSections = takeLen hShOff (hShEntSize * hShNum)
         bsSegments = takeLen hPhOff (hPhEntSize * hPhNum)
     in do
-        ss <- parseListA hData bsSections
-        ps <- parseListA hData bsSegments
+        ss <- parseBList hData bsSections
+        ps <- parseBList hData bsSegments
         return $ sing :&: HeadersXX (hxx, ss, ps)
 
 -- | Parse ELF file and produce header and section and segment tables
