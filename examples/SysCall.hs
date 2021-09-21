@@ -30,7 +30,7 @@ syscall = return $ SELFCLASS64 :&: ElfList
                     }
                 , ElfSegmentTable
                 , ElfRawData
-                    { erData = txt
+                    { edData = txt
                     }
                 ]
             }

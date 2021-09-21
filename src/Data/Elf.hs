@@ -360,11 +360,11 @@ data ElfXX (c :: ElfClass)
         , epData     :: [ElfXX c]
         }
     | ElfRawData
-        { erData :: BSL.ByteString
+        { edData :: BSL.ByteString
         }
     | ElfRawAlign
-        { raOffset :: WordXX c
-        , raAlign  :: WordXX c
+        { eaOffset :: WordXX c
+        , eaAlign  :: WordXX c
         }
 
 -- FIXME MyTree nodeT leafT, bifunctor MyTree, Elf -> split to 6 separate types
@@ -406,7 +406,7 @@ data ElfXX (c :: ElfClass)
 --             , epData     :: [Elf c t']
 --             } -> Elf c 'Segment
 --         ElfRawData ::
---             { erData :: BSL.ByteString
+--             { edData :: BSL.ByteString
 --             } -> Elf c 'Raw
 --
 -- -- FIXME: ElfSomeNode
@@ -871,11 +871,11 @@ serializeElf' elfs = do
                 }
         elf2WBuilder' ElfRawData{..} WBuilderState{..} =
             return WBuilderState
-                { wbsDataReversed = (WBuilderDataByteStream erData) : wbsDataReversed
-                , wbsOffset = wbsOffset + (fromIntegral $ BSL.length erData)
+                { wbsDataReversed = (WBuilderDataByteStream edData) : wbsDataReversed
+                , wbsOffset = wbsOffset + (fromIntegral $ BSL.length edData)
                 , ..
                 }
-        elf2WBuilder' ElfRawAlign{..} s = align raOffset raAlign s
+        elf2WBuilder' ElfRawAlign{..} s = align eaOffset eaAlign s
 
         elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => ElfXX a -> n ()
         elf2WBuilder elf = MS.get >>= elf2WBuilder' elf >>= MS.put

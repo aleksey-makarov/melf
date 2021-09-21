@@ -474,12 +474,12 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
         printElf'' ElfSegmentTable = return "segment table"
         printElf'' ElfRawData{..} =
             return $ formatPairsBlock "raw data"
-                [ ("Data",       printData full erData)
+                [ ("Data",       printData full edData)
                 ]
         printElf'' ElfRawAlign{..} =
             return $ formatPairsBlock "raw align"
-                [ ("Offset", printWordXX raOffset )
-                , ("Align",  printWordXX raAlign  )
+                [ ("Offset", printWordXX eaOffset )
+                , ("Align",  printWordXX eaAlign  )
                 ]
 
     printElf' elfs
