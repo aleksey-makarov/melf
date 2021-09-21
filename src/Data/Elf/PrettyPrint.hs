@@ -32,10 +32,13 @@ module Data.Elf.PrettyPrint
     , readFileLazy
     , writeElfDump
     , writeElfLayout
+
+    , splitBits
     ) where
 
 import Control.Monad
 import Control.Monad.Catch
+import Data.Bits
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy.Char8 as BSL8
 import qualified Data.ByteString.Lazy as BSL
@@ -56,6 +59,12 @@ import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
 import Data.Interval
+
+-- | Splits an integer into list of integers such that its sum equals to the argument,
+--   and each element of the list is of the form @(1 << x)@ for some @x@.
+--   @splitBits 5@ produces @[ 1, 4 ]@
+splitBits :: (Num w, FiniteBits w) => w -> [w]
+splitBits w = fmap (shiftL 1) $ L.filter (testBit w) $ fmap (subtract 1) [ 1 .. (finiteBitSize w) ]
 
 formatPairs :: [(String, Doc a)] -> Doc a
 formatPairs ls = align $ vsep $ fmap f ls
