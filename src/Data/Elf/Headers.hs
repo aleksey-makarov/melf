@@ -518,7 +518,7 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SegmentXX a)) where
 -- Symbol table entry
 --------------------------------------------------------------------------
 
--- | Test if the section with such integer value of section type field
+-- | Test if the section with such integer value of section type field (`sType`)
 --   contains symbol table
 sectionIsSymbolTable :: ElfSectionType -> Bool
 sectionIsSymbolTable sType  = sType `L.elem` [SHT_SYMTAB, SHT_DYNSYM]
