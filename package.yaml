@@ -28,8 +28,8 @@ library:
     - mtl
   source-dirs: src
   other-modules:
-    - Data.Elf.TH
     - Data.Elf.Constants.TH
+    - Data.Elf.Constants.Data
     - Data.Interval
     - Data.BList
   exposed-modules:
