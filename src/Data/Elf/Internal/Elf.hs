@@ -65,6 +65,9 @@ sectionInterval SectionXX{..} = I sOffset if (sType == SHT_NOBITS) then 0 else s
 segmentInterval :: IsElfClass a => SegmentXX a -> Interval (WordXX a)
 segmentInterval SegmentXX{..} = I pOffset pFileSize
 
+-- | @RBuilder@ is an intermediate internal data type that is used by parser.
+-- It contains information about layout of the ELF file that can be used
+-- by `Data.Elf.PrettyPrint.printLayout`
 data RBuilder (c :: ElfClass)
     = RBuilderHeader
         { rbhHeader :: HeaderXX c
@@ -402,7 +405,11 @@ foldMapElf f e = f e
 foldMapElfList :: Monoid m => (ElfXX a -> m) -> [ElfXX a] -> m
 foldMapElfList f l = fold $ fmap (foldMapElf f) l
 
-elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b) => [ElfXX a] -> b -> m (ElfXX a)
+-- | Find section with a given number
+elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b)
+               => [ElfXX a]   -- ^ Structured ELF data
+               -> b           -- ^ Number of the section
+               -> m (ElfXX a) -- ^ The section in question
 elfFindSection elfs n = if n == 0
     then $chainedError "no section 0"
     else maybe ($chainedError $ "no section " ++ show n) return maybeSection
@@ -411,20 +418,30 @@ elfFindSection elfs n = if n == 0
             f s@ElfSection{..} | esN == fromIntegral n = First $ Just s
             f _ = First Nothing
 
-elfFindHeader :: forall a m . (SingI a, MonadThrow m) => [ElfXX a] -> m (ElfXX a)
+-- | Find ELF header
+elfFindHeader :: forall a m . (SingI a, MonadThrow m)
+              => [ElfXX a]   -- ^ Structured ELF data
+              -> m (ElfXX a) -- ^ ELF header
 elfFindHeader elfs = maybe ($chainedError $ "no header") return maybeHeader
     where
         maybeHeader = getFirst $ foldMapElfList f elfs
         f h@ElfHeader{} = First $ Just h
         f _ = First Nothing
 
-getString :: BSL.ByteString -> Int64 -> String
+-- | Get string from string table
+getString :: BSL.ByteString -- ^ Section data of a string table section
+          -> Int64          -- ^ Offset to the start of the string in that data
+          -> String
 getString bs offset = BSL8.unpack $ BSL.takeWhile (/= 0) $ BSL.drop offset bs
 
 cut :: BSL.ByteString -> Int64 -> Int64 -> BSL.ByteString
 cut content offset size = BSL.take size $ BSL.drop offset content
 
-getSectionData :: IsElfClass a => BSL.ByteString -> SectionXX a -> BSL.ByteString
+-- | Get section data
+getSectionData :: IsElfClass a
+               => BSL.ByteString -- ^ ELF file
+               -> SectionXX a    -- ^ Parsed section entry
+               -> BSL.ByteString -- ^ Section Data
 getSectionData bs SectionXX{..} = cut bs o s
     where
         o = fromIntegral sOffset
@@ -512,7 +529,13 @@ addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
                         e' = nextOffset eAddr eAddrAlign b
                         e'' = nextOffset ee alignHint b
 
-parseRBuilder :: (IsElfClass a, MonadCatch m) => HeaderXX a -> [SectionXX a] -> [SegmentXX a] -> BSL.ByteString -> m [RBuilder a]
+-- | Parse ELF file and produce [`RBuilder`]
+parseRBuilder :: (IsElfClass a, MonadCatch m)
+              => HeaderXX a     -- ^ ELF header
+              -> [SectionXX a]  -- ^ Section table
+              -> [SegmentXX a]  -- ^ Segment table
+              -> BSL.ByteString -- ^ ELF file
+              -> m [RBuilder a]
 parseRBuilder hdr@HeaderXX{..} ss ps bs = do
 
     let
@@ -700,7 +723,7 @@ mkStringTable sectionNames = (stringTable, os)
                                     ((i', o') : iosff, insff)
                             else (iosff, (i', n') : insff)
 
--- FIXME: rewrite serializeElf all this using lenses (???)
+-- FIXME: rewrite serializeElf using lenses (???)
 serializeElf' :: forall a m . (IsElfClass a, MonadThrow m) => [ElfXX a] -> m BSL.ByteString
 serializeElf' elfs = do
 
@@ -924,14 +947,15 @@ serializeElf (classS :&: ElfList ls) = (withElfClass classS serializeElf') ls
 
 -- FIXME: move this to a separate file
 
+-- | Parsed ELF symbol table entry. NB: This is work in progress
 data ElfSymbolXX (c :: ElfClass) =
     ElfSymbolXX
-        { steName  :: String -- NB: different
-        , steBind  :: ElfSymbolBinding
-        , steType  :: ElfSymbolType
-        , steShNdx :: ElfSectionIndex
-        , steValue :: WordXX c
-        , steSize  :: WordXX c
+        { steName  :: String           -- ^ Symbol name (NB: String, not string index)
+        , steBind  :: ElfSymbolBinding -- ^ Symbol binding attributes
+        , steType  :: ElfSymbolType    -- ^ Symbol Type
+        , steShNdx :: ElfSectionIndex  -- ^ Section table index
+        , steValue :: WordXX c         -- ^ Symbol value
+        , steSize  :: WordXX c         -- ^ Size of object
         }
 
 getStringFromData :: BSL.ByteString -> Word32 -> String
@@ -949,7 +973,12 @@ mkElfSymbolTableEntry stringTable SymbolXX{..} =
     in
         ElfSymbolXX{..}
 
-parseSymbolTable :: (MonadThrow m, SingI a) => ElfData -> ElfXX a -> [ElfXX a] -> m [ElfSymbolXX a]
+-- | Parse symbol table
+parseSymbolTable :: (MonadThrow m, SingI a)
+                 => ElfData           -- ^ Endianness of the ELF file
+                 -> ElfXX a           -- ^ Parsed section such that @`sectionIsSymbolTable` . `sType`@ is true.
+                 -> [ElfXX a]         -- ^ Structured ELF data
+                 -> m [ElfSymbolXX a] -- ^ Symbol table
 parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = do
     section <- elfFindSection elfs esLink
     case section of

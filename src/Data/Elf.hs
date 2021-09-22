@@ -27,7 +27,6 @@ module Data.Elf (
     , getString
     , elfFindSection
     , elfFindHeader
-    , rBuilderInterval
 
     -- * Symbol table
     , ElfSymbolXX(..)
