@@ -18,10 +18,6 @@ module Data.Elf (
     , parseElf
     , serializeElf
 
-    -- * RBuilder
-    , RBuilder
-    , parseRBuilder
-
     -- * Misc
     , getSectionData
     , getString

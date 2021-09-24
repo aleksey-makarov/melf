@@ -45,7 +45,6 @@ import qualified Data.ByteString.Lazy as BSL
 import Data.Char
 import Data.Int
 import qualified Data.List as L
-import Data.Monoid
 import Data.Singletons
 import Data.Singletons.Sigma
 import Data.Text.Prettyprint.Doc as D
@@ -168,8 +167,8 @@ printHeaders hdr ss ps =
 --
 --------------------------------------------------------------------
 
-printRBuilder :: IsElfClass a => (Word32 -> String) -> [RBuilder a] -> Doc ()
-printRBuilder getStr rbs = vsep ldoc
+printRBuilder :: IsElfClass a => [RBuilder a] -> Doc ()
+printRBuilder rbs = vsep ldoc
 
     where
 
@@ -215,7 +214,7 @@ printRBuilder getStr rbs = vsep ldoc
                 f RBuilderSection{ rbsHeader = SectionXX{..}, ..} =
                     let
                         doc = [ "S" <> viaShow rbsN
-                              , dquotes $ pretty $ getStr sName
+                              , dquotes $ pretty $ rbsName
                               , viaShow sType
                               , viaShow $ splitBits $ ElfSectionFlag $ fromIntegral sFlags
                               ]
@@ -258,37 +257,12 @@ printRBuilder getStr rbs = vsep ldoc
                         ]
                 f RBuilderRawAlign{} = []
 
-findHeader :: SingI a => [RBuilder a] -> Maybe (HeaderXX a)
-findHeader rbs = getFirst $ foldMap f rbs
-    where
-        f RBuilderSegment{..} = First $ findHeader rbpData
-        f RBuilderHeader{ rbhHeader = h@HeaderXX{} } = First $ Just h
-        f _ = First Nothing
-
-findSection :: SingI a => Word16 -> [RBuilder a] -> Maybe (SectionXX a)
-findSection n = findSection'
-    where
-        findSection' rbs = getFirst $ foldMap f rbs
-        f RBuilderSegment{..} = First $ findSection' rbpData
-        f RBuilderSection{..} = if n == rbsN then First $ Just rbsHeader else First Nothing
-        f _ = First Nothing
-
-findStringSection :: SingI a => [RBuilder a] -> Maybe (SectionXX a)
-findStringSection rbs = do
-    HeaderXX{..} <- findHeader rbs
-    findSection hShStrNdx rbs
-
 -- | Print ELF layout.  First parse ELF with `parseHeaders`, then use this function to
 --   format the layout.
 printLayout :: MonadCatch m => (Sigma ElfClass (TyCon1 HeadersXX)) -> BSL.ByteString -> m (Doc ())
 printLayout (classS :&: HeadersXX (hdr, ss, ps)) bs = withElfClass classS do
     rbs <- parseRBuilder hdr ss ps bs
-    let
-        stringSectionData = getSectionData bs <$> findStringSection rbs
-        getString' n = case stringSectionData of
-            Nothing -> error "no string table"
-            Just st -> getString st $ fromIntegral n
-    return $ printRBuilder getString' rbs
+    return $ printRBuilder rbs
 
 --------------------------------------------------------------------
 --

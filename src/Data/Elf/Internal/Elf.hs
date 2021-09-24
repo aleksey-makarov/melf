@@ -78,9 +78,10 @@ data RBuilder (c :: ElfClass)
     | RBuilderSegmentTable
         { rbptHeader :: HeaderXX c
         }
-    | RBuilderSection -- FIXME: (?) add section name string
+    | RBuilderSection
         { rbsHeader :: SectionXX c
         , rbsN      :: Word16
+        , rbsName   :: String
         }
     | RBuilderSegment
         { rbpHeader :: SegmentXX c
@@ -529,6 +530,18 @@ addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
                         e' = nextOffset eAddr eAddrAlign b
                         e'' = nextOffset ee alignHint b
 
+infix 9 !!?
+
+(!!?) :: (Integral b) => [a] -> b -> Maybe a
+(!!?) xs i
+    | i < 0     = Nothing
+    | otherwise = go i xs
+  where
+    go :: (Integral b) => b -> [a] -> Maybe a
+    go 0 (x:_)  = Just x
+    go j (_:ys) = go (j - 1) ys
+    go _ []     = Nothing
+
 -- | Parse ELF file and produce [`RBuilder`]
 parseRBuilder :: (IsElfClass a, MonadCatch m)
               => HeaderXX a     -- ^ ELF header
@@ -538,12 +551,17 @@ parseRBuilder :: (IsElfClass a, MonadCatch m)
               -> m [RBuilder a]
 parseRBuilder hdr@HeaderXX{..} ss ps bs = do
 
+
     let
+        maybeStringSectionData = getSectionData bs <$> (ss !!? hShStrNdx)
+
         mkRBuilderSection :: (SingI a, MonadCatch m) => (Word16, SectionXX a) -> m (RBuilder a)
-        mkRBuilderSection (n, s) = return $ RBuilderSection s n
+        mkRBuilderSection (n, s@SectionXX{..}) = do
+            stringSectionData <- $maybeAddContext "No string table" maybeStringSectionData
+            return $ RBuilderSection s n $ getString stringSectionData $ fromIntegral sName
 
         mkRBuilderSegment :: (SingI a, MonadCatch m) => (Word16, SegmentXX a) -> m (RBuilder a)
-        mkRBuilderSegment (n, s) = return $ RBuilderSegment s n []
+        mkRBuilderSegment (n, p) = return $ RBuilderSegment p n []
 
     sections <- mapM mkRBuilderSection $ tail' $ Prelude.zip [0 .. ] ss
     segments <- mapM mkRBuilderSegment $         Prelude.zip [0 .. ] ps
@@ -570,12 +588,6 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
     rbs <- parseRBuilder hdr ss ps bs
 
     let
-        firstJust f = listToMaybe . mapMaybe f
-        isStringTable (n, s) | n == hShStrNdx = Just $ getSectionData bs s
-        isStringTable _                       = Nothing
-        maybeStringData = firstJust isStringTable $ tail' $ Prelude.zip [0 .. ] ss
-        stringData = maybe BSL.empty id maybeStringData
-
         rBuilderToElf :: RBuilder a -> m (ElfXX a)
         rBuilderToElf RBuilderHeader{} =
             return ElfHeader
@@ -593,7 +605,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
             return ElfSegmentTable
         rBuilderToElf RBuilderSection{ rbsHeader = s@SectionXX{..}, ..} =
             return ElfSection
-                { esName      = getString stringData $ fromIntegral sName
+                { esName      = rbsName
                 , esType      = sType
                 , esFlags     = fromIntegral sFlags
                 , esAddr      = sAddr
