@@ -21,6 +21,8 @@ module Control.Exception.ChainedException
     , chainedError'
     , addContext
     , addContext'
+    , maybeAddContext
+    , maybeAddContext'
     ) where
 
 -- https://stackoverflow.com/questions/13379356/finding-the-line-number-of-a-function-in-haskell
@@ -69,8 +71,9 @@ liftLoc Loc {..} = [| Loc loc_filename loc_package loc_module loc_start loc_end 
 chainedErrorX :: MonadThrow m => Loc -> String -> m a
 chainedErrorX loc s = throwM $ ChainedException s loc Null
 
--- | @$chainedError "error description"@ results in a `MonadThrow` monad
--- that throws `ChainedException` with @"error description"@.
+-- | @$chainedError@ results in a function of type
+-- \'@\$chainedError :: MonadThrow m => String -> m a@\'.
+-- It throws `ChainedException` with its argument as error description.
 chainedError :: Q Exp
 chainedError = withLoc [| chainedErrorX |]
 
@@ -86,11 +89,27 @@ addContextX loc s m = m `catch` f
             Just ce -> NextChained ce
             Nothing -> Next e
 
--- | @$addContext "context description" m@ where @m@ is a `MonadCatch` will run @m@ and
--- append context @"constext description"@ to any exception thrown from @m@.
+-- | @$addContext@ results in a function of type
+-- \'@\$chainedError :: MonadCatch m => String -> m a -> m a@\'.
+-- It runs the second argument and adds `ChainedException` with its first argument
+-- to the exceptions thrown from that monad.
 addContext :: Q Exp
 addContext = withLoc [| addContextX |]
 
 -- | @$addContext'@ is the same as @$addContext ""@
 addContext' :: Q Exp
 addContext' = withLoc [| \ x -> addContextX x [] |]
+
+maybeAddContextX :: MonadThrow m => Loc -> String -> Maybe a -> m a
+maybeAddContextX loc s mb = maybe (throwM $ ChainedException s loc Null) return mb
+
+-- | @$maybeAddContext@ results in a function of type
+-- \'@\$chainedError :: MonadThrow m => String -> Maybe a -> m a@\'.
+-- If its second argument is `Nothing`, it throws `ChainedException` with its first argument,
+-- else it returns the value of `Just`.
+maybeAddContext :: Q Exp
+maybeAddContext = withLoc [| maybeAddContextX |]
+
+-- | @$maybeAddContext'@ is the same as @$maybeAddContext ""@
+maybeAddContext' :: Q Exp
+maybeAddContext' = withLoc [| \ x -> maybeAddContext x [] |]
