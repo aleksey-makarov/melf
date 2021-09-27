@@ -22,7 +22,7 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Data.Elf.Internal.Elf where
+module Data.Internal.Elf where
 
 import Control.Exception.ChainedException
 import Data.Elf.Constants

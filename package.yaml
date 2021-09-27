@@ -30,7 +30,7 @@ library:
   other-modules:
     - Data.Elf.Constants.TH
     - Data.Elf.Constants.Data
-    - Data.Elf.Internal.Elf
+    - Data.Internal.Elf
     - Data.Interval
     - Data.BList
   exposed-modules:

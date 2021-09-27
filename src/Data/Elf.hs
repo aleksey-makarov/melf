@@ -29,4 +29,4 @@ module Data.Elf (
     , parseSymbolTable
     ) where
 
-import Data.Elf.Internal.Elf
+import Data.Internal.Elf
