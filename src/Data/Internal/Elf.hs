@@ -353,52 +353,6 @@ data ElfXX (c :: ElfClass)
         , eaAlign  :: WordXX c -- ^ Align module
         }
 
--- FIXME MyTree nodeT leafT, bifunctor MyTree, Elf -> split to 6 separate types
-
--- FIXME: Write GADT record with constrained type: https://stackoverflow.com/questions/21505975/write-gadt-record-with-constrained-type
--- data ElfNodeType = Header | SectionTable | SegmentTable | Section | Segment | Raw
---
--- type Elf :: ElfClass -> ElfNodeType -> Type
--- data Elf c t where
---         ElfHeader ::
---             { ehData       :: ElfData
---             , ehOSABI      :: ElfOSABI
---             , ehABIVersion :: Word8
---             , ehType       :: ElfType
---             , ehMachine    :: ElfMachine
---             , ehEntry      :: WXX c
---             , ehFlags      :: Word32
---             } -> Elf c 'Header
---         ElfSectionTable :: Elf c 'SectionTable
---         ElfSegmentTable :: Elf c 'SegmentTable
---         ElfSection ::
---             { esName      :: String -- NB: different
---             , esType      :: ElfSectionType
---             , esFlags     :: WXX c
---             , esAddr      :: WXX c
---             , esAddrAlign :: WXX c
---             , esEntSize   :: WXX c
---             , esN         :: Word16
---             , esLink      :: Word32
---             , esData      :: ElfSectionData
---             } -> Elf c 'Section
---         ElfSegment ::
---             { epType     :: ElfSegmentType
---             , epFlags    :: Word32
---             , epVirtAddr :: WXX c
---             , epPhysAddr :: WXX c
---             , epMemSize  :: WXX c
---             , epAlign    :: WXX c
---             , epData     :: [Elf c t']
---             } -> Elf c 'Segment
---         ElfRawData ::
---             { edData :: BSL.ByteString
---             } -> Elf c 'Raw
---
--- -- FIXME: ElfSomeNode
--- type ElfNode :: ElfClass -> Type
--- data ElfNode c = forall t' . ElfNode { getElf :: Elf c t' }
-
 foldMapElf :: Monoid m => (ElfXX a -> m) -> ElfXX a -> m
 foldMapElf f e@ElfSegment{..} = f e <> foldMapElfList f epData
 foldMapElf f e = f e
@@ -413,7 +367,7 @@ elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b)
                -> m (ElfXX a) -- ^ The section in question
 elfFindSection elfs n = if n == 0
     then $chainedError "no section 0"
-    else maybe ($chainedError $ "no section " ++ show n) return maybeSection
+    else $maybeAddContext ("no section " ++ show n) maybeSection
         where
             maybeSection = getFirst $ foldMapElfList f elfs
             f s@ElfSection{..} | esN == fromIntegral n = First $ Just s
@@ -423,7 +377,7 @@ elfFindSection elfs n = if n == 0
 elfFindHeader :: forall a m . (SingI a, MonadThrow m)
               => [ElfXX a]   -- ^ Structured ELF data
               -> m (ElfXX a) -- ^ ELF header
-elfFindHeader elfs = maybe ($chainedError $ "no header") return maybeHeader
+elfFindHeader elfs = $maybeAddContext "no header" maybeHeader
     where
         maybeHeader = getFirst $ foldMapElfList f elfs
         f h@ElfHeader{} = First $ Just h
