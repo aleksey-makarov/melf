@@ -3,19 +3,24 @@ module SysCall (syscall) where
 import Control.Monad.Catch
 import Data.Bits
 import qualified Data.ByteString.Lazy as BSL
+import Data.Word
 import Data.Singletons.Sigma
 
 import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
 
+addr :: Word64
+addr = 0x400000
+
 syscall :: MonadCatch m => m Elf
-syscall = return $ SELFCLASS64 :&: ElfList
-        [ ElfSegment
+syscall = return $ SELFCLASS64 :&: ElfList [ segment ]
+    where
+        segment = ElfSegment
             { epType     = PT_LOAD
             , epFlags    = PF_X .|. PF_R
-            , epVirtAddr = 0x400000
-            , epPhysAddr = 0x400000
+            , epVirtAddr = addr
+            , epPhysAddr = addr
             , epMemSize  = 0x84          -- FIXME
             , epAlign    = 0x10000
             , epData     =
@@ -34,8 +39,6 @@ syscall = return $ SELFCLASS64 :&: ElfList
                     }
                 ]
             }
-        ]
-    where
         txt = BSL.pack [
             0x20, 0x00, 0x80, 0xd2,
             0x61, 0x01, 0x00, 0x58,
