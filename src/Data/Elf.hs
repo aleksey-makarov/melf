@@ -23,6 +23,7 @@ module Data.Elf (
     , getString
     , elfFindSection
     , elfFindHeader
+    , elfLength
 
     -- * Symbol table
     , ElfSymbolXX(..)

@@ -933,6 +933,17 @@ serializeElf' elfs = do
 serializeElf :: MonadThrow m => Elf -> m BSL.ByteString
 serializeElf (classS :&: ElfList ls) = (withElfClass classS serializeElf') ls
 
+-- | Find the length of serialized part of the ELF file.
+-- The size of section, segment and string tables need to be known prior to serialization
+-- so if there is a node of those types inside the questioned one then the function returns
+-- an error
+elfLength :: forall a m . (IsElfClass a, MonadThrow m)
+          => WordXX a -- ^ Start position in the ELF file (to take into account alignment)
+          -> ElfXX a  -- ^ the node whose length should be found
+          -> m (WordXX a)
+elfLength s elf =
+    (-) s . wbsOffset <$> execStateT (elf2WBuilder Nothing elf) wbStateInit{ wbsNameIndexes = [0 ..], wbsOffset = s }
+
 -- FIXME: instance Binary Elf
 
 -------------------------------------------------------------------------------
