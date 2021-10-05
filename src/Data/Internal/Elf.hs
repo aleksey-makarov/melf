@@ -605,43 +605,6 @@ parseElf bs = do
 --
 -------------------------------------------------------------------------------
 
-data WBuilderData
-    = WBuilderDataHeader
-    | WBuilderDataByteStream { wbdData :: BSL.ByteString }
-    | WBuilderDataSectionTable
-    | WBuilderDataSegmentTable
-
-data WBuilderState (a :: ElfClass) =
-    WBuilderState
-        { wbsSections         :: [(Word16, SectionXX a)]
-        , wbsSegmentsReversed :: [SegmentXX a]
-        , wbsDataReversed     :: [WBuilderData]
-        , wbsOffset           :: WordXX a
-        , wbsPhOff            :: WordXX a
-        , wbsShOff            :: WordXX a
-        , wbsShStrNdx         :: Word16
-        , wbsNameIndexes      :: [Int64]
-        }
-
-wbStateInit :: forall a . IsElfClass a => WBuilderState a
-wbStateInit = WBuilderState
-    { wbsSections         = []
-    , wbsSegmentsReversed = []
-    , wbsDataReversed     = []
-    , wbsOffset           = 0
-    , wbsPhOff            = 0
-    , wbsShOff            = 0
-    , wbsShStrNdx         = 0
-    , wbsNameIndexes      = []
-    }
-
-zeroSection :: forall a . IsElfClass a => SectionXX a
-zeroSection = SectionXX 0 0 0 0 0 0 0 0 0 0
-
-neighbours :: [a] -> (a -> a -> b) -> [b]
-neighbours [] _ = []
-neighbours x  f = fmap (uncurry f) $ L.zip x $ L.tail x
-
 -- make string table and indexes for it from a list of strings
 mkStringTable :: [String] -> (BSL.ByteString, [Int64])
 mkStringTable sectionNames = (stringTable, os)
@@ -689,7 +652,184 @@ mkStringTable sectionNames = (stringTable, os)
                                     ((i', o') : iosff, insff)
                             else (iosff, (i', n') : insff)
 
--- FIXME: rewrite serializeElf using lenses (???)
+data WBuilderData
+    = WBuilderDataHeader
+    | WBuilderDataByteStream { wbdData :: BSL.ByteString }
+    | WBuilderDataSectionTable
+    | WBuilderDataSegmentTable
+
+data WBuilderState (a :: ElfClass) =
+    WBuilderState
+        { wbsSections         :: [(Word16, SectionXX a)]
+        , wbsSegmentsReversed :: [SegmentXX a]
+        , wbsDataReversed     :: [WBuilderData]
+        , wbsOffset           :: WordXX a
+        , wbsPhOff            :: WordXX a
+        , wbsShOff            :: WordXX a
+        , wbsShStrNdx         :: Word16
+        , wbsNameIndexes      :: [Int64]
+        }
+
+data WBuilderCtxt (a :: ElfClass) =
+    WBuilderCtxt
+        { wbcSectionN           :: WordXX a
+        , wbcSegmentN           :: WordXX a
+        , wbcStringTable        :: BSL.ByteString
+        , wbcNameIndexes        :: [Int64]
+        }
+
+wbStateInit :: forall a . IsElfClass a => WBuilderState a
+wbStateInit = WBuilderState
+    { wbsSections         = []
+    , wbsSegmentsReversed = []
+    , wbsDataReversed     = []
+    , wbsOffset           = 0
+    , wbsPhOff            = 0
+    , wbsShOff            = 0
+    , wbsShStrNdx         = 0
+    , wbsNameIndexes      = []
+    }
+
+align :: (IsElfClass a, MonadThrow n) => WordXX a -> WordXX a -> WBuilderState a -> n (WBuilderState a)
+align _ 0 x = return x
+align _ 1 x = return x
+align t m WBuilderState{..} | m .&. (m - 1) /= 0 = $chainedError $ "align module is not power of two " ++ (show m)
+                            | otherwise =
+    let
+        wbsOffset' = nextOffset t m wbsOffset
+        d = WBuilderDataByteStream $ BSL.replicate (fromIntegral $ wbsOffset' - wbsOffset) 0
+    in
+        return WBuilderState
+            { wbsDataReversed = d : wbsDataReversed
+            , wbsOffset = wbsOffset'
+            , ..
+            }
+
+alignWord :: forall a n . (IsElfClass a, MonadThrow n) => WBuilderState a -> n (WBuilderState a)
+alignWord = align 0 $ wordSize $ fromSing $ sing @a
+
+elf2WBuilder' :: forall a n . (IsElfClass a, MonadThrow n) => Maybe (WBuilderCtxt a) -> ElfXX a -> WBuilderState a -> n (WBuilderState a)
+elf2WBuilder' _ ElfHeader{} WBuilderState{..} =
+    return WBuilderState
+        { wbsDataReversed = WBuilderDataHeader : wbsDataReversed
+        , wbsOffset       = wbsOffset + headerSize (fromSing $ sing @a)
+        , ..
+        }
+elf2WBuilder' Nothing ElfSectionTable _ = $chainedError "trying to serialize section table without knowing the number of section"
+elf2WBuilder' (Just WBuilderCtxt{..}) ElfSectionTable s = do
+    WBuilderState{..} <- alignWord s
+    return WBuilderState
+        { wbsDataReversed = WBuilderDataSectionTable : wbsDataReversed
+        , wbsOffset       = wbsOffset + (wbcSectionN + 1) * sectionTableEntrySize (fromSing $ sing @a)
+        , wbsShOff        = wbsOffset
+        , ..
+        }
+elf2WBuilder' Nothing ElfSegmentTable _ = $chainedError "trying to serialize segment table without knowing the number of segments"
+elf2WBuilder' (Just WBuilderCtxt{..}) ElfSegmentTable s = do
+    WBuilderState{..} <- alignWord s
+    return WBuilderState
+        { wbsDataReversed = WBuilderDataSegmentTable : wbsDataReversed
+        , wbsOffset       = wbsOffset + wbcSegmentN * segmentTableEntrySize (fromSing $ sing @a)
+        , wbsPhOff        = wbsOffset
+        , ..
+        }
+elf2WBuilder' mCtxt ElfSection{esFlags = ElfSectionFlag f, ..} s = do
+    when (f .&. (fromIntegral $ complement (maxBound @ (WordXX a))) /= 0)
+        ($chainedError $ "section flags at section " ++ show esN ++ "don't fit")
+    WBuilderState{..} <- if esType == SHT_NOBITS
+        then return s
+        else align 0 esAddrAlign s
+    (d, shStrNdx) <- case esData of
+        ElfSectionData bs         -> return (bs, wbsShStrNdx)
+        ElfSectionDataStringTable -> case mCtxt of
+            Nothing                 -> $chainedError "trying to serialize string table without specifying its content"
+            Just (WBuilderCtxt{..}) -> return (wbcStringTable, esN)
+    let
+        (n, ns) = case wbsNameIndexes of
+            n' : ns' -> (n', ns')
+            _ -> error "internal error: different number of sections in two iterations" -- should never happen
+        sName      = fromIntegral n
+        sType      = esType
+        sFlags     = fromIntegral f
+        sAddr      = esAddr
+        sOffset    = wbsOffset
+        sSize      = fromIntegral $ BSL.length d
+        sLink      = esLink
+        sInfo      = esInfo
+        sAddrAlign = esAddrAlign
+        sEntSize   = esEntSize
+    return WBuilderState
+        { wbsSections     = (esN, SectionXX{..}) : wbsSections
+        , wbsDataReversed = (WBuilderDataByteStream d) : wbsDataReversed
+        , wbsOffset       = wbsOffset + (fromIntegral $ BSL.length d)
+        , wbsShStrNdx     = shStrNdx
+        , wbsNameIndexes  = ns
+        , ..
+        }
+elf2WBuilder' mCtxt ElfSegment{..} s = do
+    s' <- align epVirtAddr epAlign s
+    let
+        -- start of the segment
+        offset = wbsOffset s'
+    WBuilderState{..} <- execStateT (mapM (elf2WBuilder mCtxt) epData) s'
+    stringTable <- case mCtxt of -- FIXME: is it ok?
+        Nothing                 -> $chainedError "trying to serialize a segment containing string table without specifying its content"
+        Just (WBuilderCtxt{..}) -> return wbcStringTable
+    let
+        dataIsEmpty :: ElfSectionData -> Bool
+        dataIsEmpty (ElfSectionData bs)       = BSL.null bs
+        dataIsEmpty ElfSectionDataStringTable = BSL.null stringTable
+
+        lastSectionIsEmpty :: [ElfXX a] -> Bool
+        lastSectionIsEmpty [] = False
+        lastSectionIsEmpty l = case L.last l of
+            ElfSection{..} -> esType == SHT_NOBITS || dataIsEmpty esData
+            _ -> False
+
+        -- allocate one more byte in the end of segment if there exists an empty section
+        -- at the end so that that empty section will go to the current segment
+        -- (if this section is not empty)
+        add1      = lastSectionIsEmpty epData && offset /= wbsOffset
+        pType     = epType
+        pFlags    = epFlags
+        pOffset   = offset
+        pVirtAddr = epVirtAddr
+        pPhysAddr = epPhysAddr
+        pFileSize = wbsOffset - offset + if add1 then 1 else 0
+        pMemSize  = epMemSize
+        pAlign    = epAlign
+    return WBuilderState
+        { wbsSegmentsReversed = SegmentXX{..} : wbsSegmentsReversed
+        , wbsDataReversed = if add1
+            then (WBuilderDataByteStream $ BSL.singleton 0) : wbsDataReversed
+            else wbsDataReversed
+        , wbsOffset = if add1
+            then wbsOffset + 1
+            else wbsOffset
+        , ..
+        }
+elf2WBuilder' _ ElfRawData{..} WBuilderState{..} =
+    return WBuilderState
+        { wbsDataReversed = (WBuilderDataByteStream edData) : wbsDataReversed
+        , wbsOffset       = wbsOffset + (fromIntegral $ BSL.length edData)
+        , ..
+        }
+elf2WBuilder' _ ElfRawAlign{..} s = align eaOffset eaAlign s
+
+elf2WBuilder :: (IsElfClass a, MonadThrow n, MonadState (WBuilderState a) n) => Maybe (WBuilderCtxt a) -> ElfXX a -> n ()
+elf2WBuilder ctxt elf = MS.get >>= elf2WBuilder' ctxt elf >>= MS.put
+
+mkWBuilderState :: (IsElfClass a, MonadThrow n) => WBuilderCtxt a -> [ElfXX a] -> n (WBuilderState a)
+mkWBuilderState ctxt@WBuilderCtxt{..} elfs =
+    execStateT (mapM (elf2WBuilder (Just ctxt)) elfs) wbStateInit{ wbsNameIndexes = wbcNameIndexes }
+
+zeroSection :: forall a . IsElfClass a => SectionXX a
+zeroSection = SectionXX 0 0 0 0 0 0 0 0 0 0
+
+neighbours :: [a] -> (a -> a -> b) -> [b]
+neighbours [] _ = []
+neighbours x  f = fmap (uncurry f) $ L.zip x $ L.tail x
+
 serializeElf' :: forall a m . (IsElfClass a, MonadThrow m) => [ElfXX a] -> m BSL.ByteString
 serializeElf' elfs = do
 
@@ -709,6 +849,20 @@ serializeElf' elfs = do
                 f ElfSection{} = Sum 1
                 f _ =  Sum 0
 
+        segmentN :: Num b => b
+        segmentN = getSum $ foldMapElfList f elfs
+            where
+                f ElfSegment{} = Sum 1
+                f _ =  Sum 0
+
+        ctxt :: WBuilderCtxt a
+        ctxt = WBuilderCtxt
+            { wbcSectionN           = sectionN
+            , wbcSegmentN           = segmentN
+            , wbcStringTable        = stringTable
+            , wbcNameIndexes        = nameIndexes
+            }
+
         sectionNames :: [String]
         sectionNames = foldMapElfList f elfs
             where
@@ -717,137 +871,11 @@ serializeElf' elfs = do
 
         (stringTable, nameIndexes) = mkStringTable sectionNames
 
-        segmentN :: Num b => b
-        segmentN = getSum $ foldMapElfList f elfs
-            where
-                f ElfSegment{} = Sum 1
-                f _ =  Sum 0
-
         sectionTable :: Bool
         sectionTable = getAny $ foldMapElfList f elfs
             where
                 f ElfSectionTable =  Any True
                 f _ = Any False
-
-        align :: MonadThrow n => WordXX a -> WordXX a -> WBuilderState a -> n (WBuilderState a)
-        align _ 0 x = return x
-        align _ 1 x = return x
-        align t m WBuilderState{..} | m .&. (m - 1) /= 0 = $chainedError $ "align module is not power of two " ++ (show m)
-                                    | otherwise =
-            let
-                wbsOffset' = nextOffset t m wbsOffset
-                d = WBuilderDataByteStream $ BSL.replicate (fromIntegral $ wbsOffset' - wbsOffset) 0
-            in
-                return WBuilderState
-                    { wbsDataReversed = d : wbsDataReversed
-                    , wbsOffset = wbsOffset'
-                    , ..
-                    }
-
-        alignWord :: MonadThrow n => WBuilderState a -> n (WBuilderState a)
-        alignWord = align 0 $ wordSize $ fromSing $ sing @a
-
-        dataIsEmpty :: ElfSectionData -> Bool
-        dataIsEmpty (ElfSectionData bs)       = BSL.null bs
-        dataIsEmpty ElfSectionDataStringTable = BSL.null stringTable
-
-        lastSectionIsEmpty :: [ElfXX a] -> Bool
-        lastSectionIsEmpty [] = False
-        lastSectionIsEmpty l = case L.last l of
-            ElfSection{..} -> esType == SHT_NOBITS || dataIsEmpty esData
-            _ -> False
-
-        elf2WBuilder' :: MonadThrow n => ElfXX a -> WBuilderState a -> n (WBuilderState a)
-        elf2WBuilder' ElfHeader{} WBuilderState{..} =
-            return WBuilderState
-                { wbsDataReversed = WBuilderDataHeader : wbsDataReversed
-                , wbsOffset = wbsOffset + headerSize elfClass
-                , ..
-                }
-        elf2WBuilder' ElfSectionTable s = do
-            WBuilderState{..} <- alignWord s
-            return WBuilderState
-                { wbsDataReversed = WBuilderDataSectionTable : wbsDataReversed
-                , wbsOffset = wbsOffset + (sectionN + 1) * sectionTableEntrySize elfClass
-                , wbsShOff = wbsOffset
-                , ..
-                }
-        elf2WBuilder' ElfSegmentTable s = do
-            WBuilderState{..} <- alignWord s
-            return WBuilderState
-                { wbsDataReversed = WBuilderDataSegmentTable : wbsDataReversed
-                , wbsOffset = wbsOffset + segmentN * segmentTableEntrySize elfClass
-                , wbsPhOff = wbsOffset
-                , ..
-                }
-        elf2WBuilder' ElfSection{esFlags = ElfSectionFlag f, ..} s = do
-            when (f .&. (fromIntegral $ complement (maxBound @ (WordXX a))) /= 0)
-                ($chainedError $ "section flags at section " ++ show esN ++ "don't fit")
-            WBuilderState{..} <- if esType == SHT_NOBITS
-                then return s
-                else align 0 esAddrAlign s
-            let
-                (d, shStrNdx) = case esData of
-                    ElfSectionData bs -> (bs, wbsShStrNdx)
-                    ElfSectionDataStringTable -> (stringTable, esN)
-                (n, ns) = case wbsNameIndexes of
-                    n' : ns' -> (n', ns')
-                    _ -> error "internal error: different number of sections in two iterations"
-                sName = fromIntegral n                 -- Word32
-                sType = esType                         -- ElfSectionType
-                sFlags = fromIntegral f
-                sAddr = esAddr                         -- WXX c
-                sOffset = wbsOffset                    -- WXX c
-                sSize = fromIntegral $ BSL.length d    -- WXX c
-                sLink = esLink                         -- Word32
-                sInfo = esInfo                         -- Word32
-                sAddrAlign = esAddrAlign               -- WXX c
-                sEntSize = esEntSize                   -- WXX c
-            return WBuilderState
-                { wbsSections = (esN, SectionXX{..}) : wbsSections
-                , wbsDataReversed = (WBuilderDataByteStream d) : wbsDataReversed
-                , wbsOffset = wbsOffset + (fromIntegral $ BSL.length d)
-                , wbsShStrNdx = shStrNdx
-                , wbsNameIndexes = ns
-                , ..
-                }
-        elf2WBuilder' ElfSegment{..} s = do
-            s' <- align epVirtAddr epAlign s
-            let
-                offset = wbsOffset s'
-            WBuilderState{..} <- execStateT (mapM elf2WBuilder epData) s'
-            let
-                -- allocate one more byte in the end of segment if there exists an empty section
-                -- at the end so that that empty section will go to the current segment
-                add1 = lastSectionIsEmpty epData && offset /= wbsOffset
-                pType = epType
-                pFlags = epFlags
-                pOffset = offset
-                pVirtAddr = epVirtAddr
-                pPhysAddr = epPhysAddr
-                pFileSize = wbsOffset - offset + if add1 then 1 else 0
-                pMemSize = epMemSize
-                pAlign = epAlign
-            return WBuilderState
-                { wbsSegmentsReversed = SegmentXX{..} : wbsSegmentsReversed
-                , wbsDataReversed = if add1
-                    then (WBuilderDataByteStream $ BSL.singleton 0) : wbsDataReversed
-                    else wbsDataReversed
-                , wbsOffset = if add1
-                    then wbsOffset + 1
-                    else wbsOffset
-                , ..
-                }
-        elf2WBuilder' ElfRawData{..} WBuilderState{..} =
-            return WBuilderState
-                { wbsDataReversed = (WBuilderDataByteStream edData) : wbsDataReversed
-                , wbsOffset = wbsOffset + (fromIntegral $ BSL.length edData)
-                , ..
-                }
-        elf2WBuilder' ElfRawAlign{..} s = align eaOffset eaAlign s
-
-        elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => ElfXX a -> n ()
-        elf2WBuilder elf = MS.get >>= elf2WBuilder' elf >>= MS.put
 
         fixSections :: [(Word16, SectionXX a)] -> m [SectionXX a]
         fixSections ss = do
@@ -899,7 +927,7 @@ serializeElf' elfs = do
 
             return $ foldMap f $ L.reverse wbsDataReversed
 
-    execStateT (mapM elf2WBuilder elfs) wbStateInit{ wbsNameIndexes = nameIndexes } >>= wbState2ByteString
+    mkWBuilderState ctxt elfs >>= wbState2ByteString
 
 -- | Serialze ELF file
 serializeElf :: MonadThrow m => Elf -> m BSL.ByteString

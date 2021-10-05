@@ -54,7 +54,7 @@ import Numeric
 import System.IO
 
 import Control.Exception.ChainedException
-import Data.Internal.Elf
+import Data.Internal.Elf hiding (align)
 import Data.Elf.Constants
 import Data.Elf.Headers
 import Data.Interval
