@@ -11,7 +11,7 @@ BUILD   = $(EXECS) $(OBJS) $(DISASMS) $(LAYOUTS) $(DUMPS)
 all : $(BUILD)
 
 objc: objc.o obj_main.o
-syscalls: LDFLAGS += -nostdlib
+syscalls: LDFLAGS += -nostdlib -Wl,-Ttext-segment=0x40ffc8
 
 %.dis : %
 	$(PREFIX)objdump -D $< > $@
