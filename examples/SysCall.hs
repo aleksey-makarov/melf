@@ -17,13 +17,13 @@ syscall :: MonadCatch m => m Elf
 syscall = return $ SELFCLASS64 :&: ElfList [ segment ]
     where
         segment = ElfSegment
-            { epType     = PT_LOAD
-            , epFlags    = PF_X .|. PF_R
-            , epVirtAddr = addr
-            , epPhysAddr = addr
-            , epMemSize  = 0x84          -- FIXME
-            , epAlign    = 0x10000
-            , epData     =
+            { epType       = PT_LOAD
+            , epFlags      = PF_X .|. PF_R
+            , epVirtAddr   = addr
+            , epPhysAddr   = addr
+            , epAddMemSize = 0
+            , epAlign      = 0x10000
+            , epData       =
                 [ ElfHeader
                     { ehData       = ELFDATA2LSB
                     , ehOSABI      = ELFOSABI_SYSV

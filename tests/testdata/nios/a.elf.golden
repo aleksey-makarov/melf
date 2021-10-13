@@ -1,11 +1,11 @@
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_X,PF_R]
-    VirtAddr: 0x00001000
-    PhysAddr: 0x00001000
-    MemSize:  0x0000d23c
-    Align:    0x00001000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_X,PF_R]
+    VirtAddr:   0x00001000
+    PhysAddr:   0x00001000
+    AddMemSize: 0x00000000
+    Align:      0x00001000
+    Data:       
         header {
             Class:      ELFCLASS32
             Data:       ELFDATA2LSB
@@ -47,13 +47,13 @@ segment {
         }
 }
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_W,PF_R]
-    VirtAddr: 0x0000f23c
-    PhysAddr: 0x0000f23c
-    MemSize:  0x000009e8
-    Align:    0x00001000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_W,PF_R]
+    VirtAddr:   0x0000f23c
+    PhysAddr:   0x0000f23c
+    AddMemSize: 0x00000040
+    Align:      0x00001000
+    Data:       
         section 3 ".data" {
             Type:      SHT_PROGBITS
             Flags:     [SHF_WRITE,SHF_ALLOC]

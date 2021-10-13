@@ -1,19 +1,19 @@
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_X,PF_R]
-    VirtAddr: 0x0000000000400000
-    PhysAddr: 0x0000000000400000
-    MemSize:  0x00000000000000ec
-    Align:    0x0000000000200000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_X,PF_R]
+    VirtAddr:   0x0000000000400000
+    PhysAddr:   0x0000000000400000
+    AddMemSize: 0x0000000000000000
+    Align:      0x0000000000200000
+    Data:       
         segment {
-            Type:     PT_NOTE
-            Flags:    [PF_R]
-            VirtAddr: 0x0000000000000000
-            PhysAddr: 0x0000000000000000
-            MemSize:  0x0000000000000000
-            Align:    0x0000000000000008
-            Data:     
+            Type:       PT_NOTE
+            Flags:      [PF_R]
+            VirtAddr:   0x0000000000000000
+            PhysAddr:   0x0000000000000000
+            AddMemSize: 0x0000000000000000
+            Align:      0x0000000000000008
+            Data:       
         }
         header {
             Class:      ELFCLASS64

@@ -1,19 +1,19 @@
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_X,PF_R]
-    VirtAddr: 0x00400000
-    PhysAddr: 0x00400000
-    MemSize:  0x00081b94
-    Align:    0x00001000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_X,PF_R]
+    VirtAddr:   0x00400000
+    PhysAddr:   0x00400000
+    AddMemSize: 0x00000000
+    Align:      0x00001000
+    Data:       
         segment {
-            Type:     PT_EXT 1685382481
-            Flags:    [PF_X,PF_W,PF_R]
-            VirtAddr: 0x00000000
-            PhysAddr: 0x00000000
-            MemSize:  0x00000000
-            Align:    0x00000004
-            Data:     
+            Type:       PT_EXT 1685382481
+            Flags:      [PF_X,PF_W,PF_R]
+            VirtAddr:   0x00000000
+            PhysAddr:   0x00000000
+            AddMemSize: 0x00000000
+            Align:      0x00000004
+            Data:       
         }
         header {
             Class:      ELFCLASS32
@@ -26,36 +26,36 @@ segment {
             Flags:      0x50001007
         }
         segment {
-            Type:     PT_PHDR
-            Flags:    [PF_X,PF_R]
-            VirtAddr: 0x00400034
-            PhysAddr: 0x00400034
-            MemSize:  0x000000e0
-            Align:    0x00000004
-            Data:     
+            Type:       PT_PHDR
+            Flags:      [PF_X,PF_R]
+            VirtAddr:   0x00400034
+            PhysAddr:   0x00400034
+            AddMemSize: 0x00000000
+            Align:      0x00000004
+            Data:       
                 segment table
         }
         segment {
-            Type:     PT_INTERP
-            Flags:    [PF_R]
-            VirtAddr: 0x00400114
-            PhysAddr: 0x00400114
-            MemSize:  0x00000014
-            Align:    0x00000001
-            Data:     
+            Type:       PT_INTERP
+            Flags:      [PF_R]
+            VirtAddr:   0x00400114
+            PhysAddr:   0x00400114
+            AddMemSize: 0x00000000
+            Align:      0x00000001
+            Data:       
                 raw data {
                     Data: 2f 6c 69 62 2f 6c 64 2d 75 43 6c 69 62 63 2e 73 # /lib/ld-uClibc.s
                           6f 2e 30 00                                     # o.0.
                 }
         }
         segment {
-            Type:     PT_DYNAMIC
-            Flags:    [PF_X,PF_W,PF_R]
-            VirtAddr: 0x00400128
-            PhysAddr: 0x00400128
-            MemSize:  0x00005f34
-            Align:    0x00000004
-            Data:     
+            Type:       PT_DYNAMIC
+            Flags:      [PF_X,PF_W,PF_R]
+            VirtAddr:   0x00400128
+            PhysAddr:   0x00400128
+            AddMemSize: 0x00000000
+            Align:      0x00000004
+            Data:       
                 raw data {
                     Data: 00 00 00 01 00 00 1d 58 00 00 00 01 00 00 1d 97 # .......X........
                           00 00 00 01 00 00 1d dd 00 00 00 0c 00 40 60 5c # .............@`\
@@ -72,13 +72,13 @@ segment {
                   total: 506636
         }
         segment {
-            Type:     PT_EXT 1685382480
-            Flags:    [PF_R]
-            VirtAddr: 0x00481b68
-            PhysAddr: 0x00481b68
-            MemSize:  0x0000002c
-            Align:    0x00000004
-            Data:     
+            Type:       PT_EXT 1685382480
+            Flags:      [PF_R]
+            VirtAddr:   0x00481b68
+            PhysAddr:   0x00481b68
+            AddMemSize: 0x00000000
+            Align:      0x00000004
+            Data:       
                 raw data {
                     Data: 01 1b 03 3b 00 04 04 94 00 00 00 04 ff f8 48 d8 # ...;..........H.
                           00 04 04 a8 ff f8 4e e8 00 04 04 b8 ff f8 55 18 # ......N.......U.
@@ -87,13 +87,13 @@ segment {
         }
 }
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_W,PF_R]
-    VirtAddr: 0x004c2000
-    PhysAddr: 0x004c2000
-    MemSize:  0x00002c68
-    Align:    0x00001000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_W,PF_R]
+    VirtAddr:   0x004c2000
+    PhysAddr:   0x004c2000
+    AddMemSize: 0x000013ac
+    Align:      0x00001000
+    Data:       
         raw data {
             Data: 00 00 00 0c 00 00 00 00 01 00 01 7c 1f 0c 1d 00 # ...........|....
                   00 00 00 0c 00 00 00 14 00 40 64 40 00 00 06 0c # .........@d@....

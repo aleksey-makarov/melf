@@ -440,7 +440,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                 , ("Flags",      viaShow $ splitBits epFlags )
                 , ("VirtAddr",   printWordXX epVirtAddr )
                 , ("PhysAddr",   printWordXX epPhysAddr )
-                , ("MemSize",    printWordXX epMemSize  )
+                , ("AddMemSize", printWordXX epAddMemSize )
                 , ("Align",      printWordXX epAlign    )
                 , ("Data",       dataDoc                )
                 ]

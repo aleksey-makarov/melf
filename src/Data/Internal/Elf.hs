@@ -332,13 +332,14 @@ data ElfXX (c :: ElfClass)
         , esData      :: ElfSectionData -- ^ The content of the section
         }
     | ElfSegment
-        { epType     :: ElfSegmentType -- ^ Type of segment
-        , epFlags    :: ElfSegmentFlag -- ^ Segment attributes
-        , epVirtAddr :: WordXX c       -- ^ Virtual address in memory
-        , epPhysAddr :: WordXX c       -- ^ Physical address
-        , epMemSize  :: WordXX c       -- ^ Size of segment in memory
-        , epAlign    :: WordXX c       -- ^ Alignment of segment
-        , epData     :: [ElfXX c]      -- ^ Content of the segment
+        { epType       :: ElfSegmentType -- ^ Type of segment
+        , epFlags      :: ElfSegmentFlag -- ^ Segment attributes
+        , epVirtAddr   :: WordXX c       -- ^ Virtual address in memory
+        , epPhysAddr   :: WordXX c       -- ^ Physical address
+        , epAddMemSize :: WordXX c       -- ^ Add this amount of memory after the section when the section is loaded to memory by execution system.
+                                         --   Or, in other words this is how much `pMemSize` is bigger than `pFileSize`
+        , epAlign      :: WordXX c       -- ^ Alignment of segment
+        , epData       :: [ElfXX c]      -- ^ Content of the segment
         }
     | ElfRawData -- ^ Some ELF files (some executables) don't bother to define
                  -- section for linking and have just raw data in segments.
@@ -578,14 +579,17 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 }
         rBuilderToElf RBuilderSegment{ rbpHeader = SegmentXX{..}, ..} = do
             d <- mapM rBuilderToElf rbpData
+            addMemSize <- if pMemSize /= 0 && pFileSize /= 0 && pMemSize < pFileSize
+                then $chainedError "memSize < fileSize"
+                else return (pMemSize - pFileSize)
             return ElfSegment
-                { epType     = pType
-                , epFlags    = pFlags
-                , epVirtAddr = pVirtAddr
-                , epPhysAddr = pPhysAddr
-                , epMemSize  = pMemSize
-                , epAlign    = pAlign
-                , epData     = d
+                { epType        = pType
+                , epFlags       = pFlags
+                , epVirtAddr    = pVirtAddr
+                , epPhysAddr    = pPhysAddr
+                , epAddMemSize  = addMemSize
+                , epAlign       = pAlign
+                , epData        = d
                 }
         rBuilderToElf RBuilderRawData{ rbrdInterval = I o s } =
             return $ ElfRawData $ cut bs (fromIntegral o) (fromIntegral s)
@@ -826,7 +830,7 @@ serializeElf' elfs = do
                 pVirtAddr = epVirtAddr
                 pPhysAddr = epPhysAddr
                 pFileSize = wbsOffset - offset + if add1 then 1 else 0
-                pMemSize = epMemSize
+                pMemSize = pFileSize + epAddMemSize
                 pAlign = epAlign
             return WBuilderState
                 { wbsSegmentsReversed = SegmentXX{..} : wbsSegmentsReversed

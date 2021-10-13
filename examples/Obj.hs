@@ -33,13 +33,13 @@ obj  =  do
         , ElfSegmentTable
         , ElfSectionTable
         , ElfSegment
-            { epType     = PT_LOAD
-            , epFlags    = PF_R
-            , epVirtAddr = 0
-            , epPhysAddr = 0
-            , epMemSize  = 0
-            , epAlign    = 0x100
-            , epData     =
+            { epType       = PT_LOAD
+            , epFlags      = PF_R
+            , epVirtAddr   = 0
+            , epPhysAddr   = 0
+            , epAddMemSize = 0
+            , epAlign      = 0x100
+            , epData       =
                 [ ElfSection
                     { esName      = ".some_other_section"
                     , esType      = SHT_PROGBITS

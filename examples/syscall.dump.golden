@@ -1,11 +1,11 @@
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_X,PF_R]
-    VirtAddr: 0x0000000000400000
-    PhysAddr: 0x0000000000400000
-    MemSize:  0x0000000000000084
-    Align:    0x0000000000010000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_X,PF_R]
+    VirtAddr:   0x0000000000400000
+    PhysAddr:   0x0000000000400000
+    AddMemSize: 0x0000000000000000
+    Align:      0x0000000000010000
+    Data:       
         header {
             Class:      ELFCLASS64
             Data:       ELFDATA2LSB

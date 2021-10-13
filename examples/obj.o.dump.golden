@@ -11,13 +11,13 @@ header {
 segment table
 section table
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_R]
-    VirtAddr: 0x0000000000000000
-    PhysAddr: 0x0000000000000000
-    MemSize:  0x0000000000000000
-    Align:    0x0000000000000100
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_R]
+    VirtAddr:   0x0000000000000000
+    PhysAddr:   0x0000000000000000
+    AddMemSize: 0x0000000000000000
+    Align:      0x0000000000000100
+    Data:       
         section 1 ".some_other_section" {
             Type:      SHT_PROGBITS
             Flags:     [SHF_EXECINSTR]

@@ -1,11 +1,11 @@
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_X,PF_R]
-    VirtAddr: 0x0000000000000000
-    PhysAddr: 0x0000000000000000
-    MemSize:  0x0000000000030f84
-    Align:    0x0000000000010000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_X,PF_R]
+    VirtAddr:   0x0000000000000000
+    PhysAddr:   0x0000000000000000
+    AddMemSize: 0x0000000000000000
+    Align:      0x0000000000010000
+    Data:       
         header {
             Class:      ELFCLASS64
             Data:       ELFDATA2MSB
@@ -163,13 +163,13 @@ segment {
                        total: 18732
         }
         segment {
-            Type:     PT_EXT 1685382480
-            Flags:    [PF_R]
-            VirtAddr: 0x000000000002cec4
-            PhysAddr: 0x000000000002cec4
-            MemSize:  0x0000000000000744
-            Align:    0x0000000000000004
-            Data:     
+            Type:       PT_EXT 1685382480
+            Flags:      [PF_R]
+            VirtAddr:   0x000000000002cec4
+            PhysAddr:   0x000000000002cec4
+            AddMemSize: 0x0000000000000000
+            Align:      0x0000000000000004
+            Data:       
                 section 10 ".eh_frame_hdr" {
                     Type:      SHT_PROGBITS
                     Flags:     [SHF_ALLOC]
@@ -201,21 +201,21 @@ segment {
         }
 }
 segment {
-    Type:     PT_LOAD
-    Flags:    [PF_W,PF_R]
-    VirtAddr: 0x000000000004dac0
-    PhysAddr: 0x000000000004dac0
-    MemSize:  0x00000000000036d0
-    Align:    0x0000000000010000
-    Data:     
+    Type:       PT_LOAD
+    Flags:      [PF_W,PF_R]
+    VirtAddr:   0x000000000004dac0
+    PhysAddr:   0x000000000004dac0
+    AddMemSize: 0x0000000000000168
+    Align:      0x0000000000010000
+    Data:       
         segment {
-            Type:     PT_EXT 1685382482
-            Flags:    [PF_R]
-            VirtAddr: 0x000000000004dac0
-            PhysAddr: 0x000000000004dac0
-            MemSize:  0x0000000000002540
-            Align:    0x0000000000000001
-            Data:     
+            Type:       PT_EXT 1685382482
+            Flags:      [PF_R]
+            VirtAddr:   0x000000000004dac0
+            PhysAddr:   0x000000000004dac0
+            AddMemSize: 0x0000000000000000
+            Align:      0x0000000000000001
+            Data:       
                 section 12 ".data.rel.ro" {
                     Type:      SHT_PROGBITS
                     Flags:     [SHF_WRITE,SHF_ALLOC]
@@ -231,13 +231,13 @@ segment {
                                total: 2912
                 }
                 segment {
-                    Type:     PT_DYNAMIC
-                    Flags:    [PF_W,PF_R]
-                    VirtAddr: 0x000000000004e620
-                    PhysAddr: 0x000000000004e620
-                    MemSize:  0x0000000000000190
-                    Align:    0x0000000000000008
-                    Data:     
+                    Type:       PT_DYNAMIC
+                    Flags:      [PF_W,PF_R]
+                    VirtAddr:   0x000000000004e620
+                    PhysAddr:   0x000000000004e620
+                    AddMemSize: 0x0000000000000000
+                    Align:      0x0000000000000008
+                    Data:       
                         section 13 ".dynamic" {
                             Type:      SHT_DYNAMIC
                             Flags:     [SHF_WRITE,SHF_ALLOC]
