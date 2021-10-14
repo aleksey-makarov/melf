@@ -19,13 +19,14 @@ mkElf path elf = do
 
 testElf :: String -> IO Elf -> [ TestTree ]
 testElf elfFileName elf =
-    [ testCase elfFileName (elf >>= mkElf f)
-    , after AllSucceed ("$1 == \"" ++ elfFileName ++ "\"") $ testGroup ("check " ++ elfFileName)
+    [ testCase mainTargetName (elf >>= mkElf f)
+    , after AllSucceed mainTargetName $ testGroup ("check_" ++ elfFileName)
         [ goldenVsFile "dump"   (d <.> "golden") d (writeElfDump   f d)
         , goldenVsFile "layout" (l <.> "golden") l (writeElfLayout f l)
         ]
     ]
     where
+        mainTargetName = "make_" ++ elfFileName
         t = "examples"
         f = t </> elfFileName
         d = t </> elfFileName <.> "dump"
