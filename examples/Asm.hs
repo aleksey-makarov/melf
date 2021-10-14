@@ -12,8 +12,13 @@ module Asm
     , Register (..)
     , label
     , adc
+    , mov
+    , ldr
+    , svc
+    , ascii
+    , ref
     , getCode
-    , x0, x1
+    , x0, x1, x2, x8
     , w0, w1
     ) where
 
@@ -51,9 +56,11 @@ data RegisterWidth = X | W
 type Register :: RegisterWidth -> Type
 data Register c = R Word
 
-x0, x1 :: Register 'X
+x0, x1, x2, x8 :: Register 'X
 x0 = R 0
 x1 = R 1
+x2 = R 2
+x8 = R 8
 
 w0, w1 :: Register 'W
 w0 = R 0
@@ -78,10 +85,11 @@ getLabel str = do
     mAddr <- uses labels (M.lookup str)
     fromMaybeToMonadThrow ("the label \'" ++ str ++ "\' is not defined") mAddr
 
-label :: MonadState CodeState m => String -> m ()
-label s = do
-    o <- use offset
-    labels %= (M.insert s o)
+label :: MonadState CodeState m => String -> m a -> m a
+label _ m = m
+    -- do
+    --     o <- use offset
+    --     labels %= (M.insert s o)
 
 adc :: (MonadState CodeState m, MonadThrow m) => String -> m ()
 adc str = do
@@ -89,6 +97,21 @@ adc str = do
     code %= (flip append) (packFiniteBits l)
     offset += 8
     return ()
+
+mov :: (MonadState CodeState m, MonadThrow m) => Register w -> Word64 -> m ()
+mov _ _ = return ()
+
+ldr :: (MonadState CodeState m, MonadThrow m) => Register w -> Word64 -> m ()
+ldr _ _ = return ()
+
+svc :: (MonadState CodeState m, MonadThrow m) => Word64 -> m ()
+svc _ = return ()
+
+ascii :: (MonadState CodeState m, MonadThrow m) => String -> m ()
+ascii _ = return ()
+
+ref :: String -> Word64
+ref _ = 0
 
 -- codeStateInitial :: CodeState
 -- codeStateInitial = CodeState BSL.empty M.empty 0

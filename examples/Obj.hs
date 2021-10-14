@@ -1,7 +1,9 @@
 module Obj (obj) where
 
+import Data.Bits
+import Data.Word
 import Control.Monad.Catch
-import qualified Data.ByteString.Lazy.Char8 as BSLC
+-- import qualified Data.ByteString.Lazy.Char8 as BSLC
 import Data.Singletons.Sigma
 
 import Data.Elf
@@ -13,69 +15,60 @@ import Asm
 obj :: MonadCatch m => m Elf
 obj  =  do
 
+    let
+        msg :: String
+        msg = "Hello World!\n"
+
+        msgLen :: Word64
+        msgLen = fromIntegral $ length msg
+
     txt <- getCode $ do
-        -- adc "l"
-        label "l"
-        adc "l"
-        label "m"
-        adc "m"
+        mov x0 1                --     mov x0, #1
+        ldr x1 $ ref "msg"      --     ldr x1, =msg
+        ldr x2 msgLen           --     ldr x2, =len
+        mov x8 64               --     mov x8, #64 // write()
+        svc 0                   --     svc #0
+                                --
+        mov x0 0                --     mov x0, #0
+        mov x8 93               --     mov x8, #93 // exit()
+        svc 0                   --     svc #0
+                                --
+        label "msg" $ ascii msg -- msg:
+                                --     .ascii "Hello World!\n"
 
     return $ SELFCLASS64 :&: ElfList
         [ ElfHeader
             { ehData       = ELFDATA2LSB
-            , ehOSABI      = ELFOSABI_LINUX
-            , ehABIVersion = 1
+            , ehOSABI      = ELFOSABI_SYSV
+            , ehABIVersion = 0
             , ehType       = ET_REL
             , ehMachine    = EM_AARCH64
             , ehEntry      = 0
             , ehFlags      = 0
             }
-        , ElfSegmentTable
-        , ElfSectionTable
-        , ElfSegment
-            { epType       = PT_LOAD
-            , epFlags      = PF_R
-            , epVirtAddr   = 0
-            , epPhysAddr   = 0
-            , epAddMemSize = 0
-            , epAlign      = 0x100
-            , epData       =
-                [ ElfSection
-                    { esName      = ".some_other_section"
-                    , esType      = SHT_PROGBITS
-                    , esFlags     = SHF_EXECINSTR
-                    , esAddr      = 0
-                    , esAddrAlign = 0
-                    , esEntSize   = 0
-                    , esN         = 1
-                    , esLink      = 0
-                    , esInfo      = 0
-                    , esData      = ElfSectionData $ BSLC.pack "Hello World!"
-                    }
-                ]
-            }
         , ElfSection
-            { esName      = ".some_section"
+            { esName      = ".text"
             , esType      = SHT_PROGBITS
-            , esFlags     = SHF_EXECINSTR
+            , esFlags     = SHF_EXECINSTR .|. SHF_ALLOC
             , esAddr      = 0
-            , esAddrAlign = 0
+            , esAddrAlign = 8
             , esEntSize   = 0
-            , esN         = 3
+            , esN         = 1
             , esLink      = 0
             , esInfo      = 0
             , esData      = ElfSectionData txt
             }
         , ElfSection
-            { esName      = ".some_string_section"
+            { esName      = ".shstrtab"
             , esType      = SHT_SYMTAB
             , esFlags     = 0
             , esAddr      = 0
-            , esAddrAlign = 0
+            , esAddrAlign = 1
             , esEntSize   = 0
             , esN         = 2
             , esLink      = 0
             , esInfo      = 0
             , esData      = ElfSectionDataStringTable
             }
+        , ElfSectionTable
         ]
