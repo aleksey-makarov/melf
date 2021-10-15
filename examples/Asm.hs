@@ -8,7 +8,6 @@
 
 module Asm
     ( CodeState (..)
-    , RegisterWidth (..)
     , Register (..)
     , label
     , adc
@@ -35,6 +34,8 @@ import qualified Data.List as L
 import Data.Map.Lazy as M
 import Data.Word
 
+import Data.Elf.Headers
+
 data AsmException = AsmException String
 
 instance Show AsmException where
@@ -51,18 +52,16 @@ data CodeState = CodeState
 
 makeLenses ''CodeState
 
-data RegisterWidth = X | W
-
-type Register :: RegisterWidth -> Type
+type Register :: ElfClass -> Type
 data Register c = R Word
 
-x0, x1, x2, x8 :: Register 'X
+x0, x1, x2, x8 :: Register 'ELFCLASS64
 x0 = R 0
 x1 = R 1
 x2 = R 2
 x8 = R 8
 
-w0, w1 :: Register 'W
+w0, w1 :: Register 'ELFCLASS32
 w0 = R 0
 w1 = R 1
 
