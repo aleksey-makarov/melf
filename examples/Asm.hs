@@ -8,8 +8,8 @@
 -- https://github.com/fused-effects/fused-effects -- see Related work
 
 module Asm
-    ( CodeState (..)
-    , Register (..)
+    ( CodeState
+    , Register
     , PoolRef
     , mov
     , ldr
@@ -49,7 +49,7 @@ data CodeState = CodeState
 data PoolRef = PoolRef
 
 type Register :: ElfClass -> Type
-data Register c = R Word
+data Register c = R Word32
 
 x0, x1, x2, x8 :: Register 'ELFCLASS64
 x0 = R 0
@@ -79,8 +79,17 @@ emit i = do
                   -- , offset = offset + (fromIntegral $ BSL.length bs)
                   }
 
-mov :: MonadState CodeState m => Register w -> Word16 -> m ()
-mov _ _ = return ()
+class IsElfClass w => AArch64Instr w where
+    sf :: Register w -> Word32
+
+instance AArch64Instr 'ELFCLASS32 where
+    sf _ = 0 `shift` 31
+
+instance AArch64Instr 'ELFCLASS64 where
+    sf _ = 1 `shift` 31
+
+mov :: (MonadState CodeState m, AArch64Instr w) => Register w -> Word16 -> m ()
+mov r@(R n) imm = emit $ (sf r) .|. 0x52800000 .|. (fromIntegral imm `shift` 5) .|. n
 
 ldr :: (MonadState CodeState m, MonadThrow m) => Register w -> PoolRef -> m ()
 ldr _ _ = return ()
@@ -99,8 +108,6 @@ pool _ = return PoolRef
 -- , _labelsAll :: M.Map String Word64
 -- , _offset    :: Word64
 -- }
-
-
 
 -- https://wiki.haskell.org/Tying_the_Knot
 -- -- https://www.reddit.com/r/haskell/comments/gxqeo/tying_the_knot_a_really_mind_bending_haskell/

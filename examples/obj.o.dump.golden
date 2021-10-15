@@ -16,7 +16,8 @@ section 1 ".text" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      01 00 00 d4 01 00 00 d4                         # ........
+    Data:      20 00 80 d2 a2 01 80 d2 08 08 80 d2 01 00 00 d4 #  ...............
+               00 00 80 d2 a8 0b 80 d2 01 00 00 d4             # ............
 }
 string table section 2 ".shstrtab"
 section table
