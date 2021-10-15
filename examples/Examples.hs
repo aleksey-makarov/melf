@@ -12,6 +12,12 @@ import Data.Elf.PrettyPrint
 import Obj
 import SysCall
 
+fixTargetName :: String -> String
+fixTargetName s = fmap f s
+    where
+        f '.' = '_'
+        f x   = x
+
 mkElf :: FilePath -> Elf -> IO ()
 mkElf path elf = do
     e <- serializeElf elf
@@ -19,14 +25,15 @@ mkElf path elf = do
 
 testElf :: String -> IO Elf -> [ TestTree ]
 testElf elfFileName elf =
-    [ testCase mainTargetName (elf >>= mkElf f)
-    , after AllSucceed mainTargetName $ testGroup ("check_" ++ elfFileName)
+    [ testCase makeTargetName (elf >>= mkElf f)
+    , after AllSucceed makeTargetName $ testGroup checkTargetName
         [ goldenVsFile "dump"   (d <.> "golden") d (writeElfDump   f d)
         , goldenVsFile "layout" (l <.> "golden") l (writeElfLayout f l)
         ]
     ]
     where
-        mainTargetName = "make_" ++ elfFileName
+        makeTargetName  = "make_"  ++ fixTargetName elfFileName
+        checkTargetName = "check_" ++ fixTargetName elfFileName
         t = "examples"
         f = t </> elfFileName
         d = t </> elfFileName <.> "dump"
