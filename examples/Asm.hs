@@ -5,16 +5,14 @@
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 
--- https://github.com/fused-effects/fused-effects -- see Related work
-
 module Asm
     ( CodeState
     , Register
-    , PoolRef
+    , PoolOffset
     , mov
     , ldr
     , svc
-    , pool
+    , ascii
     , getCode
     , x0, x1, x2, x8
     , w0, w1
@@ -22,34 +20,30 @@ module Asm
 
 import Prelude as P
 
--- import Control.Lens
--- import Control.Lens.Operators
 import Control.Monad.Catch
 import Control.Monad.State as MS
 import Data.Bits
-import Data.ByteString.Lazy as BSL
 import Data.ByteString.Builder
+import Data.ByteString.Lazy as BSL
+import Data.ByteString.Lazy.Char8 as BSLC
 import Data.Kind
--- import qualified Data.List as L
--- import Data.Map.Lazy as M
 import Data.Word
 
 import Data.Elf.Headers
 
 data CodeState = CodeState
-    { codeReversed :: [Word32]
-    -- { codeReversed :: [BSL.ByteString]
-    -- , _labels    :: M.Map String Word64
-    -- , _labelsAll :: M.Map String Word64
-    -- , offset       :: Word64
+    { offsetInPool :: Word32
+    , poolReversed :: [Builder]
+      -- Args:
+      -- Offset of the instruction
+      -- Offset of the pool
+    , codeReversed :: [Word64 -> Word64 -> Word32]
     }
-
--- makeLenses ''CodeState
-
-data PoolRef = PoolRef
 
 type Register :: ElfClass -> Type
 data Register c = R Word32
+
+type PoolOffset = Word32
 
 x0, x1, x2, x8 :: Register 'ELFCLASS64
 x0 = R 0
@@ -72,12 +66,38 @@ w1 = R 1
 --     where
 --         n = (finiteBitSize b + 7) `div` 8
 
-emit :: MonadState CodeState m => Word32 -> m ()
-emit i = do
+emit' :: MonadState CodeState m => (Word64 -> Word64 -> Word32) -> m ()
+emit' f = do
     CodeState {..} <- get
-    put CodeState { codeReversed = i : codeReversed
-                  -- , offset = offset + (fromIntegral $ BSL.length bs)
+    put CodeState { codeReversed = f : codeReversed
+                  , ..
                   }
+
+emit :: MonadState CodeState m => Word32 -> m ()
+emit i = emit' $ \ _ _ -> i
+
+isPower2 :: (Bits i, Integral i) => i -> Bool
+isPower2 n = n .&. (n - 1) == 0
+
+align :: (Num n, Integral n, Eq n, Bits n) => n -> n -> n
+align a _ | not (isPower2 a) = error "align is not a power of 2"
+align 0 n = n
+align a n = (n + a - 1) .&. complement (a - 1)
+
+builderRepeatZero :: Integral n => n -> Builder
+builderRepeatZero n = mconcat $ P.take (fromIntegral n) $ P.repeat $ word8 0
+
+emitPool :: MonadState CodeState m => Word32 -> ByteString -> m Word32
+emitPool a bs = do
+    CodeState {..} <- get
+    let
+        offsetInPool' = align a offsetInPool
+        o = builderRepeatZero $ offsetInPool' - offsetInPool
+    put CodeState { offsetInPool = (fromIntegral $ BSL.length bs) + offsetInPool'
+                  , poolReversed = lazyByteString bs : o : poolReversed
+                  , ..
+                  }
+    return offsetInPool'
 
 class IsElfClass w => AArch64Instr w where
     sf :: Register w -> Word32
@@ -91,29 +111,33 @@ instance AArch64Instr 'ELFCLASS64 where
 mov :: (MonadState CodeState m, AArch64Instr w) => Register w -> Word16 -> m ()
 mov r@(R n) imm = emit $ (sf r) .|. 0x52800000 .|. (fromIntegral imm `shift` 5) .|. n
 
-ldr :: (MonadState CodeState m, MonadThrow m) => Register w -> PoolRef -> m ()
+ldr :: (MonadState CodeState m, MonadThrow m) => Register w -> PoolOffset -> m ()
 ldr _ _ = return ()
 
 svc :: MonadState CodeState m => Word16 -> m ()
 svc imm = emit $ 0xd4000001 .|. (fromIntegral imm `shift` 5)
 
-pool :: (MonadState CodeState m, MonadThrow m) => ByteString -> m PoolRef
-pool _ = return PoolRef
+ascii :: (MonadState CodeState m, MonadThrow m) => String -> m PoolOffset
+ascii s = emitPool 1 $ BSLC.pack s
 
--- codeStateInitial :: CodeState
--- codeStateInitial = CodeState BSL.empty M.empty 0
+instructionSize :: Num b => b
+instructionSize = 4
 
--- { _code      :: BSL.ByteString
--- , _labels    :: M.Map String Word64
--- , _labelsAll :: M.Map String Word64
--- , _offset    :: Word64
--- }
+resolvePool :: CodeState -> BSL.ByteString
+resolvePool CodeState {..} =
+    let
+        poolOffset = instructionSize * (fromIntegral $ P.length codeReversed)
+        poolOffsetAligned = align 8 poolOffset
+        code = fmap f $ P.zip (P.reverse codeReversed) (fmap (instructionSize *) [0 .. ])
 
--- https://wiki.haskell.org/Tying_the_Knot
--- -- https://www.reddit.com/r/haskell/comments/gxqeo/tying_the_knot_a_really_mind_bending_haskell/
--- http://www.lfcs.inf.ed.ac.uk/reports/97/ECS-LFCS-97-375/
--- https://blog.melding-monads.com/2009/12/30/fun-with-the-lazy-state-monad/
+        f :: ((Word64 -> Word64 -> Word32), Word64) -> Word32
+        f (ff, n) = ff n poolOffsetAligned
+
+        codeBuilder = mconcat $ fmap word32LE code
+    in
+        toLazyByteString $  codeBuilder
+                         <> (builderRepeatZero $ poolOffsetAligned - poolOffset)
+                         <> (mconcat $ P.reverse poolReversed)
+
 getCode :: MonadCatch m => StateT CodeState m () -> m BSL.ByteString
-getCode n = do
-    CodeState cr <- execStateT n (CodeState [])
-    return $ toLazyByteString $ mconcat $ fmap word32LE $ P.reverse cr
+getCode n = resolvePool <$> execStateT n (CodeState 0 [] [])
