@@ -37,7 +37,7 @@ import Data.Elf.Headers
 -- Args:
 -- Offset of the instruction
 -- Offset of the pool
-type InstructionGen = Word64 -> Word64 -> Either String Word32
+type InstructionGen = Word32 -> Word32 -> Either String Word32
 
 data CodeState = CodeState
     { offsetInPool :: Word32
@@ -105,19 +105,33 @@ emitPool a bs = do
     return offsetInPool'
 
 class IsElfClass w => AArch64Instr w where
-    sf :: Register w -> Word32
+    b64 :: Register w -> Word32
 
 instance AArch64Instr 'ELFCLASS32 where
-    sf _ = 0 `shift` 31
+    b64 _ = 0
 
 instance AArch64Instr 'ELFCLASS64 where
-    sf _ = 1 `shift` 31
+    b64 _ = 1
 
 mov :: (MonadState CodeState m, AArch64Instr w) => Register w -> Word16 -> m ()
-mov r@(R n) imm = emit $ (sf r) .|. 0x52800000 .|. (fromIntegral imm `shift` 5) .|. n
+mov r@(R n) imm = emit $  (b64 r `shift` 31)
+                      .|. 0x52800000
+                      .|. (fromIntegral imm `shift` 5)
+                      .|. n
 
-ldr :: (MonadState CodeState m, MonadThrow m) => Register w -> PoolOffset -> m ()
-ldr _ _ = return ()
+ldr :: (MonadState CodeState m, AArch64Instr w) => Register w -> PoolOffset -> m ()
+ldr r@(R n) poolOffset = emit' f
+    where
+        f instrAddr offsetInPool =
+            let
+                imm19 = poolOffset + offsetInPool - instrAddr
+            in
+                if imm19 >= (1 `shift` 19)
+                    then Left "offset is too big"
+                    else Right $  (b64 r `shift` 30)
+                              .|. 0x18000000
+                              .|. (fromIntegral imm19 `shift` 5)
+                              .|. n
 
 svc :: MonadState CodeState m => Word16 -> m ()
 svc imm = emit $ 0xd4000001 .|. (fromIntegral imm `shift` 5)
@@ -139,7 +153,7 @@ resolvePool CodeState {..} = do
         poolOffset = instructionSize * (fromIntegral $ P.length codeReversed)
         poolOffsetAligned = align 8 poolOffset
 
-        f :: (InstructionGen, Word64) -> Either String Word32
+        f :: (InstructionGen, Word32) -> Either String Word32
         f (ff, n) = ff n poolOffsetAligned
 
     code <- returnEither $ mapM f $ P.zip (P.reverse codeReversed) (fmap (instructionSize *) [0 .. ])
