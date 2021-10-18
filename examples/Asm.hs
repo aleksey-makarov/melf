@@ -60,17 +60,6 @@ w0, w1 :: Register 'ELFCLASS32
 w0 = R 0
 w1 = R 1
 
--- splitBits :: (Bits b, Integral b) => b -> [Word8]
--- splitBits b = narrow <$> L.unfoldr f b
---     where
---         narrow x = fromIntegral (x .&. 0xff)
---         f x = Just (x, x `shiftR` 8)
---
--- packFiniteBits :: (FiniteBits b, Integral b) => b -> ByteString
--- packFiniteBits b = pack $ P.take n $ splitBits b
---     where
---         n = (finiteBitSize b + 7) `div` 8
-
 emit' :: MonadState CodeState m => InstructionGen -> m ()
 emit' f = do
     CodeState {..} <- get
@@ -124,7 +113,7 @@ ldr r@(R n) poolOffset = emit' f
     where
         f instrAddr offsetInPool =
             let
-                imm19 = poolOffset + offsetInPool - instrAddr
+                imm19 = poolOffset + offsetInPool - instrAddr -- FIXME: wrong, should be offset = SignExtend(imm19:'00', 64);
             in
                 if imm19 >= (1 `shift` 19)
                     then Left "offset is too big"
