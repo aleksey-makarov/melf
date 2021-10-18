@@ -4,6 +4,7 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
+-- {-# LANGUAGE RankNTypes #-}
 
 module Asm
     ( CodeState
@@ -20,6 +21,7 @@ module Asm
 
 import Prelude as P
 
+import Control.Exception.ChainedException
 import Control.Monad.Catch
 import Control.Monad.State as MS
 import Data.Bits
@@ -31,13 +33,16 @@ import Data.Word
 
 import Data.Elf.Headers
 
+
+-- Args:
+-- Offset of the instruction
+-- Offset of the pool
+type InstructionGen = Word64 -> Word64 -> Either String Word32
+
 data CodeState = CodeState
     { offsetInPool :: Word32
     , poolReversed :: [Builder]
-      -- Args:
-      -- Offset of the instruction
-      -- Offset of the pool
-    , codeReversed :: [Word64 -> Word64 -> Word32]
+    , codeReversed :: [InstructionGen]
     }
 
 type Register :: ElfClass -> Type
@@ -66,7 +71,7 @@ w1 = R 1
 --     where
 --         n = (finiteBitSize b + 7) `div` 8
 
-emit' :: MonadState CodeState m => (Word64 -> Word64 -> Word32) -> m ()
+emit' :: MonadState CodeState m => InstructionGen -> m ()
 emit' f = do
     CodeState {..} <- get
     put CodeState { codeReversed = f : codeReversed
@@ -74,7 +79,7 @@ emit' f = do
                   }
 
 emit :: MonadState CodeState m => Word32 -> m ()
-emit i = emit' $ \ _ _ -> i
+emit i = emit' $ \ _ _ -> Right i
 
 isPower2 :: (Bits i, Integral i) => i -> Bool
 isPower2 n = n .&. (n - 1) == 0
@@ -123,21 +128,28 @@ ascii s = emitPool 1 $ BSLC.pack s
 instructionSize :: Num b => b
 instructionSize = 4
 
-resolvePool :: CodeState -> BSL.ByteString
-resolvePool CodeState {..} =
+-- FIXME: move to Chained, create macros
+returnEither :: MonadThrow m => Either String a -> m a
+returnEither (Left s)  = $chainedError s
+returnEither (Right a) = return a
+
+resolvePool :: MonadCatch m => CodeState -> m BSL.ByteString
+resolvePool CodeState {..} = do
     let
         poolOffset = instructionSize * (fromIntegral $ P.length codeReversed)
         poolOffsetAligned = align 8 poolOffset
-        code = fmap f $ P.zip (P.reverse codeReversed) (fmap (instructionSize *) [0 .. ])
 
-        f :: ((Word64 -> Word64 -> Word32), Word64) -> Word32
+        f :: (InstructionGen, Word64) -> Either String Word32
         f (ff, n) = ff n poolOffsetAligned
 
+    code <- returnEither $ mapM f $ P.zip (P.reverse codeReversed) (fmap (instructionSize *) [0 .. ])
+
+    let
         codeBuilder = mconcat $ fmap word32LE code
-    in
-        toLazyByteString $  codeBuilder
-                         <> (builderRepeatZero $ poolOffsetAligned - poolOffset)
-                         <> (mconcat $ P.reverse poolReversed)
+
+    return $ toLazyByteString $ codeBuilder
+                             <> (builderRepeatZero $ poolOffsetAligned - poolOffset)
+                             <> (mconcat $ P.reverse poolReversed)
 
 getCode :: MonadCatch m => StateT CodeState m () -> m BSL.ByteString
-getCode n = resolvePool <$> execStateT n (CodeState 0 [] [])
+getCode n = execStateT n (CodeState 0 [] []) >>= resolvePool
