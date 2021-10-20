@@ -38,10 +38,13 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                 Nothing
                 (normalC typeName [ bangType (bang noSourceUnpackedness noSourceStrictness) baseTypeT ])
                 [ derivClause Nothing [ conT (mkName "Eq")
+                                      , conT (mkName "Ord")
+                                      , conT (mkName "Enum")
                                       , conT (mkName "Num")
+                                      , conT (mkName "Real")
+                                      , conT (mkName "Integral")
                                       , conT (mkName "Bits")
                                       , conT (mkName "FiniteBits")
-                                      , conT (mkName "Ord")
                                       ]
                 ]
 

@@ -254,7 +254,7 @@ data HeaderXX c =
         , hPhNum      :: Word16     -- ^ Number of program header entries
         , hShEntSize  :: Word16     -- ^ Size of section header entry
         , hShNum      :: Word16     -- ^ Number of section header entries
-        , hShStrNdx   :: Word16     -- ^ Section name string table index
+        , hShStrNdx   :: ElfSectionIndex -- ^ Section name string table index
         }
 
 -- | Sigma type where `ElfClass` defines the type of `HeaderXX`

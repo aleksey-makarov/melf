@@ -12,7 +12,7 @@ Header:   Class:      ELFCLASS64
           PhNum:      2
           ShEntSize:  0x0040
           ShNum:      3
-          ShStrNdx:   2
+          ShStrNdx:   SHN_EXT 2
 Sections: - N:         0
             Name:      0
             Type:      SHT_NULL

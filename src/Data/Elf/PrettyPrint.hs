@@ -213,7 +213,7 @@ printRBuilder rbs = vsep ldoc
                             ]
                 f RBuilderSection{ rbsHeader = SectionXX{..}, ..} =
                     let
-                        doc = [ "S" <> viaShow rbsN
+                        doc = [ "S" <> viaShow (fromIntegral rbsN :: Word)
                               , dquotes $ pretty $ rbsName
                               , viaShow sType
                               , viaShow $ splitBits $ ElfSectionFlag $ fromIntegral sFlags
@@ -417,7 +417,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                             SELFCLASS32 -> $chainedError "invalid ELF: EM_AARCH64 and ELFCLASS32"
                 else
                     return ("section", printData full bs)
-            return $ formatPairsBlock (sectionName <+> (viaShow esN) <+> (dquotes $ pretty esName))
+            return $ formatPairsBlock (sectionName <+> (viaShow (fromIntegral esN :: Word)) <+> (dquotes $ pretty esName))
                 [ ("Type",       viaShow esType          )
                 , ("Flags",      viaShow $ splitBits esFlags )
                 , ("Addr",       printWordXX esAddr      )
@@ -428,7 +428,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                 , ("Data",       dataDoc )
                 ]
         printElf'' ElfSection{ esData = ElfSectionDataStringTable, ..} =
-            return $ "string table section" <+> (viaShow esN) <+> (dquotes $ pretty esName)
+            return $ "string table section" <+> (viaShow (fromIntegral esN :: Word)) <+> (dquotes $ pretty esName)
         printElf'' ElfSegment{..} = do
             dataDoc <- if null epData
                 then return ""

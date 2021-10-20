@@ -80,7 +80,7 @@ data RBuilder (c :: ElfClass)
         }
     | RBuilderSection
         { rbsHeader :: SectionXX c
-        , rbsN      :: Word16
+        , rbsN      :: ElfSectionIndex
         , rbsName   :: String
         }
     | RBuilderSegment
@@ -326,7 +326,7 @@ data ElfXX (c :: ElfClass)
         , esAddr      :: WordXX c       -- ^ Virtual address in memory
         , esAddrAlign :: WordXX c       -- ^ Address alignment boundary
         , esEntSize   :: WordXX c       -- ^ Size of entries, if section has table
-        , esN         :: Word16         -- ^ Section number
+        , esN         :: ElfSectionIndex -- ^ Section number
         , esInfo      :: Word32         -- ^ Miscellaneous information
         , esLink      :: Word32         -- ^ Link to other section
         , esData      :: ElfSectionData -- ^ The content of the section
@@ -510,7 +510,7 @@ parseRBuilder hdr@HeaderXX{..} ss ps bs = do
     let
         maybeStringSectionData = getSectionData bs <$> (ss !!? hShStrNdx)
 
-        mkRBuilderSection :: (SingI a, MonadCatch m) => (Word16, SectionXX a) -> m (RBuilder a)
+        mkRBuilderSection :: (SingI a, MonadCatch m) => (ElfSectionIndex, SectionXX a) -> m (RBuilder a)
         mkRBuilderSection (n, s@SectionXX{..}) = do
             stringSectionData <- $maybeAddContext "No string table" maybeStringSectionData
             return $ RBuilderSection s n $ getString stringSectionData $ fromIntegral sName
@@ -617,13 +617,13 @@ data WBuilderData
 
 data WBuilderState (a :: ElfClass) =
     WBuilderState
-        { wbsSections         :: [(Word16, SectionXX a)]
+        { wbsSections         :: [(ElfSectionIndex, SectionXX a)]
         , wbsSegmentsReversed :: [SegmentXX a]
         , wbsDataReversed     :: [WBuilderData]
         , wbsOffset           :: WordXX a
         , wbsPhOff            :: WordXX a
         , wbsShOff            :: WordXX a
-        , wbsShStrNdx         :: Word16
+        , wbsShStrNdx         :: ElfSectionIndex
         , wbsNameIndexes      :: [Int64]
         }
 
@@ -853,7 +853,7 @@ serializeElf' elfs = do
         elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => ElfXX a -> n ()
         elf2WBuilder elf = MS.get >>= elf2WBuilder' elf >>= MS.put
 
-        fixSections :: [(Word16, SectionXX a)] -> m [SectionXX a]
+        fixSections :: [(ElfSectionIndex, SectionXX a)] -> m [SectionXX a]
         fixSections ss = do
             when (L.length ss /= sectionN) (error "internal error: L.length ss /= sectionN")
             let

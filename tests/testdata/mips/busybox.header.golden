@@ -12,7 +12,7 @@ Header:   Class:      ELFCLASS32
           PhNum:      7
           ShEntSize:  0x0000
           ShNum:      0
-          ShStrNdx:   0
+          ShStrNdx:   SHN_Undef
 Sections: 
 Segments: - N:        0
             Type:     PT_PHDR

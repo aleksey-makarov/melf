@@ -35,6 +35,7 @@ import Data.Kind
 import Data.Word
 
 import Data.Elf
+import Data.Elf.Constants
 import Data.Elf.Headers
 
 newtype CodeOffset  = CodeOffset  { getCodeOffset  :: Int64 }  deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
@@ -175,8 +176,10 @@ returnEither :: MonadThrow m => Either String a -> m a
 returnEither (Left s)  = $chainedError s
 returnEither (Right a) = return a
 
-resolve :: MonadCatch m => CodeState -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])
-resolve CodeState {..} = do
+assemble :: MonadCatch m => ElfSectionIndex -> StateT CodeState m () -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])
+assemble textSecN m = do
+
+    CodeState {..} <- execStateT m (CodeState 0 [] [] [])
 
     -- resolve txt
 
@@ -202,17 +205,14 @@ resolve CodeState {..} = do
         ff (s, r) =
             let
                 steName  = s
-                steBind  = undefined
-                steType  = undefined
-                steShNdx = undefined
+                steBind  = STB_Global
+                steType  = STT_NoType
+                steShNdx = textSecN
                 steValue = fromIntegral $ findOffset poolOffset r
-                steSize  = undefined
+                steSize  = 0
             in
                 ElfSymbolXX{..}
 
         symbolTable = fmap ff $ P.reverse symbolsRefersed
 
     return $ (txt, symbolTable)
-
-assemble :: MonadCatch m => StateT CodeState m () -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])
-assemble m = execStateT m (CodeState 0 [] [] []) >>= resolve

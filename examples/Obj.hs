@@ -16,10 +16,14 @@ import Asm
 msg :: String
 msg = "Hello World!\n"
 
+textSecN, shstrtabSecN :: ElfSectionIndex
+textSecN     = 1
+shstrtabSecN = 2
+
 obj :: MonadCatch m => m Elf
 obj  =  do
 
-    (txt, _symbolTable) <- assemble $ do
+    (txt, _symbolTable) <- assemble textSecN $ do
         label >>= exportSymbol "_start"      -- _start:
         mov x0 1                             --     mov x0, #1
         ascii msg >>= ldr x1                 --     ldr x1, =msg
@@ -50,7 +54,7 @@ obj  =  do
             , esAddr      = 0
             , esAddrAlign = 8
             , esEntSize   = 0
-            , esN         = 1
+            , esN         = textSecN
             , esLink      = 0
             , esInfo      = 0
             , esData      = ElfSectionData txt
@@ -62,7 +66,7 @@ obj  =  do
             , esAddr      = 0
             , esAddrAlign = 1
             , esEntSize   = 0
-            , esN         = 2
+            , esN         = shstrtabSecN
             , esLink      = 0
             , esInfo      = 0
             , esData      = ElfSectionDataStringTable

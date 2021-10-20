@@ -31,7 +31,7 @@ $(mkDeclarations BaseWord16 \"TypeName\" \"ValuePrefix\" \"DefaultConstructorNam
 produces this:
 
 @
-    newtype TypeName = TypeName Word16 deriving (Eq, Num, Bits, FiniteBits, Ord)
+    newtype TypeName = TypeName Word16 deriving (Eq, Ord, Enum, Num, Real, Integral, Bits, FiniteBits)
 
     instance Show TypeName where
         show (TypeName 0) = (\"ValuePrefix\" ++ "_A")
