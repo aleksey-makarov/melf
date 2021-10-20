@@ -958,4 +958,22 @@ parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = d
         _ -> $chainedError "not a section" -- FIXME
 parseSymbolTable _ _ _ = $chainedError "incorrect args to parseSymbolTable" -- FIXME
 
--- FIXME: serializeSymbolTable
+{-
+mkElfSymbolTableEntry :: SingI a => BSL.ByteString -> ElfSymbolXX a -> SymbolXX a
+mkElfSymbolTableEntry stringTable SymbolXX{..} =
+    let
+        steName  = getStringFromData stringTable stName
+        steBind  = ElfSymbolBinding $ stInfo `shiftR` 4
+        steType  = ElfSymbolType $ stInfo .&. 0x0f
+        steShNdx = stShNdx
+        steValue = stValue
+        steSize  = stSize
+    in
+        ElfSymbolXX{..}
+-}
+
+-- | Serialize symbol table
+serializeSymbolTable :: (MonadThrow m, SingI a)
+                     => [ElfSymbolXX a]                    -- ^ Symbol table
+                     -> m (BSL.ByteString, BSL.ByteString) -- ^ Pair of symbol section data and string table
+serializeSymbolTable _ = return (BSL.empty, BSL.empty)

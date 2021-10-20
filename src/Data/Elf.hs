@@ -27,6 +27,7 @@ module Data.Elf (
     -- * Symbol table
     , ElfSymbolXX(..)
     , parseSymbolTable
+    , serializeSymbolTable
     ) where
 
 import Data.Internal.Elf

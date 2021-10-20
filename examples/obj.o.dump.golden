@@ -21,4 +21,24 @@ section 1 ".text" {
                48 65 6c 6c 6f 20 57 6f 72 6c 64 21 0a          # Hello World!.
 }
 string table section 2 ".shstrtab"
+section 3 ".strtab" {
+    Type:      SHT_STRTAB
+    Flags:     []
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000001
+    EntSize:   0x0000000000000000
+    Info:      0x00000000
+    Link:      0x00000000
+    Data:      
+}
+symbol table section 4 ".symtab" {
+    Type:      SHT_SYMTAB
+    Flags:     []
+    Addr:      0x0000000000000000
+    AddrAlign: 0x0000000000000008
+    EntSize:   0x0000000000000018
+    Info:      0x00000000
+    Link:      0x00000003
+    Data:      
+}
 section table
