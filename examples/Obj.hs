@@ -65,7 +65,7 @@ obj  =  do
             }
         , ElfSection
             { esName      = ".shstrtab"
-            , esType      = SHT_SYMTAB
+            , esType      = SHT_STRTAB
             , esFlags     = 0
             , esAddr      = 0
             , esAddrAlign = 1
