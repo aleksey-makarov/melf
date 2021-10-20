@@ -958,22 +958,35 @@ parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = d
         _ -> $chainedError "not a section" -- FIXME
 parseSymbolTable _ _ _ = $chainedError "incorrect args to parseSymbolTable" -- FIXME
 
-{-
-mkElfSymbolTableEntry :: SingI a => BSL.ByteString -> ElfSymbolXX a -> SymbolXX a
-mkElfSymbolTableEntry stringTable SymbolXX{..} =
+mkSymbolTableEntry :: SingI a => Word32 -> ElfSymbolXX a -> SymbolXX a
+mkSymbolTableEntry nameIndex ElfSymbolXX{..} =
     let
-        steName  = getStringFromData stringTable stName
-        steBind  = ElfSymbolBinding $ stInfo `shiftR` 4
-        steType  = ElfSymbolType $ stInfo .&. 0x0f
-        steShNdx = stShNdx
-        steValue = stValue
-        steSize  = stSize
+        ElfSymbolBinding b = steBind
+        ElfSymbolType t = steType
+
+        stName  = nameIndex
+        stInfo  = b `shift` 4 .|. t
+        stOther = 0
+        stShNdx = steShNdx
+        stValue = steValue
+        stSize  = steSize
     in
-        ElfSymbolXX{..}
--}
+        SymbolXX{..}
 
 -- | Serialize symbol table
 serializeSymbolTable :: (MonadThrow m, SingI a)
-                     => [ElfSymbolXX a]                    -- ^ Symbol table
-                     -> m (BSL.ByteString, BSL.ByteString) -- ^ Pair of symbol section data and string table
-serializeSymbolTable _ = return (BSL.empty, BSL.empty)
+                     => ElfData                            -- ^ Endianness of the ELF file
+                     -> [ElfSymbolXX a]                    -- ^ Symbol table
+                     -> m (BSL.ByteString, BSL.ByteString) -- ^ Pair of symbol table section data and string table section data
+serializeSymbolTable d ss = do
+
+    let
+        (stringTable, stringIndexes) = mkStringTable $ fmap steName ss
+        ssWithNameIndexes = L.zip ss stringIndexes
+
+        f :: SingI a => (ElfSymbolXX a, Int64) -> SymbolXX a
+        f (s, n) = mkSymbolTableEntry (fromIntegral n) s
+
+        symbolTable = serializeBList d $ fmap f ssWithNameIndexes
+
+    return (symbolTable, stringTable)

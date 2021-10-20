@@ -39,7 +39,7 @@ obj  =  do
                                              --
                                              -- .ascii "Hello World!\n"
 
-    (symbolTableData, stringTableData) <- serializeSymbolTable symbolTable
+    (symbolTableData, stringTableData) <- serializeSymbolTable ELFDATA2LSB symbolTable
 
     return $ SELFCLASS64 :&: ElfList
         [ ElfHeader
