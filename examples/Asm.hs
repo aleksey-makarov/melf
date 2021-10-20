@@ -9,11 +9,12 @@
 module Asm
     ( CodeState
     , Register
-    , PoolOffset
+    , RelativeRef
     , mov
     , ldr
     , svc
     , ascii
+    , label
     , getCode
     , x0, x1, x2, x8
     , w0, w1
@@ -33,6 +34,9 @@ import Data.Word
 
 import Data.Elf.Headers
 
+data RelativeRef = CodeRef Word32
+                 | PoolRef Word32
+
 -- Args:
 -- Offset of the instruction
 -- Offset of the pool
@@ -44,10 +48,34 @@ data CodeState = CodeState
     , codeReversed :: [InstructionGen]
     }
 
+emit' :: MonadState CodeState m => InstructionGen -> m ()
+emit' g = modify f where
+    f CodeState {..} = CodeState { codeReversed = g : codeReversed
+                                 , ..
+                                 }
+
+emit :: MonadState CodeState m => Word32 -> m ()
+emit i = emit' $ \ _ _ -> Right i
+
+emitPool :: MonadState CodeState m => Word32 -> ByteString -> m RelativeRef
+emitPool a bs = state f where
+    f CodeState {..} =
+        let
+            offsetInPool' = align a offsetInPool
+            o = builderRepeatZero $ offsetInPool' - offsetInPool
+        in
+            ( PoolRef offsetInPool'
+            , CodeState { offsetInPool = (fromIntegral $ BSL.length bs) + offsetInPool'
+                        , poolReversed = lazyByteString bs : o : poolReversed
+                        , ..
+                        }
+            )
+
+label :: MonadState CodeState m => m RelativeRef
+label = CodeRef <$> gets offsetInPool
+
 type Register :: ElfClass -> Type
 data Register c = R Word32
-
-type PoolOffset = Word32
 
 x0, x1, x2, x8 :: Register 'ELFCLASS64
 x0 = R 0
@@ -59,15 +87,6 @@ w0, w1 :: Register 'ELFCLASS32
 w0 = R 0
 w1 = R 1
 
-emit' :: MonadState CodeState m => InstructionGen -> m ()
-emit' g = modify f where
-    f CodeState {..} = CodeState { codeReversed = g : codeReversed
-                                 , ..
-                                 }
-
-emit :: MonadState CodeState m => Word32 -> m ()
-emit i = emit' $ \ _ _ -> Right i
-
 isPower2 :: (Bits i, Integral i) => i -> Bool
 isPower2 n = n .&. (n - 1) == 0
 
@@ -78,20 +97,6 @@ align a n = (n + a - 1) .&. complement (a - 1)
 
 builderRepeatZero :: Integral n => n -> Builder
 builderRepeatZero n = mconcat $ P.take (fromIntegral n) $ P.repeat $ word8 0
-
-emitPool :: MonadState CodeState m => Word32 -> ByteString -> m Word32
-emitPool a bs = state f where
-    f CodeState {..} =
-        let
-            offsetInPool' = align a offsetInPool
-            o = builderRepeatZero $ offsetInPool' - offsetInPool
-        in
-            ( offsetInPool'
-            , CodeState { offsetInPool = (fromIntegral $ BSL.length bs) + offsetInPool'
-                        , poolReversed = lazyByteString bs : o : poolReversed
-                        , ..
-                        }
-            )
 
 class IsElfClass w => AArch64Instr w where
     b64 :: Register w -> Word32
@@ -108,24 +113,34 @@ mov r@(R n) imm = emit $  (b64 r `shift` 31)
                       .|. (fromIntegral imm `shift` 5)
                       .|. n
 
-ldr :: (MonadState CodeState m, AArch64Instr w) => Register w -> PoolOffset -> m ()
-ldr r@(R n) poolOffset = emit' f
+isBitN ::(Num b, Bits b) => Int -> b -> Bool
+isBitN bitN w = if h == 0 || h == m then True else False
     where
-        f instrAddr offsetInPool =
+        m = complement $ (1 `shift` bitN) - 1
+        h = w .&. m
+
+ldr :: (MonadState CodeState m, AArch64Instr w) => Register w -> RelativeRef -> m ()
+ldr r@(R n) rr = emit' f
+    where
+        f instrAddr poolOffset =
             let
-                imm19 = poolOffset + offsetInPool - instrAddr
+                offset = case rr of
+                    CodeRef codeOffset   -> codeOffset - instrAddr
+                    PoolRef offsetInPool -> poolOffset + offsetInPool - instrAddr
             in
-                if imm19 >= (1 `shift` 19)
-                    then Left "offset is too big"
-                    else Right $  (b64 r `shift` 30)
-                              .|. 0x18000000
-                              .|. (fromIntegral imm19 `shift` 5)
-                              .|. n
+                if offset .&. 0x3 /= 0
+                    then Left "offset is not aligned"
+                    else if not $ isBitN 19 offset
+                        then Left "offset is too big"
+                        else Right $  (b64 r `shift` 30)
+                                  .|. 0x18000000
+                                  .|. (offset `shift` 3)
+                                  .|. n
 
 svc :: MonadState CodeState m => Word16 -> m ()
 svc imm = emit $ 0xd4000001 .|. (fromIntegral imm `shift` 5)
 
-ascii :: (MonadState CodeState m, MonadThrow m) => String -> m PoolOffset
+ascii :: (MonadState CodeState m, MonadThrow m) => String -> m RelativeRef
 ascii s = emitPool 1 $ BSLC.pack s
 
 instructionSize :: Num b => b
