@@ -5,8 +5,8 @@
 ╓ 0x0000006d S2 ".shstrtab" SHT_STRTAB []
 ╙ 0x0000008d
 ╓ 0x00000090 S4 ".symtab" SHT_SYMTAB []
-╙ 0x000000a7
-╓ 0x000000a8 S3 ".strtab" SHT_STRTAB []
-╙ 0x000000af
-┎ 0x000000b0 ST (5)
-┖ 0x000001ef
+╙ 0x000000bf
+╓ 0x000000c0 S3 ".strtab" SHT_STRTAB []
+╙ 0x000000c7
+┎ 0x000000c8 ST (5)
+┖ 0x00000207

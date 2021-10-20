@@ -176,6 +176,9 @@ returnEither :: MonadThrow m => Either String a -> m a
 returnEither (Left s)  = $chainedError s
 returnEither (Right a) = return a
 
+zeroIndexStringItem :: ElfSymbolXX 'ELFCLASS64
+zeroIndexStringItem = ElfSymbolXX "" 0 0 0 0 0
+
 assemble :: MonadCatch m => ElfSectionIndex -> StateT CodeState m () -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])
 assemble textSecN m = do
 
@@ -215,4 +218,4 @@ assemble textSecN m = do
 
         symbolTable = fmap ff $ P.reverse symbolsRefersed
 
-    return $ (txt, symbolTable)
+    return $ (txt, zeroIndexStringItem : symbolTable)

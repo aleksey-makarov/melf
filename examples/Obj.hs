@@ -84,7 +84,7 @@ obj  =  do
             , esEntSize   = symbolTableEntrySize ELFCLASS64
             , esN         = symtabSecN
             , esLink      = fromIntegral strtabSecN
-            , esInfo      = 0
+            , esInfo      = 1
             , esData      = ElfSectionData symbolTableData
             }
         , ElfSection
