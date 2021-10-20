@@ -53,3 +53,5 @@ main = defaultMain $ testGroup "exceptions" [ testCase "f"    $ checkExceptions 
                                             , testCase "fe'"  $ checkExceptions fe'  "(tests/exceptions/Exceptions.hs:35) // TestException"
                                             , testCase "fe'e" $ checkExceptions fe'e "some context 2 (tests/exceptions/Exceptions.hs:38) // (tests/exceptions/Exceptions.hs:35) // TestException"
                                             ]
+
+-- FIXME: add tests for MaybeSomething
