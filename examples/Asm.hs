@@ -33,7 +33,6 @@ import Data.Word
 
 import Data.Elf.Headers
 
-
 -- Args:
 -- Offset of the instruction
 -- Offset of the pool
@@ -61,11 +60,10 @@ w0 = R 0
 w1 = R 1
 
 emit' :: MonadState CodeState m => InstructionGen -> m ()
-emit' f = do
-    CodeState {..} <- get
-    put CodeState { codeReversed = f : codeReversed
-                  , ..
-                  }
+emit' g = modify f where
+    f CodeState {..} = CodeState { codeReversed = g : codeReversed
+                                 , ..
+                                 }
 
 emit :: MonadState CodeState m => Word32 -> m ()
 emit i = emit' $ \ _ _ -> Right i
@@ -82,16 +80,18 @@ builderRepeatZero :: Integral n => n -> Builder
 builderRepeatZero n = mconcat $ P.take (fromIntegral n) $ P.repeat $ word8 0
 
 emitPool :: MonadState CodeState m => Word32 -> ByteString -> m Word32
-emitPool a bs = do
-    CodeState {..} <- get
-    let
-        offsetInPool' = align a offsetInPool
-        o = builderRepeatZero $ offsetInPool' - offsetInPool
-    put CodeState { offsetInPool = (fromIntegral $ BSL.length bs) + offsetInPool'
-                  , poolReversed = lazyByteString bs : o : poolReversed
-                  , ..
-                  }
-    return offsetInPool'
+emitPool a bs = state f where
+    f CodeState {..} =
+        let
+            offsetInPool' = align a offsetInPool
+            o = builderRepeatZero $ offsetInPool' - offsetInPool
+        in
+            ( offsetInPool'
+            , CodeState { offsetInPool = (fromIntegral $ BSL.length bs) + offsetInPool'
+                        , poolReversed = lazyByteString bs : o : poolReversed
+                        , ..
+                        }
+            )
 
 class IsElfClass w => AArch64Instr w where
     b64 :: Register w -> Word32
@@ -113,7 +113,7 @@ ldr r@(R n) poolOffset = emit' f
     where
         f instrAddr offsetInPool =
             let
-                imm19 = poolOffset + offsetInPool - instrAddr -- FIXME: wrong, should be offset = SignExtend(imm19:'00', 64);
+                imm19 = poolOffset + offsetInPool - instrAddr
             in
                 if imm19 >= (1 `shift` 19)
                     then Left "offset is too big"
