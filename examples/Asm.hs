@@ -118,7 +118,7 @@ instance AArch64Instr 'ELFCLASS64 where
     b64 _ = 1
 
 -- | C6.2.10 ADR
-adr :: (MonadState CodeState m, AArch64Instr w) => Register w -> RelativeRef -> m ()
+adr :: MonadState CodeState m => Register 'ELFCLASS64 -> RelativeRef -> m ()
 adr (R n) rr =  emit' f
     where
 
