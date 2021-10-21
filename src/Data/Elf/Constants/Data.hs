@@ -25,7 +25,7 @@ Below is an example of how it works.  The code
 $(mkDeclarations BaseWord16 \"TypeName\" \"ValuePrefix\" \"DefaultConstructorName\"
     [ (\"_A\", 0)
     , (\"_B\", 1)
-    ]
+    ])
 @
 
 produces this:
