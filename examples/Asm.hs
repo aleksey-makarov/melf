@@ -10,6 +10,7 @@ module Asm
     ( CodeState
     , Register
     , RelativeRef
+    , adr
     , mov
     , ldr
     , svc
@@ -116,6 +117,29 @@ instance AArch64Instr 'ELFCLASS32 where
 instance AArch64Instr 'ELFCLASS64 where
     b64 _ = 1
 
+-- | C6.2.10 ADR
+adr :: (MonadState CodeState m, AArch64Instr w) => Register w -> RelativeRef -> m ()
+adr (R n) rr =  emit' f
+    where
+
+        offsetToImm :: CodeOffset -> Either String Word32
+        offsetToImm (CodeOffset o) =
+            if not $ isBitN 19 o
+                    then Left "offset is too big"
+                    else
+                        let
+                            immlo = o .&. 3
+                            immhi = (o `shiftR` 2)  .&. 0x7ffff
+                        in
+                            Right $ fromIntegral $ (immhi `shift` 5) .|. (immlo `shift` 29)
+
+        f :: InstructionGen
+        f instrAddr poolOffset = do
+            imm <- offsetToImm $ findOffset poolOffset rr - instrAddr
+            return $ Instruction $  0x10000000
+                                .|. imm
+                                .|. n
+
 -- | C6.2.187 MOV (wide immediate)
 mov :: (MonadState CodeState m, AArch64Instr w) => Register w -> Word16 -> m ()
 mov r@(R n) imm = emit $ Instruction $ (b64 r `shift` 31)
@@ -135,18 +159,19 @@ findOffset :: CodeOffset -> RelativeRef -> CodeOffset
 findOffset _poolOffset (CodeRef codeOffset)   = codeOffset
 findOffset  poolOffset (PoolRef offsetInPool) = poolOffset + offsetInPool
 
-offsetToImm19 :: CodeOffset -> Either String Word32
-offsetToImm19 (CodeOffset o) =
-    if o .&. 0x3 /= 0
-        then Left "offset is not aligned"
-        else if not $ isBitN 19 o
-            then Left "offset is too big"
-            else Right $ fromIntegral $ o `shiftR` 2
-
 -- | C6.2.132 LDR (literal)
 ldr :: (MonadState CodeState m, AArch64Instr w) => Register w -> RelativeRef -> m ()
 ldr r@(R n) rr = emit' f
     where
+
+        offsetToImm19 :: CodeOffset -> Either String Word32
+        offsetToImm19 (CodeOffset o) =
+            if o .&. 0x3 /= 0
+                then Left "offset is not aligned"
+                else if not $ isBitN 19 o
+                    then Left "offset is too big"
+                    else Right $ fromIntegral $ o `shiftR` 2
+
         f :: InstructionGen
         f instrAddr poolOffset = do
             imm19 <- offsetToImm19 $ findOffset poolOffset rr - instrAddr

@@ -28,7 +28,7 @@ obj  =  do
     (txt, symbolTable) <- assemble textSecN $ do
         label >>= exportSymbol "_start"      -- _start:
         mov x0 1                             --     mov x0, #1
-        ascii msg >>= ldr x1                 --     ldr x1, =msg
+        ascii msg >>= adr x1                 --     ldr x1, =msg
         mov x2 $ fromIntegral $ P.length msg --     ldr x2, =len
         mov x8 64                            --     mov x8, #64 // write()
         svc 0                                --     svc #0
