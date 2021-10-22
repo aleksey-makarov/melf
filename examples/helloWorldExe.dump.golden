@@ -1,8 +1,8 @@
 segment {
     Type:       PT_LOAD
     Flags:      [PF_X,PF_R]
-    VirtAddr:   0x0000000000410000
-    PhysAddr:   0x0000000000410000
+    VirtAddr:   0x0000000000400000
+    PhysAddr:   0x0000000000400000
     AddMemSize: 0x0000000000000000
     Align:      0x0000000000010000
     Data:       
@@ -13,15 +13,13 @@ segment {
             ABIVersion: 0
             Type:       ET_EXEC
             Machine:    EM_AARCH64
-            Entry:      0x0000000000410040
+            Entry:      0x0000000000400040
             Flags:      0x00000000
         }
         raw data {
-            Data: 20 00 80 d2 61 01 00 58 82 01 00 58 08 08 80 d2 #  ...a..X...X....
+            Data: 20 00 80 d2 e1 00 00 10 a2 01 80 d2 08 08 80 d2 #  ...............
                   01 00 00 d4 00 00 80 d2 a8 0b 80 d2 01 00 00 d4 # ................
-                  ...
-                  60 00 41 00 00 00 00 00 0d 00 00 00 00 00 00 00 # `.A.............
-                  total: 64
+                  48 65 6c 6c 6f 20 57 6f 72 6c 64 21 0a 00 00 00 # Hello World!....
         }
         segment table
 }

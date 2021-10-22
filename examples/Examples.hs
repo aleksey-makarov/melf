@@ -1,5 +1,6 @@
 module Main (main) where
 
+import Control.Monad.Catch
 import Data.ByteString.Lazy as BSL
 import System.FilePath
 import Test.Tasty
@@ -9,8 +10,17 @@ import Test.Tasty.HUnit
 import Data.Elf
 import Data.Elf.PrettyPrint
 
-import Obj
-import SysCall
+import MkObj
+import MkExe
+import HelloWorld
+
+helloWorldExe :: MonadCatch m => m Elf
+helloWorldExe = do
+    (txt, _) <- helloWorld 1
+    mkExe txt
+
+helloWorldObj :: MonadCatch m => m Elf
+helloWorldObj = mkObj helloWorld
 
 fixTargetName :: String -> String
 fixTargetName s = fmap f s
@@ -18,14 +28,14 @@ fixTargetName s = fmap f s
         f '.' = '_'
         f x   = x
 
-mkElf :: FilePath -> Elf -> IO ()
-mkElf path elf = do
+writeElf :: FilePath -> Elf -> IO ()
+writeElf path elf = do
     e <- serializeElf elf
     BSL.writeFile path e
 
 testElf :: String -> IO Elf -> [ TestTree ]
 testElf elfFileName elf =
-    [ testCase makeTargetName (elf >>= mkElf f)
+    [ testCase makeTargetName (elf >>= writeElf f)
     , after AllSucceed makeTargetName $ testGroup checkTargetName
         [ goldenVsFile "dump"   (d <.> "golden") d (writeElfDump   f d)
         , goldenVsFile "layout" (l <.> "golden") l (writeElfLayout f l)
@@ -41,6 +51,6 @@ testElf elfFileName elf =
 
 main :: IO ()
 main = defaultMain $ testGroup "examples"
-    (  testElf "obj.o"   obj
-    ++ testElf "syscall" syscall
+    (  testElf "helloWorldObj.o" helloWorldObj
+    ++ testElf "helloWorldExe"   helloWorldExe
     )

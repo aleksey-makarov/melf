@@ -1,16 +1,17 @@
-module Obj (obj) where
+{-# LANGUAGE DataKinds #-}
+
+module MkObj (mkObj) where
 
 import Prelude as P
 
-import Data.Bits
 import Control.Monad.Catch
+import Data.Bits
+import Data.ByteString.Lazy as BSL
 import Data.Singletons.Sigma
 
 import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
-
-import HelloWorld
 
 textSecN, shstrtabSecN, strtabSecN, symtabSecN :: ElfSectionIndex
 textSecN     = 1
@@ -18,10 +19,10 @@ shstrtabSecN = 2
 strtabSecN   = 3
 symtabSecN   = 4
 
-obj :: MonadCatch m => m Elf
-obj  =  do
+mkObj :: MonadCatch m => (ElfSectionIndex -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])) -> m Elf
+mkObj assembleF =  do
 
-    (txt, symbolTable) <- helloWorld textSecN
+    (txt, symbolTable) <- assembleF textSecN
     (symbolTableData, stringTableData) <- serializeSymbolTable ELFDATA2LSB symbolTable
 
     return $ SELFCLASS64 :&: ElfList
