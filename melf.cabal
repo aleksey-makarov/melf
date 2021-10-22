@@ -89,7 +89,8 @@ test-suite examples
   type: exitcode-stdio-1.0
   main-is: Examples.hs
   other-modules:
-      Asm
+      AsmAarch64
+      HelloWorld
       Obj
       SysCall
       Paths_melf

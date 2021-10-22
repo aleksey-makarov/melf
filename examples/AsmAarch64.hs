@@ -6,7 +6,7 @@
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-module Asm
+module AsmAarch64
     ( CodeState
     , Register
     , RelativeRef

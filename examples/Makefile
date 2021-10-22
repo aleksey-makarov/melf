@@ -10,8 +10,8 @@ BUILD   = $(EXECS) $(OBJS) $(DISASMS) $(LAYOUTS) $(DUMPS)
 
 all : $(BUILD)
 
-syscalls: LDFLAGS += -nostdlib -Wl,-Ttext-segment=0x40ffc8
-obj: LDFLAGS += -nostdlib
+obj syscalls: LDFLAGS += -nostdlib
+# -Wl,-Ttext-segment=0x40ffc8
 
 %.dis : %
 	$(PREFIX)objdump -D $< > $@
