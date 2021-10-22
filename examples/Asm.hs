@@ -196,11 +196,6 @@ exportSymbol s r = modify f where
 instructionSize :: Num b => b
 instructionSize = 4
 
--- FIXME: move to Chained, create macros
-returnEither :: MonadThrow m => Either String a -> m a
-returnEither (Left s)  = $chainedError s
-returnEither (Right a) = return a
-
 zeroIndexStringItem :: ElfSymbolXX 'ELFCLASS64
 zeroIndexStringItem = ElfSymbolXX "" 0 0 0 0 0
 
@@ -218,7 +213,7 @@ assemble textSecN m = do
         f :: (InstructionGen, CodeOffset) -> Either String Instruction
         f (ff, n) = ff n poolOffsetAligned
 
-    code <- returnEither $ mapM f $ P.zip (P.reverse codeReversed) (fmap (instructionSize *) [CodeOffset 0 .. ])
+    code <- $eitherAddContext' $ mapM f $ P.zip (P.reverse codeReversed) (fmap (instructionSize *) [CodeOffset 0 .. ])
 
     let
         codeBuilder = mconcat $ fmap (word32LE . getInstruction) code
