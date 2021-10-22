@@ -37,6 +37,12 @@ fe' = $addContext' $ fe
 fe'e :: IO ()
 fe'e = $addContext "some context 2" $ fe'
 
+fmb :: IO ()
+fmb = $maybeAddContext "some context 3" $ Nothing
+
+fmb' :: IO ()
+fmb' = $maybeAddContext' Nothing
+
 --------------------------------------------
 
 checkExceptions :: IO () -> String -> IO ()
@@ -52,6 +58,8 @@ main = defaultMain $ testGroup "exceptions" [ testCase "f"    $ checkExceptions 
                                             , testCase "f1'"  $ checkExceptions f1'  "(tests/exceptions/Exceptions.hs:32) // some error (tests/exceptions/Exceptions.hs:17)"
                                             , testCase "fe'"  $ checkExceptions fe'  "(tests/exceptions/Exceptions.hs:35) // TestException"
                                             , testCase "fe'e" $ checkExceptions fe'e "some context 2 (tests/exceptions/Exceptions.hs:38) // (tests/exceptions/Exceptions.hs:35) // TestException"
+                                            , testCase "fmb"  $ checkExceptions fmb  "some context 3 (tests/exceptions/Exceptions.hs:41)"
+                                            , testCase "fmb'" $ checkExceptions fmb' "(tests/exceptions/Exceptions.hs:44)"
                                             ]
 
 -- FIXME: add tests for MaybeSomething

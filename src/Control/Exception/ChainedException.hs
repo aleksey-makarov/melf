@@ -112,4 +112,4 @@ maybeAddContext = withLoc [| maybeAddContextX |]
 
 -- | @$maybeAddContext'@ is the same as @$maybeAddContext ""@
 maybeAddContext' :: Q Exp
-maybeAddContext' = withLoc [| \ x -> maybeAddContext x [] |]
+maybeAddContext' = withLoc [| \ x -> maybeAddContextX x [] |]
