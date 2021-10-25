@@ -33,7 +33,7 @@ helloWorldObj :: MonadCatch m => m Elf
 helloWorldObj = mkObj helloWorld
 
 fixTargetName :: String -> String
-fixTargetName s = fmap f s
+fixTargetName = fmap f
     where
         f '.' = '_'
         f x   = x

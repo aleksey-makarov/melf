@@ -2,7 +2,6 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving  #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -51,7 +50,7 @@ import Data.Elf.Headers
 $(singletons [d| data RegisterWidth = X | W |])
 
 type Register :: RegisterWidth -> Type
-data Register c = R Word32
+newtype Register c = R Word32
 
 newtype CodeOffset  = CodeOffset  { getCodeOffset  :: Int64 }  deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
 newtype Instruction = Instruction { getInstruction :: Word32 } deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
@@ -88,14 +87,14 @@ emitPool a bs = state f where
             o = builderRepeatZero $ fromIntegral $ offsetInPool' - offsetInPool
         in
             ( PoolRef offsetInPool'
-            , CodeState { offsetInPool = (fromIntegral $ BSL.length bs) + offsetInPool'
+            , CodeState { offsetInPool = fromIntegral (BSL.length bs) + offsetInPool'
                         , poolReversed = lazyByteString bs : o : poolReversed
                         , ..
                         }
             )
 
 label :: MonadState CodeState m => m RelativeRef
-label = CodeRef . (* 4) . fromIntegral . P.length <$> gets codeReversed
+label = gets (CodeRef . (* 4) . fromIntegral . P.length . codeReversed)
 
 x0, x1, x2, x8 :: Register 'X
 x0 = R 0
@@ -117,7 +116,7 @@ align a n = (n + a' - 1) .&. complement (a' - 1)
     where a' = fromIntegral a
 
 builderRepeatZero :: Int -> Builder
-builderRepeatZero n = mconcat $ P.take n $ P.repeat $ word8 0
+builderRepeatZero n = mconcat $ P.replicate n (word8 0)
 
 b64 :: forall w . SingI w => Register w -> Word32
 b64 _ = case sing @ w of
@@ -151,12 +150,10 @@ b :: MonadState CodeState m => RelativeRef -> m ()
 b rr = emit' f where
 
     offsetToImm26 :: CodeOffset -> Either String Word32
-    offsetToImm26 (CodeOffset o) =
-        if o .&. 0x3 /= 0
-            then Left $ "offset is not aligned: " ++ (show o)
-            else if not $ isBitN 28 o
-                then Left "offset is too big"
-                else Right $ fromIntegral $ o `shiftR` 2
+    offsetToImm26 (CodeOffset o)
+      | o .&. 0x3 /= 0    = Left $ "offset is not aligned: " ++ show o
+      | not $ isBitN 28 o = Left "offset is too big"
+      | otherwise         = Right $ fromIntegral $ o `shiftR` 2
 
     f :: InstructionGen
     f instrAddr poolOffset = do
@@ -187,12 +184,10 @@ ldr :: (MonadState CodeState m, SingI w) => Register w -> RelativeRef -> m ()
 ldr r@(R n) rr = emit' f where
 
     offsetToImm19 :: CodeOffset -> Either String Word32
-    offsetToImm19 (CodeOffset o) =
-        if o .&. 0x3 /= 0
-            then Left "offset is not aligned"
-            else if not $ isBitN 21 o
-                then Left "offset is too big"
-                else Right $ fromIntegral $ o `shiftR` 2
+    offsetToImm19 (CodeOffset o)
+      | o .&. 0x3 /= 0    = Left "offset is not aligned"
+      | not $ isBitN 21 o = Left "offset is too big"
+      | otherwise         = Right $ fromIntegral $ o `shiftR` 2
 
     f :: InstructionGen
     f instrAddr poolOffset = do
@@ -229,7 +224,7 @@ assemble textSecN m = do
     -- resolve txt
 
     let
-        poolOffset = instructionSize * (fromIntegral $ P.length codeReversed)
+        poolOffset = instructionSize * fromIntegral (P.length codeReversed)
         poolOffsetAligned = align 8 poolOffset
 
         f :: (InstructionGen, CodeOffset) -> Either String Instruction
@@ -240,8 +235,8 @@ assemble textSecN m = do
     let
         codeBuilder = mconcat $ fmap (word32LE . getInstruction) code
         txt = toLazyByteString $ codeBuilder
-                              <> (builderRepeatZero $ fromIntegral $ poolOffsetAligned - poolOffset)
-                              <> (mconcat $ P.reverse poolReversed)
+                              <> builderRepeatZero (fromIntegral $ poolOffsetAligned - poolOffset)
+                              <> mconcat (P.reverse poolReversed)
 
     -- resolve symbolTable
 
@@ -258,6 +253,6 @@ assemble textSecN m = do
             in
                 ElfSymbolXX{..}
 
-        symbolTable = fmap ff $ P.reverse symbolsRefersed
+        symbolTable = ff <$> P.reverse symbolsRefersed
 
-    return $ (txt, zeroIndexStringItem : symbolTable)
+    return (txt, zeroIndexStringItem : symbolTable)

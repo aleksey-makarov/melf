@@ -23,22 +23,22 @@ data TestException = TestException deriving Show
 instance Exception TestException
 
 fe :: IO ()
-fe = throwM $ TestException
+fe = throwM TestException
 
 f1 :: IO ()
-f1 = $addContext "some context" $ f
+f1 = $addContext "some context" f
 
 f1' :: IO ()
-f1' = $addContext' $ f
+f1' = $addContext' f
 
 fe' :: IO ()
-fe' = $addContext' $ fe
+fe' = $addContext' fe
 
 fe'e :: IO ()
-fe'e = $addContext "some context 2" $ fe'
+fe'e = $addContext "some context 2" fe'
 
 fmb :: IO ()
-fmb = $maybeAddContext "some context 3" $ Nothing
+fmb = $maybeAddContext "some context 3" Nothing
 
 fmb' :: IO ()
 fmb' = $maybeAddContext' Nothing

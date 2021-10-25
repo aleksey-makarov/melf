@@ -12,7 +12,6 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
@@ -69,7 +68,7 @@ formatPairs :: [(String, Doc a)] -> Doc a
 formatPairs ls = align $ vsep $ fmap f ls
     where
         f (n, v) = fill w (pretty n <> ":") <+> v
-        w = 1 + (maximum $ fmap (length . fst) ls)
+        w = 1 + maximum (fmap (length . fst) ls)
 
 formatList :: [Doc ()] -> Doc ()
 formatList = align . vsep . fmap f
@@ -121,7 +120,7 @@ printHeader HeaderXX{..} =
 
 printSection :: SingI a => (Int, SectionXX a) -> Doc ()
 printSection (n, SectionXX{..}) =
-    formatPairs $
+    formatPairs
         [ ("N",         viaShow n              )
         , ("Name",      viaShow sName          ) -- Word32
         , ("Type",      viaShow sType          ) -- ElfSectionType
@@ -184,9 +183,9 @@ printRBuilder rbs = vsep ldoc
         equalize l = fmap (mapL (padL l))
 
         printLine (pos, g, doc) = hsep $ pretty g : printWord32 (fromIntegral pos) : doc
-        ls = concat $ map printRBuilder' rbs
+        ls = concatMap printRBuilder' rbs
         len = longest ls
-        ldoc = fmap printLine $ equalize len ls
+        ldoc = printLine <$> equalize len ls
 
         printRBuilder' rb = f rb
             where
@@ -214,7 +213,7 @@ printRBuilder rbs = vsep ldoc
                 f RBuilderSection{ rbsHeader = SectionXX{..}, ..} =
                     let
                         doc = [ "S" <> viaShow (fromIntegral rbsN :: Word)
-                              , dquotes $ pretty $ rbsName
+                              , dquotes $ pretty rbsName
                               , viaShow sType
                               , viaShow $ splitBits $ ElfSectionFlag $ fromIntegral sFlags
                               ]
@@ -238,12 +237,12 @@ printRBuilder rbs = vsep ldoc
                                 [(o, "-", doc)]
                             else
                                 let
-                                    xs = concat $ fmap printRBuilder' rbpData
+                                    xs = concatMap printRBuilder' rbpData
                                     l = longest xs
                                     appendSectionBar = fmap (mapL ('│' : ))
                                     xsf = appendSectionBar $ equalize l xs
-                                    b = '┌' : ((replicate l '─'))
-                                    e = '└' : ((replicate l '─'))
+                                    b = '┌' : replicate l '─'
+                                    e = '└' : replicate l '─'
                                 in
                                     [(o,                                b, doc)] ++
                                     xsf                                          ++
@@ -259,7 +258,7 @@ printRBuilder rbs = vsep ldoc
 
 -- | Print ELF layout.  First parse ELF with `parseHeaders`, then use this function to
 --   format the layout.
-printLayout :: MonadCatch m => (Sigma ElfClass (TyCon1 HeadersXX)) -> BSL.ByteString -> m (Doc ())
+printLayout :: MonadCatch m => Sigma ElfClass (TyCon1 HeadersXX) -> BSL.ByteString -> m (Doc ())
 printLayout (classS :&: HeadersXX (hdr, ss, ps)) bs = withElfClass classS do
     rbs <- parseRBuilder hdr ss ps bs
     return $ printRBuilder rbs
@@ -273,7 +272,7 @@ formatPairsBlock name pairs = vsep [ name <+> "{", indent 4 $ formatPairs pairs,
 
 printElfSymbolTableEntry :: SingI a => ElfSymbolXX a -> Doc ()
 printElfSymbolTableEntry ElfSymbolXX{..} =
-    formatPairsBlock ("symbol" <+> (dquotes $ pretty steName))
+    formatPairsBlock ("symbol" <+> dquotes (pretty steName))
         [ ("Bind",  viaShow steBind      ) -- ElfSymbolBinding
         , ("Type",  viaShow steType      ) -- ElfSymbolType
         , ("ShNdx", viaShow steShNdx     ) -- ElfSectionIndex
@@ -317,7 +316,7 @@ formatBytestringHex :: BSL.ByteString -> Doc ()
 formatBytestringHex = hsep . L.map formatHex . BSL.unpack
 
 formatBytestringLine :: BSL.ByteString -> Doc ()
-formatBytestringLine s = (fill (16 * 2 + 15) $ formatBytestringHex s)
+formatBytestringLine s = fill (16 * 2 + 15) (formatBytestringHex s)
                       <+> pretty '#'
                       <+> formatBytestringChar s
 
@@ -338,7 +337,7 @@ printData full bs = if full then printDataFull else printData'
         cl = BSL.drop (BSL.length bs - 16) bs
 
 printElfSymbolTableEntryLine :: SingI a => ElfSymbolXX a -> Doc ()
-printElfSymbolTableEntryLine ElfSymbolXX{..} =  parens ((dquotes $ pretty steName)
+printElfSymbolTableEntryLine ElfSymbolXX{..} =  parens (dquotes (pretty steName)
                                                     <+> "bind:"   <+> viaShow steBind
                                                     <+> "type:"   <+> viaShow steType
                                                     <+> "sindex:" <+> viaShow steShNdx
@@ -372,7 +371,7 @@ printRelocationTableA_AARCH64 full sLink elfs bs = do
                 _ -> xs
 
     relas <- parseBList ELFDATA2LSB bs
-    (align . vsep . split) <$> mapM f relas
+    align . vsep . split <$> mapM f relas
 
 -- | Same as @`printElf_` False@
 printElf :: MonadThrow m => Elf -> m (Doc ())
@@ -407,7 +406,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
             (sectionName, dataDoc) <- if sectionIsSymbolTable esType
                 then do
                     stes <- parseSymbolTable hData s elfs
-                    return ("symbol table section", if null stes then "" else line <> (indent 4 $ printElfSymbolTable full stes))
+                    return ("symbol table section", if null stes then "" else line <> indent 4 (printElfSymbolTable full stes))
                 else if hMachine == EM_AARCH64
                         && hData == ELFDATA2LSB
                        && esType == SHT_RELA
@@ -417,7 +416,7 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                             SELFCLASS32 -> $chainedError "invalid ELF: EM_AARCH64 and ELFCLASS32"
                 else
                     return ("section", printData full bs)
-            return $ formatPairsBlock (sectionName <+> (viaShow (fromIntegral esN :: Word)) <+> (dquotes $ pretty esName))
+            return $ formatPairsBlock (sectionName <+> viaShow (fromIntegral esN :: Word) <+> dquotes (pretty esName))
                 [ ("Type",       viaShow esType          )
                 , ("Flags",      viaShow $ splitBits esFlags )
                 , ("Addr",       printWordXX esAddr      )
@@ -428,13 +427,13 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                 , ("Data",       dataDoc )
                 ]
         printElf'' ElfSection{ esData = ElfSectionDataStringTable, ..} =
-            return $ "string table section" <+> (viaShow (fromIntegral esN :: Word)) <+> (dquotes $ pretty esName)
+            return $ "string table section" <+> viaShow (fromIntegral esN :: Word) <+> dquotes (pretty esName)
         printElf'' ElfSegment{..} = do
             dataDoc <- if null epData
                 then return ""
                 else do
                     dataDoc' <- printElf' epData
-                    return $ line <> (indent 4 dataDoc')
+                    return $ line <> indent 4 dataDoc'
             return $ formatPairsBlock "segment"
                 [ ("Type",       viaShow epType         )
                 , ("Flags",      viaShow $ splitBits epFlags )
@@ -469,9 +468,9 @@ printStringTable bs =
         Nothing -> return ""
         Just (bs', e) -> do
             when (e /= 0) $ $chainedError "string table should end with 0"
-            return if (BSL.length bs' == 0)
+            return if BSL.length bs' == 0
                 then angles ""
-                else vsep $ map (angles . pretty) $ L.sort $ map BSL8.unpack $ BSL.splitWith (== 0) $ bs'
+                else vsep $ map (angles . pretty) $ L.sort $ map BSL8.unpack $ BSL.splitWith (== 0) bs'
 
 --------------------------------------------------------------------
 --

@@ -83,7 +83,7 @@ chainedError = withLoc [| chainedErrorX |]
 
 -- | @\$chainedError'@ is the same as @$`chainedError` ""@
 chainedError' :: Q Exp
-chainedError' = withLoc [| \ x -> chainedErrorX x [] |]
+chainedError' = withLoc [| (`chainedErrorX` []) |]
 
 addContextX :: MonadCatch m => Loc -> String -> m a -> m a
 addContextX loc s m = m `catch` f
@@ -102,10 +102,10 @@ addContext = withLoc [| addContextX |]
 
 -- | @\$addContext'@ is the same as @$addContext ""@
 addContext' :: Q Exp
-addContext' = withLoc [| \ x -> addContextX x [] |]
+addContext' = withLoc [| (`addContextX` []) |]
 
 maybeAddContextX :: MonadThrow m => Loc -> String -> Maybe a -> m a
-maybeAddContextX loc s mb = maybe (throwM $ ChainedException s loc Null) return mb
+maybeAddContextX loc s = maybe (throwM $ ChainedException s loc Null) return
 
 -- | @\$maybeAddContext@ results in a function of type
 -- \'@maybeAddContext :: MonadThrow m => String -> Maybe a -> m a@\'.
@@ -116,7 +116,7 @@ maybeAddContext = withLoc [| maybeAddContextX |]
 
 -- | @\$maybeAddContext'@ is the same as @$maybeAddContext ""@
 maybeAddContext' :: Q Exp
-maybeAddContext' = withLoc [| \ x -> maybeAddContextX x [] |]
+maybeAddContext' = withLoc [| (`maybeAddContextX` []) |]
 
 eitherAddContextX :: MonadThrow m => Loc -> Either String a -> m a
 eitherAddContextX loc = either (\ s -> throwM $ ChainedException s loc Null) return

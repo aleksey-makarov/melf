@@ -18,8 +18,6 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE GADTSyntax #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -27,7 +25,6 @@
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
@@ -315,7 +312,7 @@ getHeader' classS = do
 
     hFlags <- getE
     (hSize :: Word16) <- getE
-    when (hSize /= (headerSize $ fromSing classS)) $ error "incorrect size of elf header"
+    when (hSize /= headerSize (fromSing classS)) $ error "incorrect size of elf header"
     hPhEntSize <- getE
     hPhNum <- getE
     hShEntSize <- getE
@@ -421,12 +418,12 @@ putSection putE (SectionXX{..}) = do
     putE sEntSize
 
 instance forall (a :: ElfClass) . SingI a => Binary (Be (SectionXX a)) where
-    put = (withElfClass (sing @ a) (putSection putBe)) . fromBe
-    get = Be <$> (withElfClass (sing @ a) (getSection getBe))
+    put = withElfClass (sing @ a) (putSection putBe) . fromBe
+    get = Be <$> withElfClass (sing @ a) (getSection getBe)
 
 instance forall (a :: ElfClass) . SingI a => Binary (Le (SectionXX a)) where
-    put = (withElfClass (sing @ a) (putSection putLe)) . fromLe
-    get = Le <$> (withElfClass (sing @ a) (getSection getLe))
+    put = withElfClass (sing @ a) (putSection putLe) . fromLe
+    get = Le <$> withElfClass (sing @ a) (getSection getLe)
 
 --------------------------------------------------------------------------
 -- Segment
@@ -609,7 +606,7 @@ relaInfo32 :: Word32 -> Word32 -> Word32
 relaInfo32 s t = (t .&. 0xff) .|. (s `shiftL` 8)
 
 relaInfo64 :: Word32 -> Word32 -> Word64
-relaInfo64 s t = (fromIntegral t) .|. (fromIntegral s `shiftL` 32)
+relaInfo64 s t = fromIntegral t .|. (fromIntegral s `shiftL` 32)
 
 getRelocationTableAEntry ::      forall c . IsElfClass c =>
     (forall b . (Binary (Le b), Binary (Be b)) => Get b) -> Get (RelaXX c)
@@ -627,17 +624,17 @@ putRelocationTableAEntry ::         forall c . IsElfClass c =>
 putRelocationTableAEntry putE (RelaXX{..}) = do
     putE relaOffset
     (case sing @ c of
-        SELFCLASS64 -> (putE $ relaInfo64 relaSym relaType)
-        SELFCLASS32 -> (putE $ relaInfo32 relaSym relaType)) :: Put
+        SELFCLASS64 -> putE $ relaInfo64 relaSym relaType
+        SELFCLASS32 -> putE $ relaInfo32 relaSym relaType) :: Put
     putE relaAddend
 
 instance forall (a :: ElfClass) . SingI a => Binary (Be (RelaXX a)) where
-    put = (withElfClass (sing @ a) (putRelocationTableAEntry putBe)) . fromBe
-    get = Be <$> (withElfClass (sing @ a) (getRelocationTableAEntry getBe))
+    put = withElfClass (sing @ a) (putRelocationTableAEntry putBe) . fromBe
+    get = Be <$> withElfClass (sing @ a) (getRelocationTableAEntry getBe)
 
 instance forall (a :: ElfClass) . SingI a => Binary (Le (RelaXX a)) where
-    put = (withElfClass (sing @ a) (putRelocationTableAEntry putLe)) . fromLe
-    get = Le <$> (withElfClass (sing @ a) (getRelocationTableAEntry getLe))
+    put = withElfClass (sing @ a) (putRelocationTableAEntry putLe) . fromLe
+    get = Le <$> withElfClass (sing @ a) (getRelocationTableAEntry getLe)
 
 -- | Size of @RelaXX a@ in bytes.
 relocationTableAEntrySize :: forall a . IsElfClass a => WordXX a
@@ -658,7 +655,7 @@ elfDecodeOrFail bs = snd <$> elfDecodeOrFail' bs
 elfDecodeAllOrFail :: (Binary a, MonadThrow m) => BSL.ByteString -> m a
 elfDecodeAllOrFail bs = do
     (off, a) <- elfDecodeOrFail' bs
-    if off == (BSL.length bs) then return a else $chainedError $ "leftover != 0 @" ++ show off
+    if off == BSL.length bs then return a else $chainedError $ "leftover != 0 @" ++ show off
 
 -- | Parse an array
 parseBList :: (MonadThrow m, Binary (Le a), Binary (Be a))
@@ -698,4 +695,4 @@ parseHeaders' hxx@HeaderXX{..} bs =
 parseHeaders :: MonadThrow m => BSL.ByteString -> m (Sigma ElfClass (TyCon1 HeadersXX))
 parseHeaders bs = do
     ((classS :&: hxx) :: Header) <- elfDecodeOrFail bs
-    (withElfClass classS parseHeaders') hxx bs
+    withElfClass classS parseHeaders' hxx bs

@@ -82,7 +82,7 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                         (mkName "put")
                         [ clause
                             [putP]
-                            (normalB $ putE)
+                            (normalB putE)
                             []
                         ]
                 binaryInstanceGet =
@@ -156,6 +156,6 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                 implBidir
                 (conP typeName [varP localName3])
 
-    let patterns = (join $ map mkPatterns enums) ++ [ defaultPatternSig, defaultPatternDef ]
+    let patterns = join (map mkPatterns enums) ++ [ defaultPatternSig, defaultPatternDef ]
 
     sequence $ newTypeDef : showInstance : patterns ++ binaryInstances

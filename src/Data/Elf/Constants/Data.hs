@@ -213,16 +213,16 @@ $(mkDeclarations BaseWord32 "ElfSegmentType" "PT" "PT_EXT"
 
 -- | Attributes of the section
 $(mkDeclarations BaseWord64 "ElfSectionFlag" "SHF" "SHF_EXT"
-    [ ("_WRITE",     (1 `shiftL` 0)) -- Section contains writable data
-    , ("_ALLOC",     (1 `shiftL` 1)) -- Section is allocated in memory image of program
-    , ("_EXECINSTR", (1 `shiftL` 2)) -- Section contains executable instructions
+    [ ("_WRITE",     1 `shiftL` 0) -- Section contains writable data
+    , ("_ALLOC",     1 `shiftL` 1) -- Section is allocated in memory image of program
+    , ("_EXECINSTR", 1 `shiftL` 2) -- Section contains executable instructions
     ])
 
 -- | Attributes of the segment
 $(mkDeclarations BaseWord32 "ElfSegmentFlag" "PF" "PF_EXT"
-    [ ("_X", (1 `shiftL` 0)) -- Execute permission
-    , ("_W", (1 `shiftL` 1)) -- Write permission
-    , ("_R", (1 `shiftL` 2)) -- Read permission
+    [ ("_X", 1 `shiftL` 0) -- Execute permission
+    , ("_W", 1 `shiftL` 1) -- Write permission
+    , ("_R", 1 `shiftL` 2) -- Read permission
     ])
 
 -- | Symbol type

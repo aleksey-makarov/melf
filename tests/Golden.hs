@@ -43,7 +43,7 @@ import Data.Elf.Headers
 import Data.Endian
 
 partitionM :: Monad m => (a -> m Bool) -> [a] -> m ([a], [a])
-partitionM p l = foldlM f ([], []) l
+partitionM p = foldlM f ([], [])
     where
         f (ts, fs) x = do
             b <- p x
@@ -57,7 +57,7 @@ traverseDir root ok = go root
             paths <- P.map (dir </>) <$> listDirectory dir
             (dirPaths, filePaths) <- partitionM doesDirectoryExist paths
             oks <- filterM ok filePaths
-            (oks ++) <$> (F.concat <$> (sequence $ P.map go dirPaths))
+            (oks ++) <$> (F.concat <$> mapM go dirPaths)
 
 isElf :: FilePath -> IO Bool
 isElf p = if takeExtension p == ".bad" then return False else (elfMagic ==) . decode <$> BSL.readFile p
@@ -84,10 +84,10 @@ mkTest'' HeaderXX{..} bs = do
 mkTest' :: ByteString -> Assertion
 mkTest' bs = do
     (off, elfh@(classS :&: hxx) :: Header) <- decodeOrFailAssertion bs
-    assertBool "Incorrect header size" ((headerSize $ fromSing classS) == off)
+    assertBool "Incorrect header size" (headerSize (fromSing classS) == off)
     assertEqual "Header round trip does not work" (BSL.take off bs) (encode elfh)
 
-    (withElfClass classS mkTest'') hxx bs
+    withElfClass classS mkTest'' hxx bs
 
 mkTest :: FilePath -> TestTree
 mkTest p = testCase p $ withBinaryFile p ReadMode (BSL.hGetContents >=> mkTest')
@@ -98,7 +98,7 @@ mkGoldenTest' g o formatFunction file = goldenVsFile file g o mkGoldenTestOutput
         mkGoldenTestOutput :: IO ()
         mkGoldenTestOutput = do
             doc <- formatFunction file
-            withFile o WriteMode (\ h -> hPutDoc h doc)
+            withFile o WriteMode (`hPutDoc` doc)
 
 mkGoldenTest :: String -> (FilePath -> IO (Doc ())) -> FilePath -> TestTree
 mkGoldenTest name formatFunction file = mkGoldenTest' g o formatFunction file
@@ -124,7 +124,7 @@ index' (_:xs) n | n > 0     = index' xs (n-1)
                 | otherwise = $chainedError "index': negative argument."
 index' _ _                  = $chainedError "index': index too large."
 
-getStringTable :: MonadThrow m => (Sigma ElfClass (TyCon1 HeadersXX)) -> BSL.ByteString -> m BSL.ByteString
+getStringTable :: MonadThrow m => Sigma ElfClass (TyCon1 HeadersXX) -> BSL.ByteString -> m BSL.ByteString
 getStringTable (classS :&: HeadersXX (HeaderXX{..}, ss, _)) bs = withElfClass classS
     if hShStrNdx == 0
         then return BSL.empty
@@ -187,10 +187,10 @@ printCopyElfFile path = do
 -----------------------------------------------------------------------
 
 testHeader64 :: Header
-testHeader64 = SELFCLASS64 :&: (HeaderXX ELFDATA2LSB 0 0 0 0 0 0 0 0 0 0 0 0 0)
+testHeader64 = SELFCLASS64 :&: HeaderXX ELFDATA2LSB 0 0 0 0 0 0 0 0 0 0 0 0 0
 
 testHeader32 :: Header
-testHeader32 = SELFCLASS32 :&: (HeaderXX ELFDATA2MSB 0 0 0 0 0 0 0 0 0 0 0 0 0)
+testHeader32 = SELFCLASS32 :&: HeaderXX ELFDATA2MSB 0 0 0 0 0 0 0 0 0 0 0 0 0
 
 testSection64 :: SectionXX 'ELFCLASS64
 testSection64 = SectionXX 0 0 0 0 0 0 0 0 0 0

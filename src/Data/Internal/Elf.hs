@@ -7,8 +7,6 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE GADTSyntax #-}
 {-# LANGUAGE InstanceSigs #-}
-{-# LANGUAGE KindSignatures #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -16,7 +14,6 @@
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeOperators #-}
@@ -60,7 +57,7 @@ segmentTableInterval :: IsElfClass a => HeaderXX a -> Interval (WordXX a)
 segmentTableInterval HeaderXX{..} = I hPhOff $ fromIntegral $ hPhEntSize * hPhNum
 
 sectionInterval :: IsElfClass a => SectionXX a -> Interval (WordXX a)
-sectionInterval SectionXX{..} = I sOffset if (sType == SHT_NOBITS) then 0 else sSize
+sectionInterval SectionXX{..} = I sOffset if sType == SHT_NOBITS then 0 else sSize
 
 segmentInterval :: IsElfClass a => SegmentXX a -> Interval (WordXX a)
 segmentInterval SegmentXX{..} = I pOffset pFileSize
@@ -109,13 +106,13 @@ data LZip a = LZip [a] (Maybe a) [a]
 
 instance Foldable LZip where
     foldMap f (LZip l  (Just c) r) = foldMap f $ LZip l Nothing (c : r)
-    foldMap f (LZip l  Nothing  r) = foldMap f $ (L.reverse l) ++ r
+    foldMap f (LZip l  Nothing  r) = foldMap f $ L.reverse l ++ r
 
 findInterval :: (Ord t, Num t) => (a -> Interval t) -> t -> [a] -> LZip a
-findInterval f e list = findInterval' [] list
+findInterval f e = findInterval' []
     where
         findInterval' l []                           = LZip l Nothing []
-        findInterval' l (x : xs) | e `touches` (f x) = LZip l (Just x) xs
+        findInterval' l (x : xs) | e `touches`  f x  = LZip l (Just x) xs
                                  | e < offset  (f x) = LZip l Nothing (x : xs)
                                  | otherwise         = findInterval' (x : l) xs
         touches a i | I.empty i = a == offset i
@@ -131,7 +128,7 @@ showRBuilder' RBuilderRawData{}      = "raw data" -- should not be called
 showRBuilder' RBuilderRawAlign{}     = "alignment" -- should not be called
 
 showRBuilder :: IsElfClass a => RBuilder a -> String
-showRBuilder v = showRBuilder' v ++ " (" ++ (show $ rBuilderInterval v) ++ ")"
+showRBuilder v = showRBuilder' v ++ " (" ++ show (rBuilderInterval v) ++ ")"
 
 -- showERBList :: IsElfClass a => [RBuilder a] -> String
 -- showERBList l = "[" ++ (L.concat $ L.intersperse ", " $ fmap showRBuilder l) ++ "]"
@@ -161,7 +158,7 @@ addRBuilders newts =
                         f (le, h : lo) =
                             let
                                 hi = rBuilderInterval h
-                            in if (not $ I.empty hi) || (offset hi /= a)
+                            in if not (I.empty hi) || (offset hi /= a)
                                 then (L.reverse le, h : lo)
                                 else f (h : le, lo)
             in case c' of
@@ -239,7 +236,7 @@ addRBuilders newts =
 
                             Just c2 ->
 
-                                if ti `contains` (rBuilderInterval c2) then do
+                                if ti `contains` rBuilderInterval c2 then do
 
                                     -- add this:     ......[t______________________]........................
                                     -- to this list: ......[c_________]......[c2___]......[________]........
@@ -274,7 +271,7 @@ addRBuilders newts =
 
                         Just c2 ->
 
-                            if ti `contains` (rBuilderInterval c2) then do
+                            if ti `contains` rBuilderInterval c2 then do
 
                                 -- add this:     ....[t_________________________________]........
                                 -- to this list: ..........[l2__]..[l2__].....[c2_______]........
@@ -359,7 +356,7 @@ foldMapElf f e@ElfSegment{..} = f e <> foldMapElfList f epData
 foldMapElf f e = f e
 
 foldMapElfList :: Monoid m => (ElfXX a -> m) -> [ElfXX a] -> m
-foldMapElfList f l = fold $ fmap (foldMapElf f) l
+foldMapElfList f = foldMap (foldMapElf f)
 
 -- | Find section with a given number
 elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b)
@@ -409,7 +406,7 @@ tail' (_ : xs) = xs
 
 nextOffset :: IsElfClass a => WordXX a -> WordXX a -> WordXX a -> WordXX a
 nextOffset _ 0 a = a
-nextOffset t m a | m .&. (m - 1) /= 0 = error $ "align module is not power of two " ++ (show m)
+nextOffset t m a | m .&. (m - 1) /= 0 = error $ "align module is not power of two " ++ show m
                  | otherwise          = if a' + t' < a then a' + m + t' else a' + t'
     where
         a' = a .&. complement (m - 1)
@@ -537,7 +534,7 @@ parseElf' :: forall a m . (IsElfClass a, MonadCatch m) =>
                                             HeaderXX a ->
                                          [SectionXX a] ->
                                          [SegmentXX a] ->
-                                        BSL.ByteString -> m (Elf)
+                                        BSL.ByteString -> m Elf
 parseElf' hdr@HeaderXX{..} ss ps bs = do
 
     rbs <- parseRBuilder hdr ss ps bs
@@ -603,7 +600,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
 parseElf :: MonadCatch m => BSL.ByteString -> m Elf
 parseElf bs = do
     classS :&: HeadersXX (hdr, ss, ps) <- parseHeaders bs
-    (withElfClass classS parseElf') hdr ss ps bs
+    withElfClass classS parseElf' hdr ss ps bs
 
 -------------------------------------------------------------------------------
 --
@@ -736,7 +733,7 @@ serializeElf' elfs = do
         align :: MonadThrow n => WordXX a -> WordXX a -> WBuilderState a -> n (WBuilderState a)
         align _ 0 x = return x
         align _ 1 x = return x
-        align t m WBuilderState{..} | m .&. (m - 1) /= 0 = $chainedError $ "align module is not power of two " ++ (show m)
+        align t m WBuilderState{..} | m .&. (m - 1) /= 0 = $chainedError $ "align module is not power of two " ++ show m
                                     | otherwise =
             let
                 wbsOffset' = nextOffset t m wbsOffset
@@ -785,7 +782,7 @@ serializeElf' elfs = do
                 , ..
                 }
         elf2WBuilder' ElfSection{esFlags = ElfSectionFlag f, ..} s = do
-            when (f .&. (fromIntegral $ complement (maxBound @ (WordXX a))) /= 0)
+            when (f .&. fromIntegral (complement (maxBound @ (WordXX a))) /= 0)
                 ($chainedError $ "section flags at section " ++ show esN ++ "don't fit")
             WBuilderState{..} <- if esType == SHT_NOBITS
                 then return s
@@ -809,8 +806,8 @@ serializeElf' elfs = do
                 sEntSize = esEntSize                   -- WXX c
             return WBuilderState
                 { wbsSections = (esN, SectionXX{..}) : wbsSections
-                , wbsDataReversed = (WBuilderDataByteStream d) : wbsDataReversed
-                , wbsOffset = wbsOffset + (fromIntegral $ BSL.length d)
+                , wbsDataReversed = WBuilderDataByteStream d : wbsDataReversed
+                , wbsOffset = wbsOffset + fromIntegral (BSL.length d)
                 , wbsShStrNdx = shStrNdx
                 , wbsNameIndexes = ns
                 , ..
@@ -835,7 +832,7 @@ serializeElf' elfs = do
             return WBuilderState
                 { wbsSegmentsReversed = SegmentXX{..} : wbsSegmentsReversed
                 , wbsDataReversed = if add1
-                    then (WBuilderDataByteStream $ BSL.singleton 0) : wbsDataReversed
+                    then WBuilderDataByteStream (BSL.singleton 0) : wbsDataReversed
                     else wbsDataReversed
                 , wbsOffset = if add1
                     then wbsOffset + 1
@@ -844,8 +841,8 @@ serializeElf' elfs = do
                 }
         elf2WBuilder' ElfRawData{..} WBuilderState{..} =
             return WBuilderState
-                { wbsDataReversed = (WBuilderDataByteStream edData) : wbsDataReversed
-                , wbsOffset = wbsOffset + (fromIntegral $ BSL.length edData)
+                { wbsDataReversed = WBuilderDataByteStream edData : wbsDataReversed
+                , wbsOffset = wbsOffset + fromIntegral (BSL.length edData)
                 , ..
                 }
         elf2WBuilder' ElfRawAlign{..} s = align eaOffset eaAlign s
@@ -860,9 +857,9 @@ serializeElf' elfs = do
                 f (ln, _) (rn, _) = ln `compare` rn
                 sorted = L.sortBy f ss
                 next (ln, _) (rn, _) = ln + 1 == rn
-                checkNeibours = L.all id $ neighbours sorted next
+                checkNeibours = and $ neighbours sorted next
 
-            when (not checkNeibours) ($chainedError "sections are not consistent")
+            unless checkNeibours ($chainedError "sections are not consistent")
             return $ fmap snd sorted
 
         wbState2ByteString :: WBuilderState a -> m BSL.ByteString
@@ -907,7 +904,7 @@ serializeElf' elfs = do
 
 -- | Serialze ELF file
 serializeElf :: MonadThrow m => Elf -> m BSL.ByteString
-serializeElf (classS :&: ElfList ls) = (withElfClass classS serializeElf') ls
+serializeElf (classS :&: ElfList ls) = withElfClass classS serializeElf' ls
 
 -- FIXME: instance Binary Elf
 

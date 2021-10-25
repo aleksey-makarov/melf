@@ -23,8 +23,8 @@ instance Binary a => Binary (BList a) where
 
 instance Binary (Be a) => Binary (Be (BList a)) where
     put (Be (BList l)) = put $ BList $ fmap Be l
-    get = Be <$> fmap fromBe <$> get
+    get = Be . fmap fromBe <$> get
 
 instance Binary (Le a) => Binary (Le (BList a)) where
     put (Le (BList l)) = put $ BList $ fmap Le l
-    get = Le <$> fmap fromLe <$> get
+    get = Le . fmap fromLe <$> get
