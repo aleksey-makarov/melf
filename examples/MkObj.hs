@@ -5,13 +5,15 @@ module MkObj (mkObj) where
 import Prelude as P
 
 import Control.Monad.Catch
+import Control.Monad.State
 import Data.Bits
-import Data.ByteString.Lazy as BSL
 import Data.Singletons.Sigma
 
 import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
+
+import AsmAarch64
 
 textSecN, shstrtabSecN, strtabSecN, symtabSecN :: ElfSectionIndex
 textSecN     = 1
@@ -19,10 +21,10 @@ shstrtabSecN = 2
 strtabSecN   = 3
 symtabSecN   = 4
 
-mkObj :: MonadCatch m => (ElfSectionIndex -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])) -> m Elf
-mkObj assembleF =  do
+mkObj :: MonadCatch m => StateT CodeState m () -> m Elf
+mkObj m = do
 
-    (txt, symbolTable) <- assembleF textSecN
+    (txt, symbolTable) <- assemble textSecN m
     (symbolTableData, stringTableData) <- serializeSymbolTable ELFDATA2LSB symbolTable
 
     return $ SELFCLASS64 :&: ElfList

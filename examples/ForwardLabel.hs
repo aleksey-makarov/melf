@@ -7,10 +7,7 @@ import Prelude as P
 
 import Control.Monad.Catch
 import Control.Monad.Fix
-import Data.ByteString.Lazy as BSL
-import Data.Elf
-import Data.Elf.Constants
-import Data.Elf.Headers
+import Control.Monad.State
 
 import AsmAarch64
 
@@ -20,8 +17,8 @@ ok = "ok\n"
 bad :: String
 bad = "bad\n"
 
-forwardLabel :: (MonadCatch m, MonadFix m) => ElfSectionIndex -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])
-forwardLabel textSecN = assemble textSecN $ mdo
+forwardLabel :: (MonadCatch m, MonadFix m) => StateT CodeState m ()
+forwardLabel = mdo
 
     label >>= exportSymbol "_start"
 

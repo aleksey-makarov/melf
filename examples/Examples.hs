@@ -24,14 +24,10 @@ makeFileExecutable path = do
     setFileMode path $ m .|. ownerExecuteMode
 
 helloWorldExe :: MonadCatch m => m Elf
-helloWorldExe = do
-    (txt, _) <- helloWorld 1
-    mkExe txt
+helloWorldExe = mkExe helloWorld
 
 forwardLabelExe :: (MonadCatch m, MonadFix m) => m Elf
-forwardLabelExe = do
-    (txt, _) <- forwardLabel 1
-    mkExe txt
+forwardLabelExe = mkExe forwardLabel
 
 helloWorldObj :: MonadCatch m => m Elf
 helloWorldObj = mkObj helloWorld

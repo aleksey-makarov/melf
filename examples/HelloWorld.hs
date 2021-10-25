@@ -5,18 +5,15 @@ module HelloWorld (helloWorld) where
 import Prelude as P
 
 import Control.Monad.Catch
-import Data.ByteString.Lazy as BSL
-import Data.Elf
-import Data.Elf.Constants
-import Data.Elf.Headers
+import Control.Monad.State
 
 import AsmAarch64
 
 msg :: String
 msg = "Hello World!\n"
 
-helloWorld :: MonadCatch m => ElfSectionIndex -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])
-helloWorld textSecN = assemble textSecN $ do
+helloWorld :: MonadCatch m => StateT CodeState m ()
+helloWorld = do
 
     label >>= exportSymbol "_start"      -- _start:
     mov x0 1                             --     mov x0, #1
