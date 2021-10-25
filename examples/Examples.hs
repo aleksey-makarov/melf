@@ -2,8 +2,10 @@ module Main (main) where
 
 import Control.Monad.Fix
 import Control.Monad.Catch
+import Data.Bits
 import Data.ByteString.Lazy as BSL
 import System.FilePath
+import System.Posix.Files
 import Test.Tasty
 import Test.Tasty.Golden
 import Test.Tasty.HUnit
@@ -15,6 +17,11 @@ import MkObj
 import MkExe
 import HelloWorld
 import ForwardLabel
+
+makeFileExecutable :: String -> IO ()
+makeFileExecutable path = do
+    m <- fileMode <$> getFileStatus path
+    setFileMode path $ m .|. ownerExecuteMode
 
 helloWorldExe :: MonadCatch m => m Elf
 helloWorldExe = do
@@ -39,6 +46,7 @@ writeElf :: FilePath -> Elf -> IO ()
 writeElf path elf = do
     e <- serializeElf elf
     BSL.writeFile path e
+    makeFileExecutable path
 
 testElf :: String -> IO Elf -> [ TestTree ]
 testElf elfFileName elf =

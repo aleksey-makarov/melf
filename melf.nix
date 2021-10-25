@@ -1,7 +1,7 @@
 { mkDerivation, base, binary, bytestring, containers, directory
 , exceptions, filepath, hpack, lens, lib, mtl, optparse-applicative
 , prettyprinter, singletons, tasty, tasty-golden, tasty-hunit
-, template-haskell
+, template-haskell, unix
 }:
 mkDerivation {
   pname = "melf";
@@ -21,6 +21,7 @@ mkDerivation {
   testHaskellDepends = [
     base binary bytestring containers directory exceptions filepath
     lens mtl prettyprinter singletons tasty tasty-golden tasty-hunit
+    unix
   ];
   prePatch = "hpack";
   homepage = "https://github.com/aleksey-makarov/melf";
