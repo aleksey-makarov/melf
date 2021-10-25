@@ -18,6 +18,7 @@ module AsmAarch64
     , Register
     , RelativeRef
     , adr
+    , b
     , mov
     , ldr
     , svc
@@ -94,7 +95,7 @@ emitPool a bs = state f where
             )
 
 label :: MonadState CodeState m => m RelativeRef
-label = CodeRef <$> gets offsetInPool
+label = CodeRef . (* 4) . fromIntegral . P.length <$> gets codeReversed
 
 x0, x1, x2, x8 :: Register 'X
 x0 = R 0
@@ -125,26 +126,42 @@ b64 _ = case sing @ w of
 
 -- | C6.2.10 ADR
 adr :: MonadState CodeState m => Register 'X -> RelativeRef -> m ()
-adr (R n) rr =  emit' f
-    where
+adr (R n) rr =  emit' f where
 
-        offsetToImm :: CodeOffset -> Either String Word32
-        offsetToImm (CodeOffset o) =
-            if not $ isBitN 19 o
-                    then Left "offset is too big"
-                    else
-                        let
-                            immlo = o .&. 3
-                            immhi = (o `shiftR` 2)  .&. 0x7ffff
-                        in
-                            Right $ fromIntegral $ (immhi `shift` 5) .|. (immlo `shift` 29)
+    offsetToImm :: CodeOffset -> Either String Word32
+    offsetToImm (CodeOffset o) =
+        if not $ isBitN 19 o
+                then Left "offset is too big"
+                else
+                    let
+                        immlo = o .&. 3
+                        immhi = (o `shiftR` 2)  .&. 0x7ffff
+                    in
+                        Right $ fromIntegral $ (immhi `shift` 5) .|. (immlo `shift` 29)
 
-        f :: InstructionGen
-        f instrAddr poolOffset = do
-            imm <- offsetToImm $ findOffset poolOffset rr - instrAddr
-            return $ Instruction $  0x10000000
-                                .|. imm
-                                .|. n
+    f :: InstructionGen
+    f instrAddr poolOffset = do
+        imm <- offsetToImm $ findOffset poolOffset rr - instrAddr
+        return $ Instruction $  0x10000000
+                            .|. imm
+                            .|. n
+
+-- | C6.2.26 B
+b :: MonadState CodeState m => RelativeRef -> m ()
+b rr = emit' f where
+
+    offsetToImm26 :: CodeOffset -> Either String Word32
+    offsetToImm26 (CodeOffset o) =
+        if o .&. 0x3 /= 0
+            then Left $ "offset is not aligned: " ++ (show o)
+            else if not $ isBitN 28 o
+                then Left "offset is too big"
+                else Right $ fromIntegral $ o `shiftR` 2
+
+    f :: InstructionGen
+    f instrAddr poolOffset = do
+        imm26 <- offsetToImm26 $ findOffset poolOffset rr - instrAddr
+        return $ Instruction $  0x14000000 .|. imm26
 
 -- | C6.2.187 MOV (wide immediate)
 mov :: (MonadState CodeState m, SingI w) => Register w -> Word16 -> m ()
@@ -167,24 +184,23 @@ findOffset  poolOffset (PoolRef offsetInPool) = poolOffset + offsetInPool
 
 -- | C6.2.132 LDR (literal)
 ldr :: (MonadState CodeState m, SingI w) => Register w -> RelativeRef -> m ()
-ldr r@(R n) rr = emit' f
-    where
+ldr r@(R n) rr = emit' f where
 
-        offsetToImm19 :: CodeOffset -> Either String Word32
-        offsetToImm19 (CodeOffset o) =
-            if o .&. 0x3 /= 0
-                then Left "offset is not aligned"
-                else if not $ isBitN 19 o
-                    then Left "offset is too big"
-                    else Right $ fromIntegral $ o `shiftR` 2
+    offsetToImm19 :: CodeOffset -> Either String Word32
+    offsetToImm19 (CodeOffset o) =
+        if o .&. 0x3 /= 0
+            then Left "offset is not aligned"
+            else if not $ isBitN 21 o
+                then Left "offset is too big"
+                else Right $ fromIntegral $ o `shiftR` 2
 
-        f :: InstructionGen
-        f instrAddr poolOffset = do
-            imm19 <- offsetToImm19 $ findOffset poolOffset rr - instrAddr
-            return $ Instruction $ (b64 r `shift` 30)
-                                .|. 0x18000000
-                                .|. (imm19 `shift` 5)
-                                .|. n
+    f :: InstructionGen
+    f instrAddr poolOffset = do
+        imm19 <- offsetToImm19 $ findOffset poolOffset rr - instrAddr
+        return $ Instruction $ (b64 r `shift` 30)
+                            .|. 0x18000000
+                            .|. (imm19 `shift` 5)
+                            .|. n
 
 -- | C6.2.317 SVC
 svc :: MonadState CodeState m => Word16 -> m ()

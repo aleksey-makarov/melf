@@ -1,5 +1,6 @@
 module Main (main) where
 
+import Control.Monad.Fix
 import Control.Monad.Catch
 import Data.ByteString.Lazy as BSL
 import System.FilePath
@@ -13,10 +14,16 @@ import Data.Elf.PrettyPrint
 import MkObj
 import MkExe
 import HelloWorld
+import ForwardLabel
 
 helloWorldExe :: MonadCatch m => m Elf
 helloWorldExe = do
     (txt, _) <- helloWorld 1
+    mkExe txt
+
+forwardLabelExe :: (MonadCatch m, MonadFix m) => m Elf
+forwardLabelExe = do
+    (txt, _) <- forwardLabel 1
     mkExe txt
 
 helloWorldObj :: MonadCatch m => m Elf
@@ -53,4 +60,5 @@ main :: IO ()
 main = defaultMain $ testGroup "examples"
     (  testElf "helloWorldObj.o" helloWorldObj
     ++ testElf "helloWorldExe"   helloWorldExe
+    ++ testElf "forwardLabelExe" forwardLabelExe
     )
