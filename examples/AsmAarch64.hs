@@ -2,9 +2,16 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving  #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE TypeFamilies #-}
+
+{-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
 module AsmAarch64
     ( CodeState
@@ -33,11 +40,17 @@ import Data.ByteString.Lazy as BSL
 import Data.ByteString.Lazy.Char8 as BSLC
 import Data.Int
 import Data.Kind
+import Data.Singletons.TH
 import Data.Word
 
 import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
+
+$(singletons [d| data RegisterWidth = X | W |])
+
+type Register :: RegisterWidth -> Type
+data Register c = R Word32
 
 newtype CodeOffset  = CodeOffset  { getCodeOffset  :: Int64 }  deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
 newtype Instruction = Instruction { getInstruction :: Word32 } deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
@@ -83,16 +96,13 @@ emitPool a bs = state f where
 label :: MonadState CodeState m => m RelativeRef
 label = CodeRef <$> gets offsetInPool
 
-type Register :: ElfClass -> Type
-data Register c = R Word32
-
-x0, x1, x2, x8 :: Register 'ELFCLASS64
+x0, x1, x2, x8 :: Register 'X
 x0 = R 0
 x1 = R 1
 x2 = R 2
 x8 = R 8
 
-w0, w1 :: Register 'ELFCLASS32
+w0, w1 :: Register 'W
 w0 = R 0
 w1 = R 1
 
@@ -108,17 +118,13 @@ align a n = (n + a' - 1) .&. complement (a' - 1)
 builderRepeatZero :: Int -> Builder
 builderRepeatZero n = mconcat $ P.take n $ P.repeat $ word8 0
 
-class IsElfClass w => AArch64Instr w where
-    b64 :: Register w -> Word32
-
-instance AArch64Instr 'ELFCLASS32 where
-    b64 _ = 0
-
-instance AArch64Instr 'ELFCLASS64 where
-    b64 _ = 1
+b64 :: forall w . SingI w => Register w -> Word32
+b64 _ = case sing @ w of
+    SX -> 1
+    SW -> 0
 
 -- | C6.2.10 ADR
-adr :: MonadState CodeState m => Register 'ELFCLASS64 -> RelativeRef -> m ()
+adr :: MonadState CodeState m => Register 'X -> RelativeRef -> m ()
 adr (R n) rr =  emit' f
     where
 
@@ -141,7 +147,7 @@ adr (R n) rr =  emit' f
                                 .|. n
 
 -- | C6.2.187 MOV (wide immediate)
-mov :: (MonadState CodeState m, AArch64Instr w) => Register w -> Word16 -> m ()
+mov :: (MonadState CodeState m, SingI w) => Register w -> Word16 -> m ()
 mov r@(R n) imm = emit $ Instruction $ (b64 r `shift` 31)
                                     .|. 0x52800000
                                     .|. (fromIntegral imm `shift` 5)
@@ -160,7 +166,7 @@ findOffset _poolOffset (CodeRef codeOffset)   = codeOffset
 findOffset  poolOffset (PoolRef offsetInPool) = poolOffset + offsetInPool
 
 -- | C6.2.132 LDR (literal)
-ldr :: (MonadState CodeState m, AArch64Instr w) => Register w -> RelativeRef -> m ()
+ldr :: (MonadState CodeState m, SingI w) => Register w -> RelativeRef -> m ()
 ldr r@(R n) rr = emit' f
     where
 
