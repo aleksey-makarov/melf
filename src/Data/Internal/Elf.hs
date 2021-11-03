@@ -339,8 +339,7 @@ data ElfXX (c :: ElfClass)
         , epData       :: [ElfXX c]      -- ^ Content of the segment
         }
     | ElfRawData -- ^ Some ELF files (some executables) don't bother to define
-                 -- section for linking and have just raw data in segments.
-                 -- This is for that case.
+                 -- sections for linking and have just raw data in segments.
         { edData :: BSL.ByteString -- ^ Raw data in ELF file
         }
     | ElfRawAlign -- ^ Align the next data in the ELF file.
