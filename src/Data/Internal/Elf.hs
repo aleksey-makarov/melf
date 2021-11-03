@@ -905,8 +905,6 @@ serializeElf' elfs = do
 serializeElf :: MonadThrow m => Elf -> m BSL.ByteString
 serializeElf (classS :&: ElfList ls) = withElfClass classS serializeElf' ls
 
--- FIXME: instance Binary Elf
-
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
