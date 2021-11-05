@@ -201,7 +201,7 @@ ldr r@(R n) rr = emit' f where
 svc :: MonadState CodeState m => Word16 -> m ()
 svc imm = emit $ 0xd4000001 .|. (fromIntegral imm `shift` 5)
 
-ascii :: (MonadState CodeState m, MonadThrow m) => String -> m RelativeRef
+ascii :: MonadState CodeState m => String -> m RelativeRef
 ascii s = emitPool 1 $ BSLC.pack s
 
 exportSymbol :: MonadState CodeState m => String -> RelativeRef -> m ()
