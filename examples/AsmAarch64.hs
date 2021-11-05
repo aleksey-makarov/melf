@@ -94,7 +94,7 @@ emitPool a bs = state f where
             )
 
 label :: MonadState CodeState m => m RelativeRef
-label = gets (CodeRef . (* 4) . fromIntegral . P.length . codeReversed)
+label = gets (CodeRef . (* instructionSize) . fromIntegral . P.length . codeReversed)
 
 x0, x1, x2, x8 :: Register 'X
 x0 = R 0
