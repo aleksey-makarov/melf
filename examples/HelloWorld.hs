@@ -20,9 +20,11 @@ sys_exit = 93
 helloWorld :: MonadCatch m => StateT CodeState m ()
 helloWorld = do
 
-    label >>= exportSymbol "_start"      -- _start:
+    start <- label
+    exportSymbol "_start" start          -- _start:
     mov x0 1                             --     mov x0, #1
-    ascii msg >>= adr x1                 --     ldr x1, =msg
+    helloString <- ascii msg             --
+    adr x1 helloString                   --     ldr x1, =msg
     mov x2 $ fromIntegral $ P.length msg --     ldr x2, =len
     mov x8 sys_write                     --     mov x8, #64 // write()
     svc 0                                --     svc #0
