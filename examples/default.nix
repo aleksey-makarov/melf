@@ -1,36 +1,21 @@
-
 let
-    pkgsf = import (fetchTarball https://github.com/NixOS/nixpkgs/archive/64b4617883844efe0cc20163e007ee636462eb18.tar.gz);
-    pkgs = pkgsf {};
-    pkgsCross = pkgsf {
-        crossSystem.config = "aarch64-unknown-linux-gnu";
-    };
-
-    # local store:
-    #
-    # melf = /nix/store/m018j93qw518gn1hsh3w49djgp8b7xdw-melf-0.1;
-
-    # FIXME: works, but I doubt it's correct
-    # cachix:
-    #
-    # 1. install cachix:
-    # nix-env -iA cachix -f https://cachix.org/api/v1/install
-    #
-    # 2. add 'aleksey-makarov' cachix cache
-    # cachix use aleksey-makarov
-    #
-    # 3. nix-store -r /nix/store/nhxlwsf8ig2km7ph188hnhq8jkc99mmq-melf-0.1
-    #
-    # How to upgrade to the late build from cache:
-    # - Copy the last line of "Run nix-build" from gihub's actions
-    # - Issue this command
-    # find . -type f -print0 | xargs -0 sed -i 's$/nix/store/nhxlwsf8ig2km7ph188hnhq8jkc99mmq-melf-0.1$<insert new path here>$g'
-
-    melf = /nix/store/nhxlwsf8ig2km7ph188hnhq8jkc99mmq-melf-0.1;
-
+  pkgsFunc = import <nixpkgs>;
+  pkgs = pkgsFunc {};
+  pkgsCross = pkgsFunc {
+    crossSystem.config = "aarch64-unknown-linux-gnu";
+  };
+  melfSrc = pkgs.fetchFromGitHub {
+    owner = "aleksey-makarov";
+    repo  = "melf";
+    rev = "ed63a07cb8d88dcfc1221d8dbe9f49b911734420";
+    sha256 = "06n7g5my9mspr0xdv8959yfpgdck6pib5k29q3jjv0170yy3ywc2";
+  };
+  melf = pkgs.haskellPackages.callCabal2nix "melf" melfSrc {};
+  ghc = pkgs.haskellPackages.ghcWithPackages (ps: with ps; [
+    melf
+  ]);
 in
-
-    pkgsCross.mkShell {
-      nativeBuildInputs = [ melf pkgs.qemu ];
-      LANG = "C.UTF-8" ;
-    }
+  pkgsCross.mkShell {
+    nativeBuildInputs = [ pkgs.qemu pkgs.cabal-install ghc ];
+    LANG = "C.UTF-8" ;
+  }
