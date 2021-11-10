@@ -3,8 +3,8 @@
 
 import qualified Data.ByteString as BS
 import Data.ByteString.Lazy as BSL
-import Data.Text.Prettyprint.Doc
-import Data.Text.Prettyprint.Doc.Util
+import Prettyprinter
+import Prettyprinter.Util
 import Options.Applicative
 
 import Data.Elf

@@ -47,8 +47,8 @@ import Data.Int
 import qualified Data.List as L
 import Data.Singletons
 import Data.Singletons.Sigma
-import Data.Text.Prettyprint.Doc as D
-import Data.Text.Prettyprint.Doc.Render.Text
+import Prettyprinter
+import Prettyprinter.Render.Text
 import Data.Word
 import Numeric
 import System.IO

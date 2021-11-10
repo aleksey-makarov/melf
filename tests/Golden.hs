@@ -27,8 +27,8 @@ import Data.Int
 import Data.List (sort)
 import Data.Singletons
 import Data.Singletons.Sigma
-import Data.Text.Prettyprint.Doc as D
-import Data.Text.Prettyprint.Doc.Render.Text
+import Prettyprinter
+import Prettyprinter.Render.Text
 import System.Directory
 import System.FilePath
 import System.IO as IO
