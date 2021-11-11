@@ -2,11 +2,12 @@ PREFIX = aarch64-unknown-linux-gnu-
 CFLAGS = -Wall
 
 EXECS   = helloWorldObj test
+DOCS    = README_ru.html
 SHOW    = forwardLabelExe helloWorldExe helloWorldObj.o test
 DISASMS = $(addsuffix .dis,    $(SHOW))
 LAYOUTS = $(addsuffix .layout, $(SHOW))
 DUMPS   = $(addsuffix .dump,   $(SHOW))
-BUILD   = $(EXECS) $(DISASMS) $(LAYOUTS) $(DUMPS)
+BUILD   = $(EXECS) $(DOCS) $(DISASMS) $(LAYOUTS) $(DUMPS)
 
 all : $(BUILD)
 
@@ -20,6 +21,10 @@ $(EXECS) : LDFLAGS += -nostdlib
 
 %.dump : %
 	hobjdump -f $< > $@
+
+# https://pandoc.org/MANUAL.html
+%.html : %.md
+	pandoc --standalone -o $@ $<
 
 clean:
 	rm -rf $(BUILD)
