@@ -16,16 +16,13 @@ the my copy of the [elf](https://github.com/aleksey-makarov/elf) repo.
 ## How to build
 
 - [Install](https://nixos.org/manual/nix/stable/#chap-installation) Nix
-- Make sure you have path to Nix binaries set in the user environment.  (Installation process modifies .bash_profile)
+- `nix-shell`
+- `cabal new-build`
 
 ## Tests
 
 Test data is committed with [git-lfs](https://git-lfs.github.com/).
-
-## Development
-
-- `melf.cabal` is generated from `package.yaml`.  Use `hpack` to do that.
-- `melf.nix` is generated.  Use `cabal2nix . > melf.nix` to do that.
+To run tests, issue this command in `nix-shell`: `cabal new-test --test-show-details=direct`
 
 ## License
 
