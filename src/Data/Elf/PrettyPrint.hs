@@ -27,6 +27,7 @@ module Data.Elf.PrettyPrint
     , printElf_
     , printElf
     , printStringTable
+    , printHeader
 
     , readFileLazy
     , writeElfDump

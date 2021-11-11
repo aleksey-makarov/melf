@@ -24,7 +24,7 @@ import Data.ByteString.Lazy as BSL
 import Data.Foldable as F
 -- import Data.Functor.Identity
 import Data.Int
--- import Data.List as L
+import Data.List (sort)
 import Data.Singletons
 import Data.Singletons.Sigma
 import Data.Text.Prettyprint.Doc as D
@@ -137,6 +137,18 @@ copyElf bs = parseElf bs >>= serializeElf
 
 ---------------------------------------------------------------------
 
+-- This is for examples/README.md
+withHeader :: BSL.ByteString -> (forall a . IsElfClass a => HeaderXX a -> b) -> Either String b
+withHeader bs f =
+    case decodeOrFail bs of
+        Left (_, _, err) -> Left err
+        Right (_, _, (classS :&: hxx) :: Header) -> Right $ withElfClass classS f hxx
+
+printHeaderFile :: FilePath -> IO (Doc ())
+printHeaderFile path = do
+    bs <- fromStrict <$> BS.readFile path
+    $eitherAddContext' $ withHeader bs printHeader
+
 printHeadersFile :: FilePath -> IO (Doc ())
 printHeadersFile path = do
     bs <- fromStrict <$> BS.readFile path
@@ -236,7 +248,8 @@ main = do
 
     defaultMain $ testGroup "elf" [ hdrSizeTests
                                   , testGroup "headers round trip"  (mkTest <$> elfs)
-                                  , testGroup "headers golden"      (mkGoldenTest        "header"          printHeadersFile      <$> elfs)
+                                  , testGroup "elf headers golden"  (mkGoldenTest        "elf_header"      printHeaderFile       <$> (P.take 2 $ sort $ elfs))
+                                  , testGroup "header golden"       (mkGoldenTest        "header"          printHeadersFile      <$> elfs)
                                   , testGroup "string table golden" (mkGoldenTest        "strtable"        printStrTableFile     <$> elfs)
                                   , testGroup "layout golden"       (mkGoldenTest        "layout"          printRBuilderFile     <$> elfs)
                                   , testGroup "elf golden"          (mkGoldenTest        "elf"             printElfFile          <$> elfs)
