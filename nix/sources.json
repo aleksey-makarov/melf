@@ -1,0 +1,38 @@
+{
+    "melf": {
+        "branch": "master",
+        "description": "A Haskell library to parse/serialize Executable and Linkable Format (ELF)",
+        "homepage": null,
+        "owner": "aleksey-makarov",
+        "repo": "melf",
+        "rev": "ed63a07cb8d88dcfc1221d8dbe9f49b911734420",
+        "sha256": "06n7g5my9mspr0xdv8959yfpgdck6pib5k29q3jjv0170yy3ywc2",
+        "type": "tarball",
+        "url": "https://github.com/aleksey-makarov/melf/archive/ed63a07cb8d88dcfc1221d8dbe9f49b911734420.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "niv": {
+        "branch": "master",
+        "description": "Easy dependency management for Nix projects",
+        "homepage": "https://github.com/nmattia/niv",
+        "owner": "nmattia",
+        "repo": "niv",
+        "rev": "5830a4dd348d77e39a0f3c4c762ff2663b602d4c",
+        "sha256": "1d3lsrqvci4qz2hwjrcnd8h5vfkg8aypq3sjd4g3izbc8frwz5sm",
+        "type": "tarball",
+        "url": "https://github.com/nmattia/niv/archive/5830a4dd348d77e39a0f3c4c762ff2663b602d4c.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "nixpkgs": {
+        "branch": "release-21.05",
+        "description": "Nix Packages collection",
+        "homepage": "",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "1adf5530ae9681707930a096186e87c077797caa",
+        "sha256": "04b4kdv08s0y5zb5r5dcnnyg99qb7b1lk9vh7j6cg0djlhhgc66r",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nixpkgs/archive/1adf5530ae9681707930a096186e87c077797caa.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    }
+}

@@ -16,9 +16,9 @@ maintainer:     aleksey.makarov@gmail.com
 copyright:      Aleksey Makarov
 license:        BSD3
 license-file:   LICENSE
+build-type:     Simple
 tested-with:
     GHC == 8.10.2
-build-type:     Simple
 
 source-repository head
   type: git
