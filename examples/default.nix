@@ -16,6 +16,6 @@ let
   ]);
 in
   pkgsCross.mkShell {
-    nativeBuildInputs = [ pkgs.qemu pkgs.cabal-install ghc ];
+    nativeBuildInputs = [ pkgs.qemu pkgs.cabal-install ghc pkgs.pandoc ];
     LANG = "C.UTF-8" ;
   }
