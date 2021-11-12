@@ -24,7 +24,6 @@ import Data.ByteString.Lazy as BSL
 import Data.Foldable as F
 -- import Data.Functor.Identity
 import Data.Int
-import Data.List (sort)
 import Data.Singletons
 import Data.Singletons.Sigma
 import Prettyprinter
@@ -241,6 +240,9 @@ hdrSizeTests = testGroup "header size" [ mkSizeTest "header 64" testHeader64 (he
                                        , mkSizeTest "symbol table entry 32" (Be testSymbolTableEntry32) (symbolTableEntrySize ELFCLASS32)
                                        ]
 
+elfsForHeader :: [String]
+elfsForHeader = [ "testdata/ppc/64/du", "testdata/arm_32_lsb/arp" ]
+
 main :: IO ()
 main = do
 
@@ -248,7 +250,7 @@ main = do
 
     defaultMain $ testGroup "elf" [ hdrSizeTests
                                   , testGroup "headers round trip"  (mkTest <$> elfs)
-                                  , testGroup "elf headers golden"  (mkGoldenTest        "elf_header"      printHeaderFile       <$> (P.take 2 $ sort $ elfs))
+                                  , testGroup "elf headers golden"  (mkGoldenTest        "elf_header"      printHeaderFile       <$> elfsForHeader)
                                   , testGroup "header golden"       (mkGoldenTest        "header"          printHeadersFile      <$> elfs)
                                   , testGroup "string table golden" (mkGoldenTest        "strtable"        printStrTableFile     <$> elfs)
                                   , testGroup "layout golden"       (mkGoldenTest        "layout"          printRBuilderFile     <$> elfs)
