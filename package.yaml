@@ -1,5 +1,5 @@
 name: melf
-version: '0.1'
+version: '1.0.0'
 synopsis: An Elf parser
 description: Parser for ELF object format
 category: Data
@@ -10,7 +10,7 @@ license: BSD3
 homepage: https://github.com/aleksey-makarov/melf
 dependencies:
   - base >=4.6 && <5.0
-tested-with: GHC == 8.10.2
+tested-with: GHC == 8.10.4
 ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
 
 github: aleksey-makarov/melf
@@ -23,7 +23,7 @@ library:
     - exceptions
     - lens
     - prettyprinter
-    - singletons
+    - singletons < 3.0
     - template-haskell
     - mtl
   source-dirs: src
@@ -54,7 +54,7 @@ tests:
       - filepath
       - melf
       - prettyprinter
-      - singletons
+      - singletons < 3.0
       - tasty
       - tasty-golden
       - tasty-hunit
@@ -79,7 +79,7 @@ tests:
       - lens
       - melf
       - mtl
-      - singletons
+      - singletons < 3.0
       - tasty
       - tasty-golden
       - tasty-hunit

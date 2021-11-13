@@ -5,7 +5,7 @@ cabal-version: 1.12
 -- see: https://github.com/sol/hpack
 
 name:           melf
-version:        0.1
+version:        1.0.0
 synopsis:       An Elf parser
 description:    Parser for ELF object format
 category:       Data
@@ -18,7 +18,7 @@ license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 tested-with:
-    GHC == 8.10.2
+    GHC == 8.10.4
 
 source-repository head
   type: git
@@ -49,7 +49,7 @@ library
     , lens
     , mtl
     , prettyprinter
-    , singletons
+    , singletons <3.0
     , template-haskell
   default-language: Haskell2010
 
@@ -107,7 +107,7 @@ test-suite examples
     , lens
     , melf
     , mtl
-    , singletons
+    , singletons <3.0
     , tasty
     , tasty-golden
     , tasty-hunit
@@ -147,7 +147,7 @@ test-suite golden
     , filepath
     , melf
     , prettyprinter
-    , singletons
+    , singletons <3.0
     , tasty
     , tasty-golden
     , tasty-hunit
