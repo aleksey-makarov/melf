@@ -12,6 +12,9 @@ dependencies:
   - base >=4.6 && <5.0
 tested-with: GHC == 8.10.4
 ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
+extra-doc-files:
+    - ChangeLog.md
+    - README.md
 
 github: aleksey-makarov/melf
 
@@ -86,7 +89,7 @@ executables:
   hobjdump:
     main: hObjDump.hs
     source-dirs: app
-    ghc-options: -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+    ghc-options: -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
     dependencies:
       - melf
       - binary
@@ -96,7 +99,7 @@ executables:
   hobjlayout:
     main: hObjLayout.hs
     source-dirs: app
-    ghc-options: -O2 -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+    ghc-options: -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
     dependencies:
       - melf
       - binary
