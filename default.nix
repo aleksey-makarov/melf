@@ -10,5 +10,6 @@ in
           cabal2nix
           hpack
           niv
+          packdeps
         ]);
   }
