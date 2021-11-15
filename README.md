@@ -17,7 +17,7 @@ the my copy of the [elf](https://github.com/aleksey-makarov/elf) repo.
 
 - [Install](https://nixos.org/manual/nix/stable/#chap-installation) Nix
 - `nix-shell`
-- `cabal new-build`
+- `cabal new-configure; cabal new-build`
 
 ## Tests
 
