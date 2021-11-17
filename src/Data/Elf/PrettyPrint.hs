@@ -99,6 +99,7 @@ printWordXXS SELFCLASS64 = printWord64
 printWordXX :: SingI a => WordXX a -> Doc ()
 printWordXX = withSing printWordXXS
 
+-- | Print ELF header.  It's used in golden tests
 printHeader :: forall a . SingI a => HeaderXX a -> Doc ()
 printHeader HeaderXX{..} =
     formatPairs
@@ -149,7 +150,8 @@ printSegment (n, SegmentXX{..}) =
         , ("Align",    printWordXX pAlign    ) -- WordXX c
         ]
 
--- | Print parsed headers.  It's used in golden tests
+-- | Print parsed header, section table and segment table.
+--   It's used in golden tests
 printHeaders :: SingI a => HeaderXX a -> [SectionXX a] -> [SegmentXX a] -> Doc ()
 printHeaders hdr ss ps =
     let

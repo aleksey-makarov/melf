@@ -22,6 +22,7 @@ tested-with:
 extra-doc-files:
     ChangeLog.md
     README.md
+    examples/README_ru.md
 
 source-repository head
   type: git
