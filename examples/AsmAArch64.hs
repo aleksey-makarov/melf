@@ -12,7 +12,7 @@
 
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
-module AsmAarch64
+module AsmAArch64
     ( CodeState
     , Register
     , RelativeRef

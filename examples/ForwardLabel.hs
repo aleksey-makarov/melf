@@ -9,7 +9,7 @@ import Control.Monad.Catch
 import Control.Monad.Fix
 import Control.Monad.State
 
-import AsmAarch64
+import AsmAArch64
 
 ok :: String
 ok = "ok\n"

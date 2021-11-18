@@ -13,7 +13,7 @@ import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
 
-import AsmAarch64
+import AsmAArch64
 
 textSecN, shstrtabSecN, strtabSecN, symtabSecN :: ElfSectionIndex
 textSecN     = 1
