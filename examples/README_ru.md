@@ -194,7 +194,7 @@ data ElfSectionData
     = ElfSectionData BSL.ByteString -- ^ Regular section data
     | ElfSectionDataStringTable     -- ^ Section data will be generated from section names
 
-- | The type of node that defines Elf structure.
+-- | The type of node that defines Elf structure.
 data ElfXX (c :: ElfClass)
     = ElfHeader
         { ehData       :: ElfData    -- ^ Data encoding (big- or little-endian)
@@ -278,7 +278,7 @@ parseElf :: MonadCatch m => ByteString -> m Elf
 Для использования в демонстрационных приложениях написан модуль, 
 генерирующий машинный код для AArch64
 (файл [`AsmAarch64.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.0/examples/AsmAarch64.hs)).
-Сгенерированнвй код использует системные вызовы чтобы вывести на стандартный вывод "Hello World!" и завершить приложение.
+Сгенерированный код использует системные вызовы чтобы вывести на стандартный вывод "Hello World!" и завершить приложение.
 Идея позаимствована из вдохновляющей статьи Стивена Дила "От монад к машинному коду"
 ([Stephen Diehl "Monads to Machine Code"](https://www.stephendiehl.com/posts/monads_machine_code.html)).
 Так же как в статье, используется монада состояния, в нашем случае `CodeState`.
@@ -360,7 +360,7 @@ svc imm = emit $ 0xd4000001 .|. (fromIntegral imm `shift` 5)
 как с 64-битными или как с 32-битными значениями.
 Для указания разрядности регистров для них используются разные имена:
 `x0`, `x1`... -- для 64-битных, `w0`, `w1`... -- для 32-битных.
-Регистроы определены с помощью [фантомного](https://wiki.haskell.org/Phantom_type) типа:
+Регистры определены с помощью [фантомного](https://wiki.haskell.org/Phantom_type) типа:
 
 
 ``` Haskell
