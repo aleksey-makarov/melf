@@ -8,7 +8,7 @@ import Control.Monad.Catch
 import Control.Monad.State
 import Data.Word
 
-import AsmAarch64
+import AsmAArch64
 
 msg :: String
 msg = "Hello World!\n"

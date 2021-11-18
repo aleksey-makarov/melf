@@ -92,7 +92,7 @@ test-suite examples
   type: exitcode-stdio-1.0
   main-is: Examples.hs
   other-modules:
-      AsmAarch64
+      AsmAArch64
       ForwardLabel
       HelloWorld
       MkExe

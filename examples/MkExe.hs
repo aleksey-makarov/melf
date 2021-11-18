@@ -10,7 +10,7 @@ import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
 
-import AsmAarch64
+import AsmAArch64
 
 addr :: Word64
 addr = 0x400000
