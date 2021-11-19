@@ -13,8 +13,8 @@ import Test.Tasty.HUnit
 import Data.Elf
 import Data.Elf.PrettyPrint
 
-import MkObj
-import MkExe
+import DummyLd
+import AsmAArch64
 import HelloWorld
 import ForwardLabel
 
@@ -24,13 +24,13 @@ makeFileExecutable path = do
     setFileMode path $ m .|. ownerExecuteMode
 
 helloWorldExe :: MonadCatch m => m Elf
-helloWorldExe = mkExe helloWorld
+helloWorldExe = assemble helloWorld >>= dummyLd
 
 forwardLabelExe :: (MonadCatch m, MonadFix m) => m Elf
-forwardLabelExe = mkExe forwardLabel
+forwardLabelExe = assemble forwardLabel >>= dummyLd
 
 helloWorldObj :: MonadCatch m => m Elf
-helloWorldObj = mkObj helloWorld
+helloWorldObj = assemble helloWorld
 
 fixTargetName :: String -> String
 fixTargetName = fmap f

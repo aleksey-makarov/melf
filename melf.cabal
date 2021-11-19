@@ -93,10 +93,9 @@ test-suite examples
   main-is: Examples.hs
   other-modules:
       AsmAArch64
+      DummyLd
       ForwardLabel
       HelloWorld
-      MkExe
-      MkObj
       Paths_melf
   hs-source-dirs:
       examples
