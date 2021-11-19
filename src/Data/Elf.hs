@@ -19,9 +19,10 @@ module Data.Elf (
     , serializeElf
 
     -- * Misc
-    , getSectionData
-    , getString
+    , getSectionData -- FIXME: Should be moved to Data.Elf.Headers (requires bumping major version)
+    , getString      -- FIXME: ...
     , elfFindSection
+    , elfFindSectionByName
     , elfFindHeader
 
     -- * Symbol table

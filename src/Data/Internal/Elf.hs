@@ -370,6 +370,17 @@ elfFindSection elfs n = if n == 0
             f s@ElfSection{..} | esN == fromIntegral n = First $ Just s
             f _ = First Nothing
 
+-- | Find section with a given name
+elfFindSectionByName :: forall a m . (SingI a, MonadThrow m)
+                     => [ElfXX a]   -- ^ Structured ELF data
+                     -> String      -- ^ Section name
+                     -> m (ElfXX a) -- ^ The section in question
+elfFindSectionByName elfs n = $maybeAddContext ("no section \"" ++ show n ++ "\"") maybeSection
+    where
+        maybeSection = getFirst $ foldMapElfList f elfs
+        f s@ElfSection{..} | esName == n = First $ Just s
+        f _ = First Nothing
+
 -- | Find ELF header
 elfFindHeader :: forall a m . (SingI a, MonadThrow m)
               => [ElfXX a]   -- ^ Structured ELF data
