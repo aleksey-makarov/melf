@@ -1,16 +1,4 @@
 {
-    "melf": {
-        "branch": "master",
-        "description": "A Haskell library to parse/serialize Executable and Linkable Format (ELF)",
-        "homepage": null,
-        "owner": "aleksey-makarov",
-        "repo": "melf",
-        "rev": "ed63a07cb8d88dcfc1221d8dbe9f49b911734420",
-        "sha256": "06n7g5my9mspr0xdv8959yfpgdck6pib5k29q3jjv0170yy3ywc2",
-        "type": "tarball",
-        "url": "https://github.com/aleksey-makarov/melf/archive/ed63a07cb8d88dcfc1221d8dbe9f49b911734420.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
     "niv": {
         "branch": "master",
         "description": "Easy dependency management for Nix projects",
