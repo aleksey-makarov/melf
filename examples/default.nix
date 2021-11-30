@@ -1,8 +1,7 @@
 let
   sources = import ../nix/sources.nix;
-  pkgsFunc = import sources.nixpkgs;
-  pkgs = pkgsFunc {};
-  pkgsCross = pkgsFunc {
+  pkgs = import sources.nixpkgs {};
+  pkgsCross = import sources.nixpkgs {
     crossSystem.config = "aarch64-unknown-linux-gnu";
   };
   melfSrc = sources.melf;
@@ -11,7 +10,7 @@ let
     melf
   ]);
 in
-  pkgsCross.mkShell {
-    nativeBuildInputs = [ pkgs.qemu pkgs.cabal-install ghc pkgs.pandoc ];
+  pkgs.mkShell {
+    buildInputs = with pkgs ; [ qemu cabal-install pandoc ghc pkgsCross.buildPackages.gcc ];
     LANG = "C.UTF-8" ;
   }

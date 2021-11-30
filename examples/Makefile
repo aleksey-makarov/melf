@@ -1,5 +1,6 @@
 PREFIX = aarch64-unknown-linux-gnu-
 CFLAGS = -Wall
+CC = $(PREFIX)gcc
 
 EXECS   = helloWorldObj test
 DOCS    = README_ru.html
