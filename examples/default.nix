@@ -12,5 +12,8 @@ let
 in
   pkgs.mkShell {
     buildInputs = with pkgs ; [ qemu cabal-install pandoc ghc pkgsCross.buildPackages.gcc ];
+    # 8.10.4: en_US.UTF-8 => ascii, C.UTF-8 => utf8
+    # 9.0.1:  en_US.UTF-8 => utf8,  C.UTF-8 => ascii
+    # WTF?
     LANG = "C.UTF-8" ;
   }
