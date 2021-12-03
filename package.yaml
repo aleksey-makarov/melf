@@ -16,6 +16,13 @@ extra-doc-files:
     - ChangeLog.md
     - README.md
     - examples/README_ru.md
+data-files:
+    - tests/testdata/orig/*.golden
+    - examples/*.golden
+    # Add only original tests to keep the size of the tarball small
+    - testdata/orig/bloated
+    - testdata/orig/tiny
+    - testdata/orig/vdso
 
 github: aleksey-makarov/melf
 
