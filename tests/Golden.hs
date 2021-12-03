@@ -241,7 +241,10 @@ hdrSizeTests = testGroup "header size" [ mkSizeTest "header 64" testHeader64 (he
                                        ]
 
 elfsForHeader :: [String]
-elfsForHeader = [ "testdata/ppc/64/du", "testdata/arm_32_lsb/arp" ]
+elfsForHeader = [ "testdata/orig/bloated"
+                , "testdata/orig/tiny"
+                , "testdata/orig/vdso"
+                ]
 
 main :: IO ()
 main = do

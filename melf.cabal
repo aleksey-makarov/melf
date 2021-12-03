@@ -23,6 +23,31 @@ extra-doc-files:
     ChangeLog.md
     README.md
     examples/README_ru.md
+data-files:
+    tests/testdata/orig/bloated.elf.golden
+    tests/testdata/orig/bloated.elf_header.golden
+    tests/testdata/orig/bloated.header.golden
+    tests/testdata/orig/bloated.layout.golden
+    tests/testdata/orig/bloated.strtable.golden
+    tests/testdata/orig/tiny.elf.golden
+    tests/testdata/orig/tiny.elf_header.golden
+    tests/testdata/orig/tiny.header.golden
+    tests/testdata/orig/tiny.layout.golden
+    tests/testdata/orig/tiny.strtable.golden
+    tests/testdata/orig/vdso.elf.golden
+    tests/testdata/orig/vdso.elf_header.golden
+    tests/testdata/orig/vdso.header.golden
+    tests/testdata/orig/vdso.layout.golden
+    tests/testdata/orig/vdso.strtable.golden
+    examples/forwardLabelExe.dump.golden
+    examples/forwardLabelExe.layout.golden
+    examples/helloWorldExe.dump.golden
+    examples/helloWorldExe.layout.golden
+    examples/helloWorldObj.o.dump.golden
+    examples/helloWorldObj.o.layout.golden
+    testdata/orig/bloated
+    testdata/orig/tiny
+    testdata/orig/vdso
 
 source-repository head
   type: git
