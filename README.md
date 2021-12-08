@@ -5,19 +5,15 @@
 
 ## Related work
 
-- [elf](https://github.com/wangbj/elf) - does not write ELF, only parses it
-- [data-elf](https://github.com/mvv/data-elf) - parses just headers/tables; depends on a library that fails to build with modern GHCs
+- [elf](https://github.com/wangbj/elf)
+- [data-elf](https://github.com/mvv/data-elf)
+
+These just parse/serialize ELF header and table entries but not the whole ELF files.
 
 ## History
 
 For the early history look at the branch "[amakarov](https://github.com/aleksey-makarov/elf/tree/amakarov)" of
 the my copy of the [elf](https://github.com/aleksey-makarov/elf) repo.
-
-## How to build
-
-- [Install](https://nixos.org/manual/nix/stable/#chap-installation) Nix
-- `nix-shell`
-- `cabal new-configure; cabal new-build`
 
 ## Tests
 
