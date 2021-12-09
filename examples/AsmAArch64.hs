@@ -5,10 +5,17 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
+
+{-# LANGUAGE CPP #-}
+
+#if defined(MIN_VERSION_GLASGOW_HASKELL)
+#if MIN_VERSION_GLASGOW_HASKELL(8,10,0,0)
+{-# LANGUAGE StandaloneKindSignatures #-}
+#endif
+#endif
 
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
@@ -39,7 +46,6 @@ import Data.ByteString.Builder
 import Data.ByteString.Lazy as BSL
 import Data.ByteString.Lazy.Char8 as BSLC
 import Data.Int
-import Data.Kind
 import Data.Singletons.Sigma
 import Data.Singletons.TH
 import Data.Word
@@ -50,8 +56,7 @@ import Data.Elf.Headers
 
 $(singletons [d| data RegisterWidth = X | W |])
 
-type Register :: RegisterWidth -> Type
-newtype Register c = R Word32
+newtype Register (c :: RegisterWidth) = R Word32
 
 newtype CodeOffset  = CodeOffset  { getCodeOffset  :: Int64 }  deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
 newtype Instruction = Instruction { getInstruction :: Word32 } deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)

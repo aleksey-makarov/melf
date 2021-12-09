@@ -11,7 +11,6 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
@@ -29,21 +28,17 @@ import Data.Interval as I
 import Control.Monad
 import Control.Monad.Catch
 import Control.Monad.State as MS
--- import Data.Bifunctor
 import Data.Binary
 import Data.Bits as Bin
 import Data.ByteString.Lazy.Char8 as BSL8
 import Data.ByteString.Lazy as BSL
--- import Data.Either
 import Data.Foldable
 import Data.Int
--- import Data.Kind
 import qualified Data.List as L
 import Data.Maybe
 import Data.Monoid
 import Data.Singletons
 import Data.Singletons.Sigma
--- import Data.Word
 
 -- import System.IO.Unsafe
 

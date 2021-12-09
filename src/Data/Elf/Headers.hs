@@ -22,12 +22,19 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE StandaloneKindSignatures #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilyDependencies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+
+{-# LANGUAGE CPP #-}
+
+#if defined(MIN_VERSION_GLASGOW_HASKELL)
+#if MIN_VERSION_GLASGOW_HASKELL(8,10,0,0)
+{-# LANGUAGE StandaloneKindSignatures #-}
+#endif
+#endif
 
 {-# OPTIONS_GHC -Wno-unused-top-binds #-}
 
@@ -83,28 +90,19 @@ module Data.Elf.Headers (
 
     ) where
 
--- import Control.Lens hiding (at)
--- import Control.Arrow
 import Control.Monad
 import Control.Monad.Catch
--- import Control.Monad.State hiding (get, put)
--- import qualified Control.Monad.State as S
 import Data.Binary
 import Data.Binary.Get
 import Data.Binary.Put
 import Data.Bits
 import Data.ByteString       as BS
 import Data.ByteString.Lazy  as BSL
--- import Data.ByteString.Char8 as BSC
 import Data.Data (Data)
-import Data.Kind
--- import Data.Kind
 import qualified Data.List as L
 import Data.Singletons.Sigma
 import Data.Singletons.TH
 import Data.Typeable (Typeable)
--- import Numeric.Interval as I
--- import Numeric.Interval.NonEmpty as INE
 
 import Control.Exception.ChainedException
 import Data.BList
@@ -203,7 +201,6 @@ putLe = putEndian ELFDATA2LSB
 
 -- | @IsElfClass a@ is defined for each constructor of `ElfClass`.
 --   It defines @WordXX a@, which is `Word32` for `ELFCLASS32` and `Word64` for `ELFCLASS64`.
-type IsElfClass :: ElfClass -> Constraint
 class ( SingI c
       , Typeable c
       , Typeable (WordXX c)
@@ -222,7 +219,7 @@ class ( SingI c
       , Binary (Be (WordXX c))
       , Binary (Le (WordXX c))
       ) => IsElfClass c where
-    type WordXX c = r | r -> c
+    type WordXX (c :: ElfClass) = r | r -> c
 
 instance IsElfClass 'ELFCLASS32 where
     type WordXX 'ELFCLASS32 = Word32
@@ -235,7 +232,6 @@ instance IsElfClass 'ELFCLASS64 where
 --------------------------------------------------------------------------
 
 -- | Parsed ELF header
-type HeaderXX :: ElfClass -> Type
 data HeaderXX c =
     HeaderXX
         { hData       :: ElfData    -- ^ Data encoding (big- or little-endian)
