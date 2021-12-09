@@ -273,7 +273,7 @@ parseElf :: MonadCatch m => ByteString -> m Elf
 [`Put`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary.html#t:Put)
 не является экземпляром класса `MonadFail`.
 
-## Ассемблер как EDSL для Хакселя
+## Ассемблер как EDSL для Хаскела
 
 Для использования в демонстрационных приложениях написан модуль, 
 генерирующий машинный код для AArch64
