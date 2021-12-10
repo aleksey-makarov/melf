@@ -71,14 +71,14 @@ library
       src
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
   build-depends:
-      base >=4.6 && <5.0
-    , binary >=0.8.8 && <0.9
-    , bytestring >=0.10.12 && <0.11
+      base >=4.13 && <5.0
+    , binary >=0.8.7 && <0.9
+    , bytestring >=0.10.10 && <0.11
     , exceptions >=0.10.4 && <0.11
     , mtl >=2.2.2 && <2.3
     , prettyprinter >=1.7.0 && <1.8
-    , singletons >=2.7 && <3
-    , template-haskell ==2.16.*
+    , singletons >=2.6 && <3
+    , template-haskell >=2.15 && <2.17
   default-language: Haskell2010
 
 executable hobjdump
@@ -89,7 +89,7 @@ executable hobjdump
       app
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.6 && <5.0
+      base >=4.13 && <5.0
     , binary
     , bytestring
     , melf
@@ -105,7 +105,7 @@ executable hobjlayout
       app
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.6 && <5.0
+      base >=4.13 && <5.0
     , binary
     , bytestring
     , exceptions
@@ -126,7 +126,7 @@ test-suite examples
       examples
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
   build-depends:
-      base >=4.6 && <5.0
+      base >=4.13 && <5.0
     , bytestring
     , containers >=0.6.2.1 && <0.7
     , exceptions
@@ -149,7 +149,7 @@ test-suite exceptions
       tests/exceptions
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
   build-depends:
-      base >=4.6 && <5.0
+      base >=4.13 && <5.0
     , exceptions
     , melf
     , tasty
@@ -165,7 +165,7 @@ test-suite golden
       tests
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
   build-depends:
-      base >=4.6 && <5.0
+      base >=4.13 && <5.0
     , binary
     , bytestring
     , directory >=1.3.6 && <1.4
