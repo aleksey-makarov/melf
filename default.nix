@@ -7,6 +7,7 @@ in
     modifier = drv:
       pkgs.haskell.lib.addBuildTools drv (with pkgs.haskellPackages;
         [ cabal-install
+          cabal-plan
           cabal2nix
           hpack
           niv
