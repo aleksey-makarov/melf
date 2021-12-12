@@ -18,7 +18,7 @@ license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 tested-with:
-    GHC == 8.10.7
+    GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.1
 extra-doc-files:
     ChangeLog.md
     README.md
@@ -77,8 +77,12 @@ library
     , exceptions >=0.10.4 && <0.11
     , mtl >=2.2.2 && <2.3
     , prettyprinter >=1.7.0 && <1.8
-    , singletons >=2.6 && <3
-    , template-haskell >=2.15 && <2.17
+    , singletons >=2.6 && <3.1
+    , template-haskell >=2.15 && <2.18
+  if impl(ghc >= 9.0)
+    build-depends:
+        singletons-base ==3.0.*
+      , singletons-th ==3.0.*
   default-language: Haskell2010
 
 executable hobjdump
@@ -138,6 +142,9 @@ test-suite examples
     , tasty-golden
     , tasty-hunit
     , unix >=2.7.2.2 && <2.8
+  if impl(ghc >= 9.0)
+    build-depends:
+        singletons-th
   default-language: Haskell2010
 
 test-suite exceptions

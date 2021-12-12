@@ -10,7 +10,7 @@ license: BSD3
 homepage: https://github.com/aleksey-makarov/melf
 dependencies:
     - base >=4.13 && <5.0
-tested-with: GHC == 8.10.7
+tested-with: GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.1
 ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
 extra-doc-files:
     - ChangeLog.md
@@ -36,8 +36,8 @@ library:
     # In 3.0 they splitted singletons into
     # singletons, singletons-base and singletons-th
     # and the latter works only for the very last GHC
-    - singletons    >= 2.6 && < 3
-    - template-haskell >= 2.15 && < 2.17
+    - singletons    >= 2.6 && < 3.1
+    - template-haskell >= 2.15 && < 2.18
   source-dirs: src
   other-modules:
     - Data.Elf.Constants.TH
@@ -52,6 +52,11 @@ library:
     - Data.Elf.Headers
     - Data.Elf.PrettyPrint
     - Control.Exception.ChainedException
+  when:
+    - condition: impl(ghc >= 9.0)
+      dependencies:
+        - singletons-th >= 3.0 && < 3.1
+        - singletons-base >= 3.0 && < 3.1
 
 tests:
   golden:
@@ -92,6 +97,10 @@ tests:
       - tasty-golden
       - tasty-hunit
       - unix >= 2.7.2.2 && < 2.8
+    when:
+      - condition: impl(ghc >= 9.0)
+        dependencies:
+          - singletons-th
 
 executables:
   hobjdump:
