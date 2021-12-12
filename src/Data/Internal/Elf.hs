@@ -789,7 +789,7 @@ serializeElf' elfs = do
                 , ..
                 }
         elf2WBuilder' ElfSection{esFlags = ElfSectionFlag f, ..} s = do
-            when (f .&. fromIntegral (complement (maxBound @ (WordXX a))) /= 0)
+            when (f .&. fromIntegral (complement (maxBound @(WordXX a))) /= 0)
                 ($chainedError $ "section flags at section " ++ show esN ++ "don't fit")
             WBuilderState{..} <- if esType == SHT_NOBITS
                 then return s
@@ -895,7 +895,7 @@ serializeElf' elfs = do
                                 hShStrNdx   = wbsShStrNdx
 
                                 h :: Header
-                                h = sing @ a :&: HeaderXX{..}
+                                h = sing @a :&: HeaderXX{..}
                             in
                                 encode h
                         _ -> error "this should be ElfHeader" -- FIXME

@@ -104,6 +104,14 @@ import Data.Singletons.Sigma
 import Data.Singletons.TH
 import Data.Typeable (Typeable)
 
+#if defined(MIN_VERSION_GLASGOW_HASKELL)
+#if MIN_VERSION_GLASGOW_HASKELL(9,0,0,0)
+import Data.Eq.Singletons
+import Text.Show.Singletons
+import Data.Bool.Singletons
+#endif
+#endif
+
 import Control.Exception.ChainedException
 import Data.BList
 import Data.Endian
@@ -414,12 +422,12 @@ putSection putE (SectionXX{..}) = do
     putE sEntSize
 
 instance forall (a :: ElfClass) . SingI a => Binary (Be (SectionXX a)) where
-    put = withElfClass (sing @ a) (putSection putBe) . fromBe
-    get = Be <$> withElfClass (sing @ a) (getSection getBe)
+    put = withElfClass (sing @a) (putSection putBe) . fromBe
+    get = Be <$> withElfClass (sing @a) (getSection getBe)
 
 instance forall (a :: ElfClass) . SingI a => Binary (Le (SectionXX a)) where
-    put = withElfClass (sing @ a) (putSection putLe) . fromLe
-    get = Le <$> withElfClass (sing @ a) (getSection getLe)
+    put = withElfClass (sing @a) (putSection putLe) . fromLe
+    get = Le <$> withElfClass (sing @a) (getSection getLe)
 
 --------------------------------------------------------------------------
 -- Segment
@@ -608,7 +616,7 @@ getRelocationTableAEntry ::      forall c . IsElfClass c =>
     (forall b . (Binary (Le b), Binary (Be b)) => Get b) -> Get (RelaXX c)
 getRelocationTableAEntry getE = do
     relaOffset <- getE
-    (relaSym, relaType) <- case sing @ c of
+    (relaSym, relaType) <- case sing @c of
         SELFCLASS64 -> (\x -> (relaSym64 x, relaType64 x)) <$> getE
         SELFCLASS32 -> (\x -> (relaSym32 x, relaType32 x)) <$> getE
     relaAddend <- getE
@@ -619,22 +627,22 @@ putRelocationTableAEntry ::         forall c . IsElfClass c =>
                                   RelaXX c -> Put
 putRelocationTableAEntry putE (RelaXX{..}) = do
     putE relaOffset
-    (case sing @ c of
+    (case sing @c of
         SELFCLASS64 -> putE $ relaInfo64 relaSym relaType
         SELFCLASS32 -> putE $ relaInfo32 relaSym relaType) :: Put
     putE relaAddend
 
 instance forall (a :: ElfClass) . SingI a => Binary (Be (RelaXX a)) where
-    put = withElfClass (sing @ a) (putRelocationTableAEntry putBe) . fromBe
-    get = Be <$> withElfClass (sing @ a) (getRelocationTableAEntry getBe)
+    put = withElfClass (sing @a) (putRelocationTableAEntry putBe) . fromBe
+    get = Be <$> withElfClass (sing @a) (getRelocationTableAEntry getBe)
 
 instance forall (a :: ElfClass) . SingI a => Binary (Le (RelaXX a)) where
-    put = withElfClass (sing @ a) (putRelocationTableAEntry putLe) . fromLe
-    get = Le <$> withElfClass (sing @ a) (getRelocationTableAEntry getLe)
+    put = withElfClass (sing @a) (putRelocationTableAEntry putLe) . fromLe
+    get = Le <$> withElfClass (sing @a) (getRelocationTableAEntry getLe)
 
 -- | Size of @RelaXX a@ in bytes.
 relocationTableAEntrySize :: forall a . IsElfClass a => WordXX a
-relocationTableAEntrySize = fromIntegral $ BSL.length $ encode $ Le $ RelaXX @ a 0 0 0 0
+relocationTableAEntrySize = fromIntegral $ BSL.length $ encode $ Le $ RelaXX @a 0 0 0 0
 
 --------------------------------------------------------------------------
 -- parseHeaders

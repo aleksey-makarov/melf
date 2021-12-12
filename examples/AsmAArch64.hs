@@ -125,7 +125,7 @@ builderRepeatZero :: Int -> Builder
 builderRepeatZero n = mconcat $ P.replicate n (word8 0)
 
 b64 :: forall w . SingI w => Register w -> Word32
-b64 _ = case sing @ w of
+b64 _ = case sing @w of
     SX -> 1
     SW -> 0
 
