@@ -1,6 +1,6 @@
 ---
 title: Работа с файлами формата ELF из Хаскела
-date: November 17, 2021
+date: December 21, 2021
 ---
 
 Работа с файлами формата ELF -- популярная тема на Хабре.
@@ -13,37 +13,40 @@ date: November 17, 2021
 Эти библиотеки работают только с заголовками и элементами таблиц и не дают возможности
 сгенерировать объектный файл.
 
-Я написал библиотеку для работы с файлами формата ELF на Хаскеле
-([GitHub](https://github.com/aleksey-makarov/melf),
- [Hackage](https://hackage.haskell.org/package/melf))
-и хочу показать как её использовать.
+Библиотека `melf`
+([GitHub](https://github.com/aleksey-makarov/melf), [Hackage](https://hackage.haskell.org/package/melf))
+даёт возможность полностью разобрать файл ELF и сгенерировать такой файл по несложной структуре данных.
+Ниже даются примеры её использования.
 
 ## Внутреннее устройство ELF
 
-Первые несколько байт файла занимает заголовок ELF.
-В нём, в частности, указано, где в файле расположены таблица секций и таблица сегментов.
 
-Сегменты и секции -- непрерывные участки файла.
-Сегменты описывают, что нужно поместить в память при загрузки программы,
-а секции я бы описал как неделимые результаты работы
-компилятора.
-В секциях размещены исполняемый код, таблицы символов, инициализированные данные.
-
-Файл формата ELF можно представлять как список деревьев.
-Деревьями могуть быть секции, сегменты, заголовок файла, таблица секций, таблица сегментов.
-Поддеревья могут содержаться только в сегментах.
-Узлы дерева выравниваются в файле, например, сегменты обычно выравниваются на размер страницы,
+В файле формата ELF последовательно размещены заголовок файла,
+секции, сегменты, таблица секций, таблица сегментов.
+Сегменты в свою очередь скомпанованы из таких же элементов.
+Порядок этих элементов произвольный, за исключением того, что заголовок файла всегда размещается в начале файла
+и может быть не более одной таблицы секций и таблицы сегментов.
+Каждый такой участок выровнен в файле, например, сегменты обычно выравниваются на размер страницы,
 а секции с данными -- на размер слова.
+
+В заголовке описано, где располагаются таблица секций и таблица сегментов,
+которые в свою очередь описывают, где располагаются секции и сегменты.
+
+Сегменты описывают, что нужно поместить в память при загрузки программы,
+а секции я бы описал как неделимые результаты работы компилятора.
+В секциях размещены исполняемый код, таблицы символов, инициализированные данные.
+Линковщик объединяет секции из различных единиц трансляции в сегменты.
+
 Вполне валидным может быть файл, где сегмент содержит данные, не размеченные как какая-либо секция.
 
 ## Базовый уровень
 
 В модуле
-[`Data.Elf.Headers`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html)
+[`Data.Elf.Headers`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html)
 реализованы разбор и сериализация заголовка файла ELF и
 элементов таблиц секций и сегментов.  Для различения 64- и 32-битных структур 
 определён тип
-[`ElfClass`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#t:ElfClass)
+[`ElfClass`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:ElfClass)
 
 ``` Haskell
 data ElfClass
@@ -54,7 +57,7 @@ data ElfClass
 
 Некоторые поля заголовка и элементов таблиц секций и сегментов имеют разную ширину в битах, зависящую от
 `ElfClass`, поэтому нужен тип
-[`WordXX a`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#t:WordXX),
+[`WordXX a`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:WordXX),
 который был позаимствован из пакета `data-elf`:
 
 ``` Haskell
@@ -90,7 +93,7 @@ instance IsElfClass 'ELFCLASS64 where
 ```
 
 Заголовок файла ELF представлен с помощью типа
-[`HeaderXX a`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#t:HeaderXX):
+[`HeaderXX a`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:HeaderXX):
 
 ``` Haskell
 -- | Parsed ELF header
@@ -114,9 +117,8 @@ data HeaderXX c =
         }
 ```
 
-Но это разные типы для 64- и 32-битных форматов.
 Для однообразной работы с форматами с разной шириной слова определён тип
-[`Header`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#t:Header):
+[`Header`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:Header):
 
 ``` Haskell
 -- | Sigma type where `ElfClass` defines the type of `HeaderXX`
@@ -124,14 +126,13 @@ type Header = Sigma ElfClass (TyCon1 HeaderXX)
 ```
 
 `Header` это пара, первый элемент которой -- объект типа `ElfClass`, определяющий ширину слова,
-второй -- `HeaderXX`, параметризованный первым элементом ($\Sigma$-тип из языков с зависимыми типами).
-Для симуляции $\Sigma$-типов использована библиотека `singletons`
+второй -- `HeaderXX`, параметризованный первым элементом (Σ-тип из языков с зависимыми типами).
+Для симуляции Σ-типов использована библиотека `singletons`
 ([Hackage](https://hackage.haskell.org/package/singletons),
  ["Introduction to singletons"](https://blog.jle.im/entry/introduction-to-singletons-1.html)).
 
-Для `Header` определён экземпляр класса
+`Header` является экземпляром класса
 [`Binary`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary.html#t:Binary).
-
 Таким образом, имея ленивую строку байт, содержащую достаточно длинный начальный отрезок файла ELF,
 можно получить заголовок этого файла, например, следующей функцией:
 
@@ -148,9 +149,10 @@ withHeader bs f =
 Здесь
 [`decodeOrFail`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary.html#v:decodeOrFail) определена в пакете
 [`binary`](https://hackage.haskell.org/package/binary), а
-[`withElfClass`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#v:withElfClass)
-похожа на
-[`withSing`](https://hackage.haskell.org/package/singletons-3.0.1/docs/Data-Singletons.html#v:withSing):
+[`withElfClass`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#v:withElfClass)
+делает явный аргумент, определяющий размер слова, неявным (constraint).
+Функция похожа на
+[`withSingI`](https://hackage.haskell.org/package/singletons-3.0.1/docs/Data-Singletons.html#v:withSingI):
 
 ``` Haskell
 -- | Convenience function for creating a
@@ -161,23 +163,23 @@ withElfClass SELFCLASS32 x = x
 ```
 
 В `Data.Elf.Headers` определены также типы
-[`SectionXX`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#t:SectionXX),
-[`SegmentXX`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#t:SegmentXX) и
-[`SymbolXX`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf-Headers.html#t:SymbolXX)
+[`SectionXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:SectionXX),
+[`SegmentXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:SegmentXX) и
+[`SymbolXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:SymbolXX)
 для элементов таблиц секций, сегментов и символов.
 
 ## Верхний уровень
 
 В модуле
-[`Data.Elf`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf.html)
+[`Data.Elf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html)
 реализованы полные разбор и сериализация файлов формата ELF.
 Чтобы разобрать такой файл читаются заголовок ELF, таблицa секций и таблица сегментов и
 на основании этой информации создаётся список элементов типа
-[`ElfXX`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf.html#t:ElfXX),
+[`ElfXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#t:ElfXX),
 отображающий рекурсивную
 структуру файла ELF.  Кроме восстановления структуры в процессе разбора, например, по номерам
 секций восстанавливаются их имена.  В результате получается объект типа
-[`Elf`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf.html#t:Elf):
+[`Elf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#t:Elf):
 
 ``` Haskell
 -- | `Elf` is a forrest of trees of type `ElfXX`.
@@ -246,10 +248,10 @@ data ElfXX (c :: ElfClass)
 Не каждый объект такого типа может быть сериализован.
 
   * В конструкторе `ElfSection`
-остался номер секции.  Он нужен, так как таблица символов и некоторые другие структуры
-ссылаются на секци по их номерам.  Поэтому при построении объекта такого типа нужно убедиться,
-что секции пронумерованы корректно, т. е. последовательными целыми от 1 до количества секций.
-Секция с номером 0 всегда пустая и она добавляется автоматически.
+    остался номер секции.  Он нужен, так как таблица символов и некоторые другие структуры
+    ссылаются на секци по их номерам.  Поэтому при построении объекта такого типа нужно убедиться,
+    что секции пронумерованы корректно, т. е. последовательными целыми числами от 1 до количества секций.
+    Секция с номером 0 всегда пустая, она добавляется автоматически.
 
   * В структуре должен быть единственный `ElfHeader`, он должен быть самым первым непустым
     узлом в дереве.
@@ -257,12 +259,12 @@ data ElfXX (c :: ElfClass)
   * Если есть хотя бы один узел `ElfSection`, то должен присутсвовать в точности один узел `ElfSectionTable`
     и в точности одна секция, поле `esData` которой равно `ElfSectionDataStringTable` (таблица строк для имён секций).
 
-  * Если есть хотя бы один узел с конструктором `ElfSegment`, то должен присутсвовать в точности один узел `ElfSegmentTable`.
+  * Если есть хотя бы один узел `ElfSegment`, то должен присутсвовать в точности один узел `ElfSegmentTable`.
 
 Корректно сформированный объект можно сериализовать с помощью функции
-[`serializeElf`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf.html#v:serializeElf)
+[`serializeElf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:serializeElf)
 и разобрать с помощью функции
-[`parseElf`](https://hackage.haskell.org/package/melf-1.0.0/docs/Data-Elf.html#v:parseElf):
+[`parseElf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:parseElf):
 
 ``` Haskell
 serializeElf :: MonadThrow m => Elf -> m ByteString
@@ -270,27 +272,18 @@ parseElf :: MonadCatch m => ByteString -> m Elf
 ```
 
 Экземпляр класса `Binary` для `ELF` не определён, так как
-[`Put`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary.html#t:Put)
+[`PutM`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary-Put.html#t:PutM)
 не является экземпляром класса `MonadFail`.
 
 ## Ассемблер как EDSL для Хаскела
 
 Для использования в демонстрационных приложениях написан модуль, 
 генерирующий машинный код для AArch64
-(файл [`AsmAarch64.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.0/examples/AsmAarch64.hs)).
+(файл [`AsmAArch64.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/AsmAArch64.hs)).
 Сгенерированный код использует системные вызовы чтобы вывести на стандартный вывод "Hello World!" и завершить приложение.
 Идея позаимствована из вдохновляющей статьи Стивена Дила "От монад к машинному коду"
 ([Stephen Diehl "Monads to Machine Code"](https://www.stephendiehl.com/posts/monads_machine_code.html)).
 Так же как в статье, используется монада состояния, в нашем случае `CodeState`.
-
-Инициализированные, в частности, константные данные часто размещаются в отдельных секциях.
-В нашем случае для константной строки использованы массивы литералов (literal pools).
-При этом данные размещаются в той же секции, что и машинный код, в месте,
-недоступном потоку исполнения, например, после команды возвращения из подпрограммы.
-При этом оказывается легко обращаться к таким данным с помощью команд,
-вычисляющих адрес данных с использованием счётчика команд.
-Код, обращающийся к таким данным, не требует использования таблицы перемещений.
-`CodeState` содержит размер массива литералов, сам массив литералов, массив машинных кодов и массив символов:
 
 ``` Haskell
 data CodeState = CodeState
@@ -300,6 +293,14 @@ data CodeState = CodeState
     , symbolsRefersed :: [(String, RelativeRef)]
     }
 ```
+
+`CodeState` содержит размер массива литералов, сам массив литералов,
+массив машинных кодов и массив символов.
+
+Массив литералов (literal pools) это участок секции в которой расположен
+исполняемый код, используемый для хранения константных данных.
+К таким данным легко обращаться с помощью команд,
+вычисляющих адрес данных с использованием счётчика команд.
 
 Для создания меток и ссылок на данные в массиве литералов введён тип `RelativeRef`
 
@@ -323,8 +324,9 @@ label = gets (CodeRef . (* instructionSize)
 ```
 
 Конструктор `PoolRef` хранит смещение данных от начала массива литералов.
+Он используется для создания `CodeOffset` в функции `emitPool` (см. ниже).
 
-Фактически в массиве машинных кодов хранятся функции для генерации машинного кода
+В массиве машинных кодов хранятся функции для генерации машинного кода
 из смещения команды от начала секции и смещения массива литералов (которое будет
 известно только после обработки всех ассемблерных команд, так как массив литералов
 располагается после кода):
@@ -356,7 +358,7 @@ svc :: MonadState CodeState m => Word16 -> m ()
 svc imm = emit $ 0xd4000001 .|. (fromIntegral imm `shift` 5)
 ```
 
-Как и многие другие команды архитектуры AArch64, команда `mov` может работать с регистрами
+Многие команды архитектуры AArch64 могут работать с регистрами
 как с 64-битными или как с 32-битными значениями.
 Для указания разрядности регистров для них используются разные имена:
 `x0`, `x1`... -- для 64-битных, `w0`, `w1`... -- для 32-битных.
@@ -415,7 +417,7 @@ ascii :: MonadState CodeState m => String -> m RelativeRef
 ascii s = emitPool 1 $ BSLC.pack s
 ```
 
-Кроме того, есть массив символов.  Символы создаются из меток:
+Символы создаются из меток:
 
 ``` Haskell
 exportSymbol :: MonadState CodeState m => String -> RelativeRef -> m ()
@@ -425,46 +427,18 @@ exportSymbol s r = modify f where
                                    }
 ```
 
-Функция `assemble` генерирует код из `CodeState`:
+Используя таким образом определённые примитивы можно написать код
+для вывода "Hello World!" на встроенном в Хаскел DSL
+([файл `HelloWorld.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/HelloWorld.hs)):
 
 ``` Haskell
-assemble :: MonadCatch m =>
-         ElfSectionIndex ->
-   StateT CodeState m () -> m (BSL.ByteString, [ElfSymbolXX 'ELFCLASS64])
-```
-
-Первый аргумент -- номер секции, которая будет содержать код,
-второй -- программа, которую нужно преобразовать в код.
-Функция возвращает пару, первый элемент которой -- содержание
-секции ".text", второй -- таблица символов.
-
-Для простоты не реализовано обращение к внешним символам и размещение данных в
-отдельных секциях.
-Всё это требует реализации таблиц перемещений, с другой стороры, сгенерированный код
-получается позиционно-независимым.
-
-Код для вывода "Hello World!" на встроенном в Хаскелл DSL выглядит так
-([файл `HelloWordl.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.0/examples/HelloWorld.hs)):
-
-``` Haskell
-{-# LANGUAGE DataKinds #-}
-
-module HelloWorld (helloWorld) where
-
-import Prelude as P
-
-import Control.Monad.Catch
-import Control.Monad.State
-import Data.Word
-
-import AsmAarch64
-
 msg :: String
 msg = "Hello World!\n"
 
-sys_exit, sys_write :: Word16
-sys_write = 64
-sys_exit = 93
+-- | syscalls
+sysExit, sysWrite :: Word16
+sysWrite = 64
+sysExit = 93
 
 helloWorld :: MonadCatch m => StateT CodeState m ()
 helloWorld = do
@@ -475,52 +449,36 @@ helloWorld = do
     helloString <- ascii msg
     adr x1 helloString
     mov x2 $ fromIntegral $ P.length msg
-    mov x8 sys_write
+    mov x8 sysWrite
     svc 0
 
     mov x0 0
-    mov x8 sys_exit
+    mov x8 sysExit
     svc 0
 ```
 Если нужно сослаться на метку, сформированную ниже по коду, нужно работать в монаде `MonadFix`
 и использовать ключевое слово `mdo` вместо `do`
-(см. файл [`ForwardLabel.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.0/examples/ForwardLabel.hs)).
+(см. файл [`ForwardLabel.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/ForwardLabel.hs)).
 
 ## Генерация объектных файлов
 
-Используем библиотеку `melf` для генерации объектных файлов
-([файл `MkObj.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.0/examples/MkObj.hs)):
+Функция `assemble`
+(см. [`AsmAArch64.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/AsmAArch64.hs))
+транслирует код на встроенном в Хаскел ассемблере в машинные коды и возвращает объект типа `Elf`:
 
 ``` Haskell
-{-# LANGUAGE DataKinds #-}
+assemble :: MonadCatch m => StateT CodeState m () -> m Elf
+```
 
-module MkObj (mkObj) where
+Она запускает переданную в качестве аргумента монаду `State`, представляющую ассемблерный код.
+Конечное состояние этой монады содержит всю информацию о содержимом секции, которая будет содержать код
+(секция с именем `.text`), и таблицы символов,
+a этого достаточно чтобы сгенерировать объектный файл.
+На содержимое секции `.text` ссылается имя `txt`,
+на содержимое таблицы символов -- имя `symbolTableData`,
+на содержимое таблицы строк, связанной с таблицей символов -- имя `stringTableData`:
 
-import Prelude as P
-
-import Control.Monad.Catch
-import Control.Monad.State
-import Data.Bits
-import Data.Singletons.Sigma
-
-import Data.Elf
-import Data.Elf.Constants
-import Data.Elf.Headers
-
-import AsmAarch64
-
-textSecN, shstrtabSecN, strtabSecN, symtabSecN :: ElfSectionIndex
-textSecN     = 1
-shstrtabSecN = 2
-strtabSecN   = 3
-symtabSecN   = 4
-
-mkObj :: MonadCatch m => StateT CodeState m () -> m Elf
-mkObj m = do
-
-    (txt, symbolTable) <- assemble textSecN m
-    (symbolTableData, stringTableData) <- serializeSymbolTable ELFDATA2LSB symbolTable
-
+``` Haskell
     return $ SELFCLASS64 :&: ElfList
         [ ElfHeader
             { ehData       = ELFDATA2LSB
@@ -583,27 +541,31 @@ mkObj m = do
         ]
 ```
 
+Здесь имена с суффиксом `SecN` (`textSecN`, `shstrtabSecN`, `symtabSecN`, `strtabSecN`) -- предопределённые
+номера секций, удовлетворяющие сформулированным выше условиям.
+
+Для простоты не реализовано обращение ко внешним символам и размещение данных в
+отдельных секциях.
+Всё это требует реализации таблиц перемещений, с другой стороны, сгенерированный код
+получается позиционно-независимым.
+
 Сгенерируем с помощью этого модуля объектный файл и попробуем его слинковать:
 
 ```
 [nix-shell:examples]$ ghci 
-GHCi, version 8.10.4: https://www.haskell.org/ghc/  :? for help
-Prelude> :l MkObj.hs HelloWorld.hs
-[1 of 3] Compiling AsmAarch64       ( AsmAarch64.hs, interpreted )
-[2 of 3] Compiling HelloWorld       ( HelloWorld.hs, interpreted )
-[3 of 3] Compiling MkObj            ( MkObj.hs, interpreted )
-Ok, three modules loaded.
-*MkObj> import MkObj 
-*MkObj MkObj> import HelloWorld 
-*MkObj MkObj HelloWorld> elf <- mkObj helloWorld
-*MkObj MkObj HelloWorld> import Data.Elf
-*MkObj MkObj HelloWorld Data.Elf> bs <- serializeElf elf
-*MkObj MkObj HelloWorld Data.Elf> import Data.ByteString.Lazy as BSL
-*MkObj MkObj HelloWorld Data.Elf BSL> BSL.writeFile "hello.o" bs
-*MkObj MkObj HelloWorld Data.Elf BSL> 
+GHCi, version 8.10.7: https://www.haskell.org/ghc/  :? for help
+Prelude> :l AsmAArch64.hs HelloWorld.hs 
+[1 of 2] Compiling AsmAArch64       ( AsmAArch64.hs, interpreted )
+[2 of 2] Compiling HelloWorld       ( HelloWorld.hs, interpreted )
+Ok, two modules loaded.
+*AsmAArch64> import HelloWorld
+*AsmAArch64 HelloWorld> elf <- assemble helloWorld
+*AsmAArch64 HelloWorld> bs <- serializeElf elf
+*AsmAArch64 HelloWorld> BSL.writeFile "helloWorld.o" bs
+*AsmAArch64 HelloWorld> 
 Leaving GHCi.
 
-[nix-shell:examples]$ aarch64-unknown-linux-gnu-gcc -nostdlib hello.o -o hello 
+[nix-shell:examples]$ aarch64-unknown-linux-gnu-gcc -nostdlib helloWorld.o -o helloWorld
 
 [nix-shell:examples]$ 
 ```
@@ -612,7 +574,7 @@ Leaving GHCi.
 Попробуем запустить результат:
 
 ```
-[nix-shell:examples]$ qemu-aarch64 hello
+[nix-shell:examples]$ qemu-aarch64 helloWorld
 Hello World!
 
 [nix-shell:examples]$ 
@@ -622,85 +584,102 @@ Hello World!
 
 ## Генерация исполняемых файлов
 
-Так как сгенерированный код для распечатки "Hello World!" является позиционно-независимым
-и не ссылается на другие секции, то его можно без изменений использовать для получения
-исполняемого файла
-([файл `MkExe.hs`](https://github.com/aleksey-makarov/melf/blob/v1.0.0/examples/MkExe.hs)):
+Код из модуля
+[`DummyLd`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/DummyLd.hs)
+использует секцию `.text` объектного файла для того чтобы создать исполняемый файл.
+Перемещение кода и разрешение символов не реализовано, поэтому такая процедура сработает только
+с позиционно-независимым кодом, не ссылающимся на посторонние единицы трансляции,
+например, с кодом, который описан в предыдущем разделе.
+
+Функция `dummyLd` принимает объект типа `Elf`, ищет в нём секцию `.text`
+(функцией [`elfFindSectionByName`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:elfFindSectionByName))
+и заголовок ELF
+(функцией [`elfFindHeader`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:elfFindHeader)).
+Тип заголовка меняется на `ET_EXEC`, прописывается адрес, по которому будет располагаться
+первая инструкция кода и формируется сегмент, в который помещается заголовок и содежимое `.text`:
 
 ``` Haskell
-module MkExe (mkExe) where
+data MachineConfig (a :: ElfClass)
+    = MachineConfig
+        { mcAddress :: WordXX a -- ^ Virtual address of the executable segment
+        , mcAlign   :: WordXX a -- ^ Required alignment of the executable segment
+                                --   in physical memory (depends on max page size)
+        }
 
-import Control.Monad.Catch
-import Control.Monad.State
-import Data.Bits
-import Data.Word
-import Data.Singletons.Sigma
+getMachineConfig :: (IsElfClass a, MonadThrow m) => ElfMachine -> m (MachineConfig a)
+getMachineConfig EM_AARCH64 = return $ MachineConfig 0x400000 0x10000
+getMachineConfig EM_X86_64  = return $ MachineConfig 0x400000 0x1000
+getMachineConfig _          = $chainedError "could not find machine config for this arch"
 
-import Data.Elf
-import Data.Elf.Constants
-import Data.Elf.Headers
+dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfList a -> m (ElfList a)
+dummyLd' (ElfList es) = do
 
-import AsmAarch64
+    txtSection <- elfFindSectionByName es ".text"
+    txtSectionData <- case txtSection of
+        ElfSection { esData = ElfSectionData textData } -> return textData
+        _ -> $chainedError "could not find correct \".text\" section"
 
-addr :: Word64
-addr = 0x400000
-
-mkExe :: MonadCatch m => StateT CodeState m () -> m Elf
-mkExe m = do
-    (txt, _) <- assemble 1 m
-    let
-        segment = ElfSegment
-            { epType       = PT_LOAD
-            , epFlags      = PF_X .|. PF_R
-            , epVirtAddr   = addr
-            , epPhysAddr   = addr
-            , epAddMemSize = 0
-            , epAlign      = 0x10000
-            , epData       =
-                [ ElfHeader
-                    { ehData       = ELFDATA2LSB
-                    , ehOSABI      = ELFOSABI_SYSV
-                    , ehABIVersion = 0
-                    , ehType       = ET_EXEC
-                    , ehMachine    = EM_AARCH64
-                    , ehEntry      = addr + headerSize ELFCLASS64
-                    , ehFlags      = 0
-                    }
-                , ElfRawData
-                    { edData = txt
+    header <- elfFindHeader es
+    case header of
+        ElfHeader { .. } -> do
+            MachineConfig { .. } <- getMachineConfig ehMachine
+            return $ ElfList
+                [ ElfSegment
+                    { epType       = PT_LOAD
+                    , epFlags      = PF_X .|. PF_R
+                    , epVirtAddr   = mcAddress
+                    , epPhysAddr   = mcAddress
+                    , epAddMemSize = 0
+                    , epAlign      = mcAlign
+                    , epData       =
+                        [ ElfHeader
+                            { ehType  = ET_EXEC
+                            , ehEntry = mcAddress + headerSize (fromSing $ sing @a)
+                            , ..
+                            }
+                        , ElfRawData
+                            { edData = txtSectionData
+                            }
+                        ]
                     }
                 , ElfSegmentTable
                 ]
-            }
-    return $ SELFCLASS64 :&: ElfList [ segment ]
+        _ -> $chainedError "could not find ELF header"
+
+-- | @dummyLd@ places the content of ".text" section of the input ELF
+-- into the loadable segment of the resulting ELF.
+-- This could work if there are no relocations or references to external symbols.
+dummyLd :: MonadThrow m => Elf -> m Elf
+dummyLd (c :&: l) = (c :&:) <$> withElfClass c dummyLd' l
 ```
 
-Попробуем его сгенерировать и запустить:
+Попробуем использовать этот код для получения исполняемого файла без участия линковщика GNU:
 
 ```
-[nix-shell:examples]$ ghci 
-GHCi, version 8.10.4: https://www.haskell.org/ghc/  :? for help
-Prelude> :l MkExe.hs HelloWorld.hs
-[1 of 3] Compiling AsmAarch64       ( AsmAarch64.hs, interpreted )
-[2 of 3] Compiling HelloWorld       ( HelloWorld.hs, interpreted )
-[3 of 3] Compiling MkExe            ( MkExe.hs, interpreted )
-Ok, three modules loaded.
-*MkExe> import MkExe
-*MkExe MkExe> import HelloWorld
-*MkExe MkExe HelloWorld> elf <- mkExe helloWorld 
-*MkExe MkExe HelloWorld> import Data.Elf
-*MkExe MkExe HelloWorld Data.Elf> bs <- serializeElf elf
-*MkExe MkExe HelloWorld Data.Elf> import Data.ByteString.Lazy as BSL
-*MkExe MkExe HelloWorld Data.Elf BSL> BSL.writeFile "hellox" bs
-*MkExe MkExe HelloWorld Data.Elf BSL> 
+[nix-shell:examples]$ ghci
+GHCi, version 8.10.7: https://www.haskell.org/ghc/  :? for help
+Prelude> :l DummyLd.hs
+[1 of 1] Compiling DummyLd          ( DummyLd.hs, interpreted )
+Ok, one module loaded.
+*DummyLd> import Data.ByteString.Lazy as BSL
+*DummyLd BSL> i <- BSL.readFile "helloWorld.o"
+*DummyLd BSL> elf <- parseElf i
+*DummyLd BSL> elf' <- dummyLd elf
+*DummyLd BSL> o <- serializeElf elf'
+*DummyLd BSL> BSL.writeFile "helloWorld2" o
+*DummyLd BSL> 
 Leaving GHCi.
 
-[nix-shell:examples]$ chmod +x hellox
+[nix-shell:examples]$ chmod +x helloWorld2
 
-[nix-shell:examples]$ qemu-aarch64 hellox
+[nix-shell:examples]$ qemu-aarch64 helloWorld2
 Hello World!
 
 [nix-shell:examples]$ 
 ```
 
 Работает.
+
+## Заключение
+
+В статье даны примеры использования библиотеки `melf` и показано, как может быть определён встроенный в Хаскел DSL для генерации машинного кода.
