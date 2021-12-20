@@ -1,21 +1,28 @@
 PREFIX = aarch64-unknown-linux-gnu-
 CFLAGS = -Wall
 CC = $(PREFIX)gcc
+OBJDUMP=$(PREFIX)objdump
 
-EXECS   = helloWorldObj test
 DOCS    = README_ru.html
-SHOW    = forwardLabelExe helloWorldExe helloWorldObj.o test
+OBJS    = helloWorldObj test test.o test.x86 test.x86.o
+SHOW    = forwardLabelExe helloWorldExe helloWorldObj.o test test.x86
 DISASMS = $(addsuffix .dis,    $(SHOW))
 LAYOUTS = $(addsuffix .layout, $(SHOW))
 DUMPS   = $(addsuffix .dump,   $(SHOW))
-BUILD   = $(EXECS) $(DOCS) $(DISASMS) $(LAYOUTS) $(DUMPS)
+BUILD   = $(OBJS) $(DOCS) $(DISASMS) $(LAYOUTS) $(DUMPS)
 
 all : $(BUILD)
 
-$(EXECS) : LDFLAGS += -nostdlib
+forwardLabelExe helloWorldExe helloWorldObj.o :
+	$(error "for forwardLabelExe helloWorldExe and helloWorldObj.o run tests")
+
+$(OBJS) : LDFLAGS += -nostdlib
+
+%.x86 : CC=gcc
+%.x86.dis : OBJDUMP=objdump
 
 %.dis : %
-	$(PREFIX)objdump -D $< > $@
+	$(OBJDUMP) -D $< > $@
 
 %.layout : %
 	hobjlayout $< > $@

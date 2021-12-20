@@ -19,7 +19,7 @@ segment {
         raw data {
             Data: 20 00 80 d2 e1 00 00 10 a2 01 80 d2 08 08 80 d2 #  ...............
                   01 00 00 d4 00 00 80 d2 a8 0b 80 d2 01 00 00 d4 # ................
-                  48 65 6c 6c 6f 20 57 6f 72 6c 64 21 0a 00 00 00 # Hello World!....
+                  48 65 6c 6c 6f 20 57 6f 72 6c 64 21 0a          # Hello World!.
         }
-        segment table
 }
+segment table

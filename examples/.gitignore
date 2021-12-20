@@ -2,6 +2,3 @@
 *.dump
 *.layout
 *.o
-libc
-syscall
-syscallc

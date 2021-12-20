@@ -1,14 +1,16 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module DummyLd (dummyLd) where
 
 import Control.Monad.Catch
 import Data.Bits
-import Data.ByteString.Lazy as BSL
-import Data.Word
+import Data.Singletons
 import Data.Singletons.Sigma
 
 import Data.Elf
@@ -16,48 +18,55 @@ import Data.Elf.Constants
 import Data.Elf.Headers
 import Control.Exception.ChainedException
 
-addr :: Word64
-addr = 0x400000
+data MachineConfig (a :: ElfClass)
+    = MachineConfig
+        { mcAddress :: WordXX a -- ^ Virtual address of the executable segment
+        , mcAlign   :: WordXX a -- ^ Required alignment of the executable segment
+                                --   in physical memory (depends on max page size)
+        }
 
-mkExe :: MonadThrow m => BSL.ByteString -> m (ElfList 'ELFCLASS64)
-mkExe txt = return $ ElfList [ segment ]
-    where
-        segment = ElfSegment
-            { epType       = PT_LOAD
-            , epFlags      = PF_X .|. PF_R
-            , epVirtAddr   = addr
-            , epPhysAddr   = addr
-            , epAddMemSize = 0
-            , epAlign      = 0x10000
-            , epData       =
-                [ ElfHeader
-                    { ehData       = ELFDATA2LSB
-                    , ehOSABI      = ELFOSABI_SYSV
-                    , ehABIVersion = 0
-                    , ehType       = ET_EXEC
-                    , ehMachine    = EM_AARCH64
-                    , ehEntry      = addr + headerSize ELFCLASS64
-                    , ehFlags      = 0
-                    }
-                , ElfRawData
-                    { edData = txt
-                    }
-                , ElfSegmentTable
-                ]
-            }
+getMachineConfig :: (IsElfClass a, MonadThrow m) => ElfMachine -> m (MachineConfig a)
+getMachineConfig EM_AARCH64 = return $ MachineConfig 0x400000 0x10000
+getMachineConfig EM_X86_64  = return $ MachineConfig 0x400000 0x1000
+getMachineConfig _          = $chainedError "could not find machine config for this arch"
 
-dummyLd' :: MonadThrow m => ElfList 'ELFCLASS64 -> m (ElfList 'ELFCLASS64)
+dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfList a -> m (ElfList a)
 dummyLd' (ElfList es) = do
 
     txtSection <- elfFindSectionByName es ".text"
-
-    case txtSection of
-        ElfSection{esData = ElfSectionData textData} -> mkExe textData
+    txtSectionData <- case txtSection of
+        ElfSection { esData = ElfSectionData textData } -> return textData
         _ -> $chainedError "could not find correct \".text\" section"
 
--- | It places the content of ".text" section of the input ELF into the
---   loadable segment of the resulting ELF.
---   It could work if there are no relocations or references to external symbols
+    header <- elfFindHeader es
+    case header of
+        ElfHeader { .. } -> do
+            MachineConfig { .. } <- getMachineConfig ehMachine
+            return $ ElfList
+                [ ElfSegment
+                    { epType       = PT_LOAD
+                    , epFlags      = PF_X .|. PF_R
+                    , epVirtAddr   = mcAddress
+                    , epPhysAddr   = mcAddress
+                    , epAddMemSize = 0
+                    , epAlign      = mcAlign
+                    , epData       =
+                        [ ElfHeader
+                            { ehType  = ET_EXEC
+                            , ehEntry = mcAddress + headerSize (fromSing $ sing @a)
+                            , ..
+                            }
+                        , ElfRawData
+                            { edData = txtSectionData
+                            }
+                        ]
+                    }
+                , ElfSegmentTable
+                ]
+        _ -> $chainedError "could not find ELF header"
+
+-- | @dummyLd@ places the content of ".text" section of the input ELF
+-- into the loadable segment of the resulting ELF.
+-- This could work if there are no relocations or references to external symbols.
 dummyLd :: MonadThrow m => Elf -> m Elf
-dummyLd (SELFCLASS32 :&: _)  = $chainedError "AArch64 arch object expected"
-dummyLd (SELFCLASS64 :&: es) = (SELFCLASS64 :&:) <$> dummyLd' es
+dummyLd (c :&: l) = (c :&:) <$> withElfClass c dummyLd' l
