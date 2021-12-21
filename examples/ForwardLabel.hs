@@ -8,6 +8,7 @@ import Prelude as P
 import Control.Monad.Catch
 import Control.Monad.Fix
 import Control.Monad.State
+import Data.Word
 
 import AsmAArch64
 
@@ -16,6 +17,11 @@ ok = "ok\n"
 
 bad :: String
 bad = "bad\n"
+
+-- | syscalls
+sysExit, sysWrite :: Word16
+sysWrite = 64
+sysExit = 93
 
 forwardLabel :: (MonadCatch m, MonadFix m) => StateT CodeState m ()
 forwardLabel = mdo
@@ -37,9 +43,9 @@ forwardLabel = mdo
 
     skipBad <- label
 
-    mov x8 64
+    mov x8 sysWrite
     svc 0
 
     mov x0 0
-    mov x8 93
+    mov x8 sysExit
     svc 0

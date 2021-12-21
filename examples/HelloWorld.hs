@@ -13,9 +13,10 @@ import AsmAArch64
 msg :: String
 msg = "Hello World!\n"
 
-sys_exit, sys_write :: Word16
-sys_write = 64
-sys_exit = 93
+-- | syscalls
+sysExit, sysWrite :: Word16
+sysWrite = 64
+sysExit = 93
 
 helloWorld :: MonadCatch m => StateT CodeState m ()
 helloWorld = do
@@ -26,9 +27,9 @@ helloWorld = do
     helloString <- ascii msg
     adr x1 helloString
     mov x2 $ fromIntegral $ P.length msg
-    mov x8 sys_write
+    mov x8 sysWrite
     svc 0
 
     mov x0 0
-    mov x8 sys_exit
+    mov x8 sysExit
     svc 0
