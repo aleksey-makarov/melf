@@ -4,23 +4,6 @@
 > Executable and Linkable Format ([ELF](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format))
 > files.
 
-## Internal sturcture of an ELF file
-
-First few bytes constitute an ELF header.
-In particular it specifies where section table and segment table are located.
-
-Sections and segments are countinuous fragments of file.
-Segments describe what should be placed into the memory in the proces of program loading.
-Sections could be described as an undivisible unit of compiler work.
-Executable code, symbol and relocation tables, initialized data are placed into separate sections.
-
-An ELF file could be conceived as a list of trees.
-A tree is a section, segment, file header, section or segment table.
-Subtrees are contained only in segments.
-The nodes of those trees are aligned in the file, for example, segments are usually aligned by page size,
-data sections -- by word size.
-There also could be files where a segment contains some data that is not marked as a section.
-
 ## Parsing the header and table entries
 
 Module
@@ -48,7 +31,6 @@ was borrowed from the `data-elf` package:
 -- | @IsElfClass a@ is defined for each constructor of `ElfClass`.
 --   It defines @WordXX a@, which is `Word32` for `ELFCLASS32`
 --   and `Word64` for `ELFCLASS64`.
-type IsElfClass :: ElfClass -> Constraint
 class ( SingI c
       , Typeable c
       , Typeable (WordXX c)
@@ -139,11 +121,11 @@ withHeader bs f =
 
 The function
 [`decodeOrFail`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary.html#v:decodeOrFail)
-is defined int the package
+is defined in the package
 [`binary`](https://hackage.haskell.org/package/binary).
 The function
 [`withElfClass`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#v:withElfClass)
-creates a context with an implicit word width available and is like
+creates a context with an implicit word width available and looks like
 [`withSingI`](https://hackage.haskell.org/package/singletons-3.0.1/docs/Data-Singletons.html#v:withSingI):
 
 
@@ -244,9 +226,9 @@ Not each object of that type can be serialized.
     It is required as the symbol table and some other structures
     refer to the sections by theirs indexes.
     So the section indexes should be consecutive integers starting from 1.
-    Section with index 0 is always empty and is appended by the library.
+    Section with index 0 is always empty and is created by the library.
 
-  * There should be a single `ElfHeader`.  It should be the first node of the tree.
+  * There should be a single `ElfHeader`.  It should be the first nonempty node of the tree.
 
   * If there exists at least one node `ElfSection` then there should exist exactly one
     node `ElfSectionTable` and exactly one section that has `ElfSectionDataStringTable` as the value
@@ -266,7 +248,7 @@ parseElf :: MonadCatch m => ByteString -> m Elf
 ```
 
 `ELF` is not an instance of the class `Binary` because
-[`Put`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary.html#t:Put)
+[`PutM`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary-Put.html#t:PutM)
 is not an instance of the class `MonadFail`.
 
 ## Generation of object files
@@ -277,7 +259,7 @@ The module
 provides a DSL embedded in Haskell.
 This DSL is a kind of assembler language for the AArch64 platform.
 It exports some primitives to generate machine instructions and organize machine code.
-It also exports function `assemble` that consumes the monad compossed of those primitives and
+It also exports function `assemble` that consumes the monad composed of those primitives and
 produces an object of the type `Elf`:
 
 ``` Haskell
@@ -372,7 +354,7 @@ particular:
   * `stringTableData` refers to the content of the string table section linked to the symbol table.
 
 Names with `SecN` suffixes (`textSecN`, `shstrtabSecN`, `symtabSecN`, `strtabSecN`)
-are predefined section numbers that confirm the conditions stated above.
+are predefined section numbers that conform to the conditions stated above.
 
 For the sake of simplicity external symbol resolution and data section allocation were not implemented.
 It requires implementation of relocation tables.  On the other hand, the resulting code
@@ -415,11 +397,11 @@ It works.
 The module
 [`DummyLd`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/DummyLd.hs)
 uses the section `.text` of object file to create an executable file.
-Code relocation and symbol resolution is not implemented to that procedure works only
+Code relocation and symbol resolution is not implemented so that procedure works only
 for position-independent code that does not refer to external translation units,
 for example, it works with the code described above.
 
-Function `dummyLd` consumes an object of the type `Elf`, finds a section `.text`
+Function `dummyLd` consumes an object of the type `Elf` and finds a section `.text`
 (using [`elfFindSectionByName`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:elfFindSectionByName))
 and header
 (using [`elfFindHeader`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:elfFindHeader))
