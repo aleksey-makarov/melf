@@ -288,7 +288,7 @@ data CodeState = CodeState
     { offsetInPool    :: CodeOffset
     , poolReversed    :: [Builder]
     , codeReversed    :: [InstructionGen]
-    , symbolsRefersed :: [(String, RelativeRef)]
+    , symbolsRefersed :: [(String, Label)]
     }
 ```
 
@@ -300,21 +300,21 @@ data CodeState = CodeState
 К таким данным легко обращаться с помощью команд,
 вычисляющих адрес данных с использованием счётчика команд.
 
-Для создания меток и ссылок на данные в массиве литералов введён тип `RelativeRef`
+Для создания меток и ссылок на данные в массиве литералов введён тип `Label`
 
 ``` Haskell
 newtype CodeOffset  = CodeOffset  { getCodeOffset  :: Int64 }
     deriving (Eq, Show, Ord, Num, Enum, Real, Integral,
     Bits, FiniteBits)
 
-data RelativeRef = CodeRef CodeOffset
-                 | PoolRef CodeOffset
+data Label = CodeRef CodeOffset
+           | PoolRef CodeOffset
 ```
 
 Конструктор `CodeRef` используется для ссылки на код (для создания меток):
 
 ``` Haskell
-label :: MonadState CodeState m => m RelativeRef
+label :: MonadState CodeState m => m Label
 label = gets (CodeRef . (* instructionSize)
                       . fromIntegral
                       . P.length
@@ -392,7 +392,7 @@ mov :: (MonadState CodeState m, SingI w) =>
 -- | C6.2.10 ADR
 adr :: MonadState CodeState m =>
                   Register 'X ->
-                  RelativeRef -> m ()
+                  Label -> m ()
 ```
 
 Для добавления данных в массив литералов используется функция `emitPool`:
@@ -400,7 +400,7 @@ adr :: MonadState CodeState m =>
 ``` Haskell
 emitPool :: MonadState CodeState m =>
                               Word ->
-                        ByteString -> m RelativeRef
+                        ByteString -> m Label
 ```
 
 Здесь первый аргумент -- необходимое выравнивание, второй -- данные, которые нужно
@@ -411,14 +411,14 @@ emitPool :: MonadState CodeState m =>
 С помощью этой функции можно, например, реализовать аналог ассемблерной директивы `.ascii`:
 
 ``` Haskell
-ascii :: MonadState CodeState m => String -> m RelativeRef
+ascii :: MonadState CodeState m => String -> m Label
 ascii s = emitPool 1 $ BSLC.pack s
 ```
 
 Символы создаются из меток:
 
 ``` Haskell
-exportSymbol :: MonadState CodeState m => String -> RelativeRef -> m ()
+exportSymbol :: MonadState CodeState m => String -> Label -> m ()
 exportSymbol s r = modify f where
     f (CodeState {..}) = CodeState { symbolsRefersed = (s, r) : symbolsRefersed
                                    , ..

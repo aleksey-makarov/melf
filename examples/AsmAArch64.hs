@@ -15,7 +15,7 @@
 module AsmAArch64
     ( CodeState
     , Register
-    , RelativeRef
+    , Label
     , adr
     , b
     , mov
@@ -56,8 +56,8 @@ newtype Register c = R Word32
 newtype CodeOffset  = CodeOffset  { getCodeOffset  :: Int64 }  deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
 newtype Instruction = Instruction { getInstruction :: Word32 } deriving (Eq, Show, Ord, Num, Enum, Real, Integral, Bits, FiniteBits)
 
-data RelativeRef = CodeRef !CodeOffset
-                 | PoolRef !CodeOffset
+data Label = CodeRef !CodeOffset
+           | PoolRef !CodeOffset
 
 -- Args:
 -- Offset of the instruction
@@ -68,7 +68,7 @@ data CodeState = CodeState
     { offsetInPool    :: CodeOffset
     , poolReversed    :: [Builder]
     , codeReversed    :: [InstructionGen]
-    , symbolsRefersed :: [(String, RelativeRef)]
+    , symbolsRefersed :: [(String, Label)]
     }
 
 emit' :: MonadState CodeState m => InstructionGen -> m ()
@@ -80,7 +80,7 @@ emit' g = modify f where
 emit :: MonadState CodeState m => Instruction -> m ()
 emit i = emit' $ \ _ _ -> Right i
 
-emitPool :: MonadState CodeState m => Word -> ByteString -> m RelativeRef
+emitPool :: MonadState CodeState m => Word -> ByteString -> m Label
 emitPool a bs = state f where
     f CodeState {..} =
         let
@@ -94,7 +94,7 @@ emitPool a bs = state f where
                         }
             )
 
-label :: MonadState CodeState m => m RelativeRef
+label :: MonadState CodeState m => m Label
 label = gets (CodeRef . (* instructionSize) . fromIntegral . P.length . codeReversed)
 
 x0, x1, x2, x8 :: Register 'X
@@ -125,7 +125,7 @@ b64 _ = case sing @ w of
     SW -> 0
 
 -- | C6.2.10 ADR
-adr :: MonadState CodeState m => Register 'X -> RelativeRef -> m ()
+adr :: MonadState CodeState m => Register 'X -> Label -> m ()
 adr (R n) rr =  emit' f where
 
     offsetToImm :: CodeOffset -> Either String Word32
@@ -147,7 +147,7 @@ adr (R n) rr =  emit' f where
                             .|. n
 
 -- | C6.2.26 B
-b :: MonadState CodeState m => RelativeRef -> m ()
+b :: MonadState CodeState m => Label -> m ()
 b rr = emit' f where
 
     offsetToImm26 :: CodeOffset -> Either String Word32
@@ -176,12 +176,12 @@ isBitN bitN w =
         h = w .&. m
     in if w >= 0 then h == 0 else h == m
 
-findOffset :: CodeOffset -> RelativeRef -> CodeOffset
+findOffset :: CodeOffset -> Label -> CodeOffset
 findOffset _poolOffset (CodeRef codeOffset)   = codeOffset
 findOffset  poolOffset (PoolRef offsetInPool) = poolOffset + offsetInPool
 
 -- | C6.2.132 LDR (literal)
-ldr :: (MonadState CodeState m, SingI w) => Register w -> RelativeRef -> m ()
+ldr :: (MonadState CodeState m, SingI w) => Register w -> Label -> m ()
 ldr r@(R n) rr = emit' f where
 
     offsetToImm19 :: CodeOffset -> Either String Word32
@@ -202,10 +202,10 @@ ldr r@(R n) rr = emit' f where
 svc :: MonadState CodeState m => Word16 -> m ()
 svc imm = emit $ 0xd4000001 .|. (fromIntegral imm `shift` 5)
 
-ascii :: MonadState CodeState m => String -> m RelativeRef
+ascii :: MonadState CodeState m => String -> m Label
 ascii s = emitPool 1 $ BSLC.pack s
 
-exportSymbol :: MonadState CodeState m => String -> RelativeRef -> m ()
+exportSymbol :: MonadState CodeState m => String -> Label -> m ()
 exportSymbol s r = modify f where
     f (CodeState {..}) = CodeState { symbolsRefersed = (s, r) : symbolsRefersed
                                    , ..
@@ -248,7 +248,7 @@ assemble m = do
     -- resolve symbolTable
 
     let
-        ff :: (String, RelativeRef) -> ElfSymbolXX 'ELFCLASS64
+        ff :: (String, Label) -> ElfSymbolXX 'ELFCLASS64
         ff (s, r) =
             let
                 steName  = s
