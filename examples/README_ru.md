@@ -175,8 +175,8 @@ withElfClass SELFCLASS32 x = x
 на основании этой информации создаётся список элементов типа
 [`ElfXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#t:ElfXX),
 отображающий рекурсивную
-структуру файла ELF.  Кроме восстановления структуры в процессе разбора, по номерам
-секций восстанавливаются их имена.  В результате получается объект типа
+структуру файла ELF.  Кроме восстановления структуры, в процессе разбора по индексам таблицы
+строк восстанавливаются имена секций.  В результате получается объект типа
 [`Elf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#t:Elf):
 
 ``` Haskell
@@ -392,7 +392,7 @@ mov :: (MonadState CodeState m, SingI w) =>
 -- | C6.2.10 ADR
 adr :: MonadState CodeState m =>
                   Register 'X ->
-                  Label -> m ()
+                        Label -> m ()
 ```
 
 Для добавления данных в массив литералов используется функция `emitPool`:

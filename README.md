@@ -255,7 +255,7 @@ is not an instance of the class `MonadFail`.
 
 To create machine code that is used in the examples a pair of modules were created.
 The module
-[`AsmAArch64`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/AsmAarch64.hs)
+[`AsmAArch64`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/AsmAArch64.hs)
 provides a DSL embedded in Haskell.
 This DSL is a kind of assembler language for the AArch64 platform.
 It exports some primitives to generate machine instructions and organize machine code.
@@ -267,7 +267,8 @@ assemble :: MonadCatch m => StateT CodeState m () -> m Elf
 ```
 
 The idea was inspired by the article
-([Stephen Diehl "Monads to Machine Code"](https://www.stephendiehl.com/posts/monads_machine_code.html)).
+["Monads to Machine Code"](https://www.stephendiehl.com/posts/monads_machine_code.html)
+by Stephen Diehl.
 Detailed description of this module is available in russian:
 [README_ru.md](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/README_ru.md).
 

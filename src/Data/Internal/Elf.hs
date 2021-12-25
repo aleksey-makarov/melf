@@ -289,6 +289,8 @@ addRBuilders newts =
     in
         addRBuilders' addRBuilderNonEmpty nonEmptyRBs [] >>= addRBuilders' addRBuilderEmpty emptyRBs
 
+-- FIXME: Use validity (https://hackage.haskell.org/package/validity) for constraints on the Elf type (???)
+
 -- | `Elf` is a forrest of trees of type `ElfXX`.
 -- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
 newtype ElfList c = ElfList [ElfXX c]
