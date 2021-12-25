@@ -1,5 +1,6 @@
 PREFIX = aarch64-unknown-linux-gnu-
 CFLAGS = -Wall
+LDFLAGS = -nostdlib
 CC = $(PREFIX)gcc
 OBJDUMP=$(PREFIX)objdump
 
@@ -16,7 +17,6 @@ all : $(BUILD)
 forwardLabelExe helloWorldExe helloWorldObj.o :
 	$(error "for forwardLabelExe helloWorldExe and helloWorldObj.o run tests")
 
-$(OBJS) : LDFLAGS += -nostdlib
 
 %.x86 : CC=gcc
 %.x86.dis : OBJDUMP=objdump
