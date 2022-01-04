@@ -158,10 +158,10 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000000
             Link:      0x00000004
-            Data:      0x000000000002f588 0x000000000001bd20 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
-                       0x000000000002f598 0x000000000001bd70 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+            Data:      0x000000000002f588 0x000000000001bd20 R_AARCH64_RELATIVE 0 ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000002f598 0x000000000001bd70 R_AARCH64_RELATIVE 0 ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                        ...
-                       0x000000000002fff8 0x0000000000000000 R_AARCH64_GLOB_DAT ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
+                       0x000000000002fff8 0x0000000000000000 R_AARCH64_GLOB_DAT 26 ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
                        total: 51
         }
         section 9 ".rela.plt" {
@@ -172,10 +172,10 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000011
             Link:      0x00000004
-            Data:      0x000000000002ff78 0x0000000000000000 R_AARCH64_JUMP_SLOT ("_dl_catch_exception" bind: STB_Global type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015880 size: 0x0000000000000088)
-                       0x000000000002ff80 0x0000000000000000 R_AARCH64_JUMP_SLOT ("malloc" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x00000000000150d8 size: 0x0000000000000124)
+            Data:      0x000000000002ff78 0x0000000000000000 R_AARCH64_JUMP_SLOT 6 ("_dl_catch_exception" bind: STB_Global type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015880 size: 0x0000000000000088)
+                       0x000000000002ff80 0x0000000000000000 R_AARCH64_JUMP_SLOT 34 ("malloc" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x00000000000150d8 size: 0x0000000000000124)
                        ...
-                       0x000000000002ffb8 0x0000000000000000 R_AARCH64_JUMP_SLOT ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
+                       0x000000000002ffb8 0x0000000000000000 R_AARCH64_JUMP_SLOT 26 ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
                        total: 9
         }
         section 10 ".plt" {

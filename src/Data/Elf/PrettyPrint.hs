@@ -365,6 +365,7 @@ printRelocationTableA_AARCH64 full sLink elfs bs = do
             return $  printWord64 relaOffset
                   <+> printWord64 relaAddend
                   <+> viaShow (ElfRelocationType_AARCH64 relaType)
+                  <+> viaShow relaSym
                   <+> printElfSymbolTableEntryLine symbolTableEntry
 
         split xs = if full then xs else

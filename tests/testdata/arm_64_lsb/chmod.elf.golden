@@ -181,10 +181,10 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000000
             Link:      0x00000005
-            Data:      0x000000000001e808 0x0000000000002f10 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
-                       0x000000000001e810 0x0000000000002ec8 R_AARCH64_RELATIVE ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+            Data:      0x000000000001e808 0x0000000000002f10 R_AARCH64_RELATIVE 0 ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000001e810 0x0000000000002ec8 R_AARCH64_RELATIVE 0 ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                        ...
-                       0x000000000001eff8 0x0000000000000000 R_AARCH64_GLOB_DAT ("__fxstatat" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000001eff8 0x0000000000000000 R_AARCH64_GLOB_DAT 75 ("__fxstatat" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                        total: 165
         }
         section 10 ".rela.plt" {
@@ -195,9 +195,9 @@ segment {
             EntSize:   0x0000000000000018
             Info:      0x00000016
             Link:      0x00000005
-            Data:      0x000000000001ebe8 0x0000000000000000 R_AARCH64_JUMP_SLOT ("__libc_start_main" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
-                       0x000000000001ebf0 0x0000000000000000 R_AARCH64_JUMP_SLOT ("__gmon_start__" bind: STB_Weak type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
-                       0x000000000001ebf8 0x0000000000000000 R_AARCH64_JUMP_SLOT ("abort" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+            Data:      0x000000000001ebe8 0x0000000000000000 R_AARCH64_JUMP_SLOT 29 ("__libc_start_main" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000001ebf0 0x0000000000000000 R_AARCH64_JUMP_SLOT 41 ("__gmon_start__" bind: STB_Weak type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
+                       0x000000000001ebf8 0x0000000000000000 R_AARCH64_JUMP_SLOT 44 ("abort" bind: STB_Global type: STT_Func sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
         }
         section 11 ".init" {
             Type:      SHT_PROGBITS
