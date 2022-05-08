@@ -60,7 +60,7 @@ segmentInterval SegmentXX{..} = I pOffset pFileSize
 -- | @RBuilder@ is an intermediate internal data type that is used by parser.
 -- It contains information about layout of the ELF file that can be used
 -- by `Data.Elf.PrettyPrint.printLayout`
-data RBuilder (c :: ElfClass)
+data RBuilder c
     = RBuilderHeader
         { rbhHeader :: HeaderXX c
         }
@@ -301,7 +301,7 @@ data ElfSectionData
     | ElfSectionDataStringTable     -- ^ Section data will be generated from section names
 
 -- | The type of node that defines Elf structure.
-data ElfXX (c :: ElfClass)
+data ElfXX c
     = ElfHeader
         { ehData       :: ElfData    -- ^ Data encoding (big- or little-endian)
         , ehOSABI      :: ElfOSABI   -- ^ OS/ABI identification
@@ -619,7 +619,7 @@ data WBuilderData
     | WBuilderDataSectionTable
     | WBuilderDataSegmentTable
 
-data WBuilderState (a :: ElfClass) =
+data WBuilderState a =
     WBuilderState
         { wbsSections         :: [(ElfSectionIndex, SectionXX a)]
         , wbsSegmentsReversed :: [SegmentXX a]
@@ -920,7 +920,7 @@ serializeElf (classS :&: ElfList ls) = withElfClass classS serializeElf' ls
 -- FIXME: move this to a separate file
 
 -- | Parsed ELF symbol table entry. NB: This is work in progress
-data ElfSymbolXX (c :: ElfClass) =
+data ElfSymbolXX c =
     ElfSymbolXX
         { steName  :: String           -- ^ Symbol name (NB: String, not string index)
         , steBind  :: ElfSymbolBinding -- ^ Symbol binding attributes

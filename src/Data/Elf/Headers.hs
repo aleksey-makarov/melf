@@ -226,8 +226,8 @@ class ( SingI c
       , FiniteBits (WordXX c)
       , Binary (Be (WordXX c))
       , Binary (Le (WordXX c))
-      ) => IsElfClass c where
-    type WordXX (c :: ElfClass) = r | r -> c
+      ) => IsElfClass (c :: ElfClass) where
+    type WordXX c = r | r -> c
 
 instance IsElfClass 'ELFCLASS32 where
     type WordXX 'ELFCLASS32 = Word32
@@ -374,7 +374,7 @@ instance Binary Header where
 --------------------------------------------------------------------------
 
 -- | Parsed ELF section table entry
-data SectionXX (c :: ElfClass) =
+data SectionXX c =
     SectionXX
         { sName      :: Word32         -- ^ Section name
         , sType      :: ElfSectionType -- ^ Section type
@@ -434,7 +434,7 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SectionXX a)) where
 --------------------------------------------------------------------------
 
 -- | Parsed ELF segment table entry
-data SegmentXX (c :: ElfClass) =
+data SegmentXX c =
     SegmentXX
         { pType     :: ElfSegmentType -- ^ Type of segment
         , pFlags    :: ElfSegmentFlag -- ^ Segment attributes
@@ -518,7 +518,7 @@ sectionIsSymbolTable :: ElfSectionType -> Bool
 sectionIsSymbolTable sType  = sType `L.elem` [SHT_SYMTAB, SHT_DYNSYM]
 
 -- | Parsed ELF symbol table entry
-data SymbolXX (c :: ElfClass) =
+data SymbolXX c =
     SymbolXX
         { stName  :: Word32          -- ^ Symbol name
         , stInfo  :: Word8           -- ^ Type and Binding attributes
@@ -586,7 +586,7 @@ instance forall (a :: ElfClass) . SingI a => Binary (Le (SymbolXX a)) where
 --------------------------------------------------------------------------
 
 -- | Parsed relocation table entry (@ElfXX_Rela@)
-data RelaXX (c :: ElfClass) =
+data RelaXX c =
     RelaXX
         { relaOffset :: WordXX c -- ^ Address of reference
         , relaSym    :: Word32   -- ^ Symbol table index
