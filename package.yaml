@@ -60,9 +60,24 @@ library:
         - singletons-base >= 3.0 && < 3.2
 
 tests:
-  golden:
+  # golden:
+  #   main: Golden.hs
+  #   source-dirs: tests
+  #   dependencies:
+  #     - binary
+  #     - bytestring
+  #     - directory >= 1.3.6 && < 1.4
+  #     - exceptions
+  #     - filepath >= 1.4.2.1 && < 1.5
+  #     - melf
+  #     - prettyprinter
+  #     - singletons
+  #     - tasty >= 1.4.1 && < 1.5
+  #     - tasty-golden >= 2.3.4 && < 2.4
+  #     - tasty-hunit >= 0.10.0.3 && < 0.11
+  golden2:
     main: Golden.hs
-    source-dirs: tests
+    source-dirs: tests/headers2
     dependencies:
       - binary
       - bytestring
@@ -75,29 +90,29 @@ tests:
       - tasty >= 1.4.1 && < 1.5
       - tasty-golden >= 2.3.4 && < 2.4
       - tasty-hunit >= 0.10.0.3 && < 0.11
-  exceptions:
-    main: Exceptions.hs
-    source-dirs: tests/exceptions
-    dependencies:
-      - exceptions
-      - tasty
-      - tasty-hunit
-      - melf
-  examples:
-    main: Examples.hs
-    source-dirs: examples
-    dependencies:
-      - bytestring
-      - containers >= 0.6.2.1 && < 0.7
-      - exceptions
-      - filepath
-      - melf
-      - mtl
-      - singletons
-      - tasty
-      - tasty-golden
-      - tasty-hunit
-      - unix >= 2.7.2.2 && < 2.8
+  # exceptions:
+  #   main: Exceptions.hs
+  #   source-dirs: tests/exceptions
+  #   dependencies:
+  #     - exceptions
+  #     - tasty
+  #     - tasty-hunit
+  #     - melf
+  # examples:
+  #   main: Examples.hs
+  #   source-dirs: examples
+  #   dependencies:
+  #     - bytestring
+  #     - containers >= 0.6.2.1 && < 0.7
+  #     - exceptions
+  #     - filepath
+  #     - melf
+  #     - mtl
+  #     - singletons
+  #     - tasty
+  #     - tasty-golden
+  #     - tasty-hunit
+  #     - unix >= 2.7.2.2 && < 2.8
     when:
       - condition: impl(ghc >= 9.0)
         dependencies:
