@@ -59,6 +59,7 @@ library
       Data.Elf
       Data.Elf.Constants
       Data.Elf.Headers
+      Data.Elf.Headers2
       Data.Elf.PrettyPrint
       Control.Exception.ChainedException
   other-modules:
