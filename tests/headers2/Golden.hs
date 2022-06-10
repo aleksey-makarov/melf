@@ -143,13 +143,6 @@ mkGoldenTest name formatFunction file = mkGoldenTest' g o formatFunction file
 
 ---------------------------------------------------------------------
 
--- -- This is for examples/README.md
--- withHeader :: BSL.ByteString -> (forall a . IsElfClass a => HeaderXX a -> b) -> Either String b
--- withHeader bs f =
---     case decodeOrFail bs of
---         Left (_, _, err) -> Left err
---         Right (_, _, (classS :&: hxx) :: Header) -> Right $ withElfClass classS f hxx
-
 padLeadingZeros :: Int -> String -> String
 padLeadingZeros n s | P.length s > n = error "padLeadingZeros args"
                     | otherwise      = "0x" ++ P.replicate (n - P.length s) '0' ++ s

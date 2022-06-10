@@ -28,6 +28,7 @@ github: aleksey-makarov/melf
 
 library:
   dependencies:
+    - array
     - binary        >= 0.8.7 && < 0.9
     - bytestring    >= 0.10.10 && < 0.12
     - exceptions    >= 0.10.4 && < 0.11

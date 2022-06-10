@@ -35,7 +35,10 @@
 module Data.Elf.Headers2 where
 
 -- import Control.Monad
--- import Control.Monad.Catch
+import Control.Monad.Catch
+import Data.Array.IO
+import Data.Array.MArray
+import Data.Array.Unboxed
 -- import Data.Binary
 -- import Data.Binary.Get
 -- import Data.Binary.Put
@@ -48,6 +51,7 @@ import Data.Singletons.Sigma
 import Data.Singletons.TH
 import Data.Word
 import Data.Typeable (Typeable)
+import System.IO
 
 import Data.Eq.Singletons
 import Text.Show.Singletons
@@ -164,6 +168,39 @@ instance IsElfClass 'ELFCLASS64 where
 type ELF = Sigma ElfClass (TyCon1 ELFXX)
 
 data ELFXX (a :: ElfClass) = ELFXX
+    { elfBytes :: UArray Int Word8
+    }
+
+mkELF :: ElfClass -> UArray Int Word8 -> ELF
+mkELF c a = withSomeSing c (:&: ELFXX a)
+
+readELF' :: Handle -> IO ELF
+readELF' h =
+     do
+    size <- hFileSize h
+    let
+        sizeInt = fromIntegral size
+    -- FIXME: check size
+    a <- newArray_ (0, sizeInt)
+    sizeRead <- hGetArray h a sizeInt
+    -- FIXME: check sizeRead
+    -- FIXME: check magic
+    c <- hClass' a
+    mkELF c <$> freeze a
+
+readELF :: FilePath -> IO ELF
+readELF p = withFile p ReadMode readELF'
+
+writeElf :: FilePath -> ELF -> IO ()
+writeElf = undefined
+
+hClass' :: IOUArray Int Word8 -> IO ElfClass
+hClass' a = do
+    v <- readArray a 4
+    case v of
+        1 -> return ELFCLASS32
+        2 -> return ELFCLASS64
+        _ -> undefined
 
 hClass :: ELFXX c -> ElfClass
 hClass _ = ELFCLASS64
@@ -249,18 +286,11 @@ wordSize :: Num a => ElfClass -> a
 wordSize ELFCLASS64 = 8
 wordSize ELFCLASS32 = 4
 
-readELF :: FilePath -> IO ELF
-readELF _ = return $ SELFCLASS64 :&: ELFXX
-
-writeElf :: FilePath -> ELF -> IO ()
-writeElf = undefined
-
 -- | Convenience function for creating a context with an implicit ElfClass available.
 withElfClass :: Sing c -> (IsElfClass c => a) -> a
 withElfClass SELFCLASS64 x = x
 withElfClass SELFCLASS32 x = x
 
--- | Convenience function for creating a context with an implicit ElfClass available.
 withELF :: ELF -> (forall c . IsElfClass c => ELFXX c -> a) -> a
 withELF (classS :&: elf) f = withElfClass classS f elf
 
