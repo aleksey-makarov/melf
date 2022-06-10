@@ -21,8 +21,10 @@ import Control.Monad
 import Data.ByteString.Lazy as BSL
 import Data.Foldable as F
 -- import Data.Int
--- import Data.Singletons
+import Data.Singletons
 -- import Data.Singletons.Sigma
+import Data.Word
+import Numeric
 import Prettyprinter
 import Prettyprinter.Render.Text
 import System.Directory
@@ -148,10 +150,58 @@ mkGoldenTest name formatFunction file = mkGoldenTest' g o formatFunction file
 --         Left (_, _, err) -> Left err
 --         Right (_, _, (classS :&: hxx) :: Header) -> Right $ withElfClass classS f hxx
 
+padLeadingZeros :: Int -> String -> String
+padLeadingZeros n s | P.length s > n = error "padLeadingZeros args"
+                    | otherwise      = "0x" ++ P.replicate (n - P.length s) '0' ++ s
+
+-- printWord8 :: Word8 -> Doc ()
+-- printWord8 n = pretty $ padLeadingZeros 2 $ showHex n ""
+
+printWord16 :: Word16 -> Doc ()
+printWord16 n = pretty $ padLeadingZeros 4 $ showHex n ""
+
+printWord32 :: Word32 -> Doc ()
+printWord32 n = pretty $ padLeadingZeros 8 $ showHex n ""
+
+printWord64 :: Word64 -> Doc ()
+printWord64 n = pretty $ padLeadingZeros 16 $ showHex n ""
+
+printWordXXS :: Sing a -> WordXX a -> Doc ()
+printWordXXS SELFCLASS32 = printWord32
+printWordXXS SELFCLASS64 = printWord64
+
+printWordXX :: SingI a => WordXX a -> Doc ()
+printWordXX = withSing printWordXXS
+
+formatPairs :: [(String, Doc a)] -> Doc a
+formatPairs ls = align $ vsep $ fmap f ls
+    where
+        f (n, v) = fill w (pretty n <> ":") <+> v
+        w = 1 + P.maximum (fmap (P.length . fst) ls)
+
+printHeader :: IsElfClass c => ELFXX c -> Doc ()
+printHeader elf = formatPairs
+    [ ( "Class",      viaShow     $ hClass      elf)
+    , ( "Data",       viaShow     $ hData       elf)
+    , ( "OSABI",      viaShow     $ hOSABI      elf)
+    , ( "ABIVersion", viaShow     $ hABIVersion elf)
+    , ( "Type",       viaShow     $ hType       elf)
+    , ( "Machine",    viaShow     $ hMachine    elf)
+    , ( "Entry",      printWordXX $ hEntry      elf)
+    , ( "PhOff",      printWordXX $ hPhOff      elf)
+    , ( "ShOff",      printWordXX $ hShOff      elf)
+    , ( "Flags",      printWord32 $ hFlags      elf)
+    , ( "PhEntSize",  printWord16 $ hPhEntSize  elf)
+    , ( "PhNum",      viaShow     $ hPhNum      elf)
+    , ( "ShEntSize",  printWord16 $ hShEntSize  elf)
+    , ( "ShNum",      viaShow     $ hShNum      elf)
+    , ( "ShStrNdx",   viaShow     $ hShStrNdx   elf)
+    ]
+
 printHeaderFile :: FilePath -> IO (Doc ())
-printHeaderFile path = undefined
---     bs <- fromStrict <$> BS.readFile path
---     $eitherAddContext' $ withHeader bs printHeader
+printHeaderFile path = do
+    elf <- readELF path
+    return $ withELF elf printHeader
 
 -- printHeadersFile :: FilePath -> IO (Doc ())
 -- printHeadersFile path = do

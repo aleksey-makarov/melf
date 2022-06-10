@@ -166,63 +166,63 @@ type ELF = Sigma ElfClass (TyCon1 ELFXX)
 data ELFXX (a :: ElfClass) = ELFXX
 
 hClass :: ELFXX c -> ElfClass
-hClass = undefined
+hClass _ = ELFCLASS64
 
 -- ^ Data encoding (big- or little-endian)
 hData :: ELFXX c -> ElfData
-hData = undefined
+hData _ = ELFDATA2LSB
 
 -- ^ OS/ABI identification
 hOSABI :: ELFXX c -> ElfOSABI
-hOSABI = undefined
+hOSABI _ = 0
 
 -- ^ ABI version
 hABIVersion :: ELFXX c -> Word8
-hABIVersion = undefined
+hABIVersion _ = 0
 
 -- ^ Object file type
 hType :: ELFXX c -> ElfType
-hType = undefined
+hType _ = 0
 
 -- ^ Machine type
 hMachine :: ELFXX c -> ElfMachine
-hMachine = undefined
+hMachine _ = 0
 
 -- ^ Entry point address
-hEntry :: ELFXX c -> WordXX c
-hEntry = undefined
+hEntry :: IsElfClass c => ELFXX c -> WordXX c
+hEntry _ = 0
 
 -- ^ Program header offset
-hPhOff :: ELFXX c -> WordXX c
-hPhOff = undefined
+hPhOff :: IsElfClass c => ELFXX c -> WordXX c
+hPhOff _ = 0
 
 -- ^ Section header offset
-hShOff :: ELFXX c -> WordXX c
-hShOff = undefined
+hShOff :: IsElfClass c => ELFXX c -> WordXX c
+hShOff _ = 0
 
 -- ^ Processor-specific flags
 hFlags :: ELFXX c -> Word32
-hFlags = undefined
+hFlags _ = 0
 
 -- ^ Size of program header entry
 hPhEntSize :: ELFXX c -> Word16
-hPhEntSize = undefined
+hPhEntSize _ = 0
 
 -- ^ Number of program header entries
 hPhNum :: ELFXX c -> Word16
-hPhNum = undefined
+hPhNum _ = 0
 
 -- ^ Size of section header entry
 hShEntSize :: ELFXX c -> Word16
-hShEntSize = undefined
+hShEntSize _ = 0
 
 -- ^ Number of section header entries
 hShNum :: ELFXX c -> Word16
-hShNum = undefined
+hShNum _ = 0
 
 -- ^ Section name string table index
 hShStrNdx :: ELFXX c -> ElfSectionIndex
-hShStrNdx = undefined
+hShStrNdx _ = 0
 
 -- | Size of ELF header.
 headerSize :: Num a => ElfClass -> a
@@ -249,10 +249,20 @@ wordSize :: Num a => ElfClass -> a
 wordSize ELFCLASS64 = 8
 wordSize ELFCLASS32 = 4
 
--- -- | Convenience function for creating a context with an implicit ElfClass available.
--- withElfClass :: Sing c -> (IsElfClass c => a) -> a
--- withElfClass SELFCLASS64 x = x
--- withElfClass SELFCLASS32 x = x
+readELF :: FilePath -> IO ELF
+readELF _ = return $ SELFCLASS64 :&: ELFXX
+
+writeElf :: FilePath -> ELF -> IO ()
+writeElf = undefined
+
+-- | Convenience function for creating a context with an implicit ElfClass available.
+withElfClass :: Sing c -> (IsElfClass c => a) -> a
+withElfClass SELFCLASS64 x = x
+withElfClass SELFCLASS32 x = x
+
+-- | Convenience function for creating a context with an implicit ElfClass available.
+withELF :: ELF -> (forall c . IsElfClass c => ELFXX c -> a) -> a
+withELF (classS :&: elf) f = withElfClass classS f elf
 
 -- getHeader' :: IsElfClass c => Sing c -> Get Header
 -- getHeader' classS = do
