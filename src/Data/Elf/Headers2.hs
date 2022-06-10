@@ -21,7 +21,7 @@
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE RankNTypes #-}
--- {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE StandaloneKindSignatures #-}
@@ -169,14 +169,14 @@ type ELF = Sigma ElfClass (TyCon1 ELFXX)
 
 data ELFXX (a :: ElfClass) = ELFXX
     { elfBytes :: UArray Int Word8
+    , elfData  :: ElfData
     }
 
-mkELF :: ElfClass -> UArray Int Word8 -> ELF
-mkELF c a = withSomeSing c (:&: ELFXX a)
+mkELF :: ElfClass -> UArray Int Word8 -> ElfData -> ELF
+mkELF c a d = withSomeSing c (:&: ELFXX a d)
 
 readELF' :: Handle -> IO ELF
-readELF' h =
-     do
+readELF' h = do
     size <- hFileSize h
     let
         sizeInt = fromIntegral size
@@ -186,7 +186,8 @@ readELF' h =
     -- FIXME: check sizeRead
     -- FIXME: check magic
     c <- hClass' a
-    mkELF c <$> freeze a
+    d <- hData' a
+    mkELF c <$> freeze a <*> pure d
 
 readELF :: FilePath -> IO ELF
 readELF p = withFile p ReadMode readELF'
@@ -202,64 +203,94 @@ hClass' a = do
         2 -> return ELFCLASS64
         _ -> undefined
 
-hClass :: ELFXX c -> ElfClass
-hClass _ = ELFCLASS64
+hClass :: forall c . SingI c => ELFXX c -> ElfClass
+hClass _ = fromSing (sing @c)
+
+hData' :: IOUArray Int Word8 -> IO ElfData
+hData' a = do
+    v <- readArray a 5
+    case v of
+        1 -> return ELFDATA2LSB
+        2 -> return ELFDATA2MSB
+        _ -> undefined
 
 -- ^ Data encoding (big- or little-endian)
 hData :: ELFXX c -> ElfData
-hData _ = ELFDATA2LSB
+hData ELFXX { .. } = elfData
+
+-- data ReadWordState = ReadWordState
+--     {
+--     , offset :: Int
+--     }
+
+readWord16 :: forall c . SingI c => ELFXX c -> Int -> Int -> Word16
+readWord16 = readWord16' (sing @c)
+    where
+        readWord16' :: forall c . SingI c => SElfClass c -> ELFXX c -> Int -> Int -> Word16
+        readWord16' SELFCLASS32 ELFXX { .. } o _ = mkWord16 elfData (elfBytes ! o + 0) (elfBytes ! o + 1)
+        readWord16' SELFCLASS64 ELFXX { .. } _ o = mkWord16 elfData (elfBytes ! o + 0) (elfBytes ! o + 1)
+
+        mkWord16 :: ElfData -> Word8 -> Word8 -> Word16
+        mkWord16 ELFDATA2LSB w1 w2 = fromIntegral w2 `shiftL` 8 .|. fromIntegral w1
+        mkWord16 ELFDATA2MSB w1 w2 = fromIntegral w1 `shiftL` 8 .|. fromIntegral w2
+
+readWord32 :: ELFXX c -> Int -> Int -> Word32
+readWord32 ELFXX { .. } o32 o64 = undefined
+
+readWordXX :: ELFXX c -> Int -> Int -> WordXX c
+readWordXX ELFXX { .. } o32 o64 = undefined
 
 -- ^ OS/ABI identification
 hOSABI :: ELFXX c -> ElfOSABI
-hOSABI _ = 0
+hOSABI ELFXX { .. } = ELFOSABI_EXT $ elfBytes ! 7
 
 -- ^ ABI version
 hABIVersion :: ELFXX c -> Word8
-hABIVersion _ = 0
+hABIVersion ELFXX { .. } = elfBytes ! 8
 
 -- ^ Object file type
-hType :: ELFXX c -> ElfType
-hType _ = 0
+hType :: SingI c => ELFXX c -> ElfType
+hType elf = ET_EXT $ readWord16 elf 16 16
 
 -- ^ Machine type
-hMachine :: ELFXX c -> ElfMachine
-hMachine _ = 0
+hMachine :: SingI c => ELFXX c -> ElfMachine
+hMachine elf = EM_EXT $ readWord16 elf 18 18
 
 -- ^ Entry point address
 hEntry :: IsElfClass c => ELFXX c -> WordXX c
-hEntry _ = 0
+hEntry elf = readWordXX elf 20 20
 
 -- ^ Program header offset
 hPhOff :: IsElfClass c => ELFXX c -> WordXX c
-hPhOff _ = 0
+hPhOff elf = readWordXX elf 20 20
 
 -- ^ Section header offset
 hShOff :: IsElfClass c => ELFXX c -> WordXX c
-hShOff _ = 0
+hShOff elf = readWordXX elf 20 20
 
 -- ^ Processor-specific flags
-hFlags :: ELFXX c -> Word32
-hFlags _ = 0
+hFlags :: SingI c => ELFXX c -> Word32
+hFlags elf = readWord32 elf 20 20
 
 -- ^ Size of program header entry
-hPhEntSize :: ELFXX c -> Word16
-hPhEntSize _ = 0
+hPhEntSize :: SingI c => ELFXX c -> Word16
+hPhEntSize elf = readWord16 elf 20 20
 
 -- ^ Number of program header entries
-hPhNum :: ELFXX c -> Word16
-hPhNum _ = 0
+hPhNum :: SingI c => ELFXX c -> Word16
+hPhNum elf = readWord16 elf 20 20
 
 -- ^ Size of section header entry
-hShEntSize :: ELFXX c -> Word16
-hShEntSize _ = 0
+hShEntSize :: SingI c => ELFXX c -> Word16
+hShEntSize elf = readWord16 elf 20 20
 
 -- ^ Number of section header entries
-hShNum :: ELFXX c -> Word16
-hShNum _ = 0
+hShNum :: SingI c => ELFXX c -> Word16
+hShNum elf = readWord16 elf 20 20
 
 -- ^ Section name string table index
-hShStrNdx :: ELFXX c -> ElfSectionIndex
-hShStrNdx _ = 0
+hShStrNdx :: SingI c => ELFXX c -> ElfSectionIndex
+hShStrNdx elf = SHN_EXT $ readWord16 elf 20 20
 
 -- | Size of ELF header.
 headerSize :: Num a => ElfClass -> a
