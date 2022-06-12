@@ -36,6 +36,7 @@ module Data.Elf.Headers2 where
 
 -- import Control.Monad
 import Control.Monad.Catch
+import Control.Monad.State
 import Data.Array.IO
 import Data.Array.MArray
 import Data.Array.Unboxed
@@ -218,27 +219,67 @@ hData' a = do
 hData :: ELFXX c -> ElfData
 hData ELFXX { .. } = elfData
 
--- data ReadWordState = ReadWordState
---     {
---     , offset :: Int
---     }
+------------------------------------------------------------
 
-readWord16 :: forall c . SingI c => ELFXX c -> Int -> Int -> Word16
-readWord16 = readWord16' (sing @c)
+data ReadWordState = ReadWordState
+    { rwsBytes  :: UArray Int Word8
+    , rwsData   :: ElfData
+    , rwsOffset :: Int
+    }
+
+read2be, read2le, read2 :: (Integral a, Num b, FiniteBits a, Bits b) => State ReadWordState a -> State ReadWordState b
+read2be m = do
+    w1 <- m
+    w2 <- m
+    return $ (fromIntegral w1) `shiftL` (finiteBitSize w1) .|. (fromIntegral w2)
+
+read2le m = do
+    w1 <- m
+    w2 <- m
+    return $ (fromIntegral w2) `shiftL` (finiteBitSize w2) .|. (fromIntegral w1)
+
+read2 m = do
+    d <- gets rwsData
+    case d of
+        ELFDATA2LSB -> read2le m
+        ELFDATA2MSB -> read2be m
+
+readWord8' :: State ReadWordState Word8
+readWord8' = do
+    s@ReadWordState { .. } <- get
+    put s { rwsOffset = rwsOffset + 1 }
+    return $ rwsBytes ! rwsOffset
+
+readWord16' :: State ReadWordState Word16
+readWord16' = read2 readWord8'
+
+readWord32' :: State ReadWordState Word32
+readWord32' = read2 readWord16'
+
+readWord64' :: State ReadWordState Word64
+readWord64' = read2 readWord32'
+
+runReadWord :: forall a c . SingI c => (State ReadWordState a) -> ELFXX c -> Int -> Int -> a
+runReadWord m ELFXX { .. } o32 o64 = evalState m $ ReadWordState elfBytes elfData o
     where
-        readWord16' :: forall c . SingI c => SElfClass c -> ELFXX c -> Int -> Int -> Word16
-        readWord16' SELFCLASS32 ELFXX { .. } o _ = mkWord16 elfData (elfBytes ! o + 0) (elfBytes ! o + 1)
-        readWord16' SELFCLASS64 ELFXX { .. } _ o = mkWord16 elfData (elfBytes ! o + 0) (elfBytes ! o + 1)
+        o = case sing @c of
+            SELFCLASS32 -> o32
+            SELFCLASS64 -> o64
 
-        mkWord16 :: ElfData -> Word8 -> Word8 -> Word16
-        mkWord16 ELFDATA2LSB w1 w2 = fromIntegral w2 `shiftL` 8 .|. fromIntegral w1
-        mkWord16 ELFDATA2MSB w1 w2 = fromIntegral w1 `shiftL` 8 .|. fromIntegral w2
+readWord16 :: SingI c => ELFXX c -> Int -> Int -> Word16
+readWord16 = runReadWord readWord16'
 
-readWord32 :: ELFXX c -> Int -> Int -> Word32
-readWord32 ELFXX { .. } o32 o64 = undefined
+readWord32 :: SingI c => ELFXX c -> Int -> Int -> Word32
+readWord32 = runReadWord readWord32'
 
-readWordXX :: ELFXX c -> Int -> Int -> WordXX c
-readWordXX ELFXX { .. } o32 o64 = undefined
+readWordXX :: IsElfClass c => ELFXX c -> Int -> Int -> WordXX c
+readWordXX = readWordXX' sing
+    where
+        readWordXX' :: IsElfClass c => SElfClass c ->  ELFXX c -> Int -> Int -> WordXX c
+        readWordXX' SELFCLASS32 = runReadWord readWord32'
+        readWordXX' SELFCLASS64 = runReadWord readWord64'
+
+------------------------------------------------------------
 
 -- ^ OS/ABI identification
 hOSABI :: ELFXX c -> ElfOSABI
