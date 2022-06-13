@@ -15,10 +15,11 @@ module Main (main) where
 import Prelude as P
 
 import Control.Lens.Combinators
-import Control.Lens.Fold
+-- import Control.Lens.Fold
 import Control.Monad
 -- import Control.Monad.Catch
 -- import Data.Binary
+import Data.Bits
 -- import qualified Data.ByteString as BS
 import Data.ByteString.Lazy as BSL
 import Data.Foldable as F
@@ -35,7 +36,7 @@ import System.FilePath
 import System.IO as IO
 import Test.Tasty
 import Test.Tasty.Golden
-import Test.Tasty.HUnit
+-- import Test.Tasty.HUnit
 
 -- import Control.Exception.ChainedException
 -- import Data.Elf
@@ -146,6 +147,12 @@ mkGoldenTest name formatFunction file = mkGoldenTest' g o formatFunction file
 
 ---------------------------------------------------------------------
 
+-- | Splits an integer into list of integers such that its sum equals to the argument,
+--   and each element of the list is of the form @(1 << x)@ for some @x@.
+--   @splitBits 5@ produces @[ 1, 4 ]@
+splitBits :: (Num w, FiniteBits w) => w -> [w]
+splitBits w = fmap (shiftL 1) $ P.filter (testBit w) $ fmap (subtract 1) [ 1 .. (finiteBitSize w) ]
+
 padLeadingZeros :: Int -> String -> String
 padLeadingZeros n s | P.length s > n = error "padLeadingZeros args"
                     | otherwise      = "0x" ++ P.replicate (n - P.length s) '0' ++ s
@@ -180,45 +187,35 @@ formatFold fd s = align $ vsep $ toListOf (fd . to f) s
     where
         f x = pretty '-' <+> x
 
--- printSection :: SingI a => Int -> SectionXX a -> Doc ()
--- printSection _n _s =
 printSection :: SingI a => SectionXX a -> Doc ()
-printSection _s =
+printSection s =
     formatPairs
-        [ ("N", "0")
-        , ("X", "1")
+        [ ("N",         viaShow     $ (0 :: Int)  )
+        , ("Name",      viaShow     $ sName      s) -- Word32
+        , ("Type",      viaShow     $ sType      s) -- ElfSectionType
+        , ("Flags",     printWordXX $ sFlags     s) -- WordXX c
+        , ("Addr",      printWordXX $ sAddr      s) -- WordXX c
+        , ("Offset",    printWordXX $ sOffset    s) -- WordXX c
+        , ("Size",      printWordXX $ sSize      s) -- WordXX c
+        , ("Link",      viaShow     $ sLink      s) -- Word32
+        , ("Info",      viaShow     $ sInfo      s) -- Word32
+        , ("AddrAlign", printWordXX $ sAddrAlign s) -- WordXX c
+        , ("EntSize",   printWordXX $ sEntSize   s) -- WordXX c
         ]
---        [ ("N",         viaShow n              )
---        , ("Name",      viaShow sName          ) -- Word32
---        , ("Type",      viaShow sType          ) -- ElfSectionType
---        , ("Flags",     printWordXX sFlags     ) -- WordXX c
---        , ("Addr",      printWordXX sAddr      ) -- WordXX c
---        , ("Offset",    printWordXX sOffset    ) -- WordXX c
---        , ("Size",      printWordXX sSize      ) -- WordXX c
---        , ("Link",      viaShow sLink          ) -- Word32
---        , ("Info",      viaShow sInfo          ) -- Word32
---        , ("AddrAlign", printWordXX sAddrAlign ) -- WordXX c
---        , ("EntSize",   printWordXX sEntSize   ) -- WordXX c
---        ]
 
--- printSegment :: SingI a => Int -> SegmentXX a -> Doc ()
--- printSegment _n _s =
 printSegment :: SingI a => SegmentXX a -> Doc ()
-printSegment _s =
+printSegment p =
     formatPairs
-        [ ("N", "0")
-        , ("X", "1")
+        [ ("N",        viaShow             $ (0 :: Int) )
+        , ("Type",     viaShow             $ pType     p) -- ElfSegmentType
+        , ("Flags",    viaShow $ splitBits $ pFlags    p) -- ElfSegmentFlag
+        , ("Offset",   printWordXX         $ pOffset   p) -- WordXX c
+        , ("VirtAddr", printWordXX         $ pVirtAddr p) -- WordXX c
+        , ("PhysAddr", printWordXX         $ pPhysAddr p) -- WordXX c
+        , ("FileSize", printWordXX         $ pFileSize p) -- WordXX c
+        , ("MemSize",  printWordXX         $ pMemSize  p) -- WordXX c
+        , ("Align",    printWordXX         $ pAlign    p) -- WordXX c
         ]
---        [ ("N",        viaShow n             )
---        , ("Type",     viaShow pType         ) -- ElfSegmentType
---        , ("Flags",    viaShow $ splitBits pFlags ) -- ElfSegmentFlag
---        , ("Offset",   printWordXX pOffset   ) -- WordXX c
---        , ("VirtAddr", printWordXX pVirtAddr ) -- WordXX c
---        , ("PhysAddr", printWordXX pPhysAddr ) -- WordXX c
---        , ("FileSize", printWordXX pFileSize ) -- WordXX c
---        , ("MemSize",  printWordXX pMemSize  ) -- WordXX c
---        , ("Align",    printWordXX pAlign    ) -- WordXX c
---        ]
 
 printSections :: IsElfClass c => ELFXX c -> Doc ()
 printSections elf = elf & formatFold (sections . to printSection)

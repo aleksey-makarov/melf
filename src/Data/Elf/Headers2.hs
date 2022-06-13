@@ -206,9 +206,6 @@ hClass' a = do
         2 -> return ELFCLASS64
         _ -> undefined
 
-hClass :: forall c . SingI c => ELFXX c -> ElfClass
-hClass _ = fromSing (sing @c)
-
 hData' :: IOUArray Int Word8 -> IO ElfData
 hData' a = do
     v <- readArray a 5
@@ -216,10 +213,6 @@ hData' a = do
         1 -> return ELFDATA2LSB
         2 -> return ELFDATA2MSB
         _ -> undefined
-
--- ^ Data encoding (big- or little-endian)
-hData :: ELFXX c -> ElfData
-hData ELFXX { .. } = elfData
 
 ------------------------------------------------------------
 
@@ -283,55 +276,62 @@ readWordXX = readWordXX' sing
 
 ------------------------------------------------------------
 
--- ^ OS/ABI identification
+hClass :: forall c . SingI c => ELFXX c -> ElfClass
+hClass _ = fromSing (sing @c)
+
+-- | Data encoding (big- or little-endian)
+hData :: ELFXX c -> ElfData
+hData ELFXX { .. } = elfData
+
+-- | OS/ABI identification
 hOSABI :: ELFXX c -> ElfOSABI
 hOSABI ELFXX { .. } = ELFOSABI_EXT $ elfBytes ! 7
 
--- ^ ABI version
+-- | ABI version
 hABIVersion :: ELFXX c -> Word8
 hABIVersion ELFXX { .. } = elfBytes ! 8
 
--- ^ Object file type
+-- | Object file type
 hType :: SingI c => ELFXX c -> ElfType
 hType elf = ET_EXT $ readWord16 elf 16 16
 
--- ^ Machine type
+-- | Machine type
 hMachine :: SingI c => ELFXX c -> ElfMachine
 hMachine elf = EM_EXT $ readWord16 elf 18 18
 
--- ^ Entry point address
+-- | Entry point address
 hEntry :: IsElfClass c => ELFXX c -> WordXX c
 hEntry elf = readWordXX elf 24 24
 
--- ^ Program header offset
+-- | Program header offset
 hPhOff :: IsElfClass c => ELFXX c -> WordXX c
 hPhOff elf = readWordXX elf 28 32
 
--- ^ Section header offset
+-- | Section header offset
 hShOff :: IsElfClass c => ELFXX c -> WordXX c
 hShOff elf = readWordXX elf 32 40
 
--- ^ Processor-specific flags
+-- | Processor-specific flags
 hFlags :: SingI c => ELFXX c -> Word32
 hFlags elf = readWord32 elf 36 48
 
--- ^ Size of program header entry
+-- | Size of program header entry
 hPhEntSize :: SingI c => ELFXX c -> Word16
 hPhEntSize elf = readWord16 elf 42 54
 
--- ^ Number of program header entries
+-- | Number of program header entries
 hPhNum :: SingI c => ELFXX c -> Word16
 hPhNum elf = readWord16 elf 44 56
 
--- ^ Size of section header entry
+-- | Size of section header entry
 hShEntSize :: SingI c => ELFXX c -> Word16
 hShEntSize elf = readWord16 elf 46 58
 
--- ^ Number of section header entries
+-- | Number of section header entries
 hShNum :: SingI c => ELFXX c -> Word16
 hShNum elf = readWord16 elf 48 60
 
--- ^ Section name string table index
+-- | Section name string table index
 hShStrNdx :: SingI c => ELFXX c -> ElfSectionIndex
 hShStrNdx elf = SHN_EXT $ readWord16 elf 50 62
 
@@ -370,51 +370,94 @@ withELF (classS :&: elf) f = withElfClass classS f elf
 
 ------------------------------------------------------------
 
-data SectionXX a = SectionXX
-    { sElf    :: ELFXX a
-    , sOffset :: Int
+data SectionXX c = SectionXX
+    { sElf :: ELFXX c
+    , sOff :: Int
     }
 
--- | Parsed ELF section table entry
--- data SectionXX c =
---     SectionXX
---         { sName      :: Word32         -- ^ Section name
---         , sType      :: ElfSectionType -- ^ Section type
---         , sFlags     :: WordXX c       -- ^ Section attributes
---         , sAddr      :: WordXX c       -- ^ Virtual address in memory
---         , sOffset    :: WordXX c       -- ^ Offset in file
---         , sSize      :: WordXX c       -- ^ Size of section
---         , sLink      :: Word32         -- ^ Link to other section
---         , sInfo      :: Word32         -- ^ Miscellaneous information
---         , sAddrAlign :: WordXX c       -- ^ Address alignment boundary
---         , sEntSize   :: WordXX c       -- ^ Size of entries, if section has table
---         }
+sName :: SectionXX c -> Word32
+-- sName SectionXX { .. } = undefined
+sName = undefined
 
-sections :: Fold (ELFXX c) (SectionXX c)
--- sections = undefined
+-- | Section type
+sType :: SectionXX c -> ElfSectionType
+sType = undefined
+
+-- | Section attributes
+sFlags :: SectionXX c -> WordXX c
+sFlags = undefined
+
+-- | Virtual address in memory
+sAddr :: SectionXX c -> WordXX c
+sAddr = undefined
+
+-- | Offset in file
+sOffset :: SectionXX c -> WordXX c
+sOffset = undefined
+
+-- | Size of section
+sSize :: SectionXX c -> WordXX c
+sSize = undefined
+
+-- | Link to other section
+sLink :: SectionXX c -> Word32
+sLink = undefined
+
+-- | Miscellaneous information
+sInfo :: SectionXX c -> Word32
+sInfo = undefined
+
+-- | Address alignment boundary
+sAddrAlign :: SectionXX c -> WordXX c
+sAddrAlign = undefined
+
+-- | Size of entries, if section has table
+sEntSize :: SectionXX c -> WordXX c
+sEntSize = undefined
+
+sections :: IsElfClass c => Fold (ELFXX c) (SectionXX c)
 sections = folding $ \ elf -> [SectionXX elf 0, SectionXX elf 1, SectionXX elf 2]
 
 ------------------------------------------------------------
 
 data SegmentXX a = SegmentXX
-    { pElf    :: ELFXX a
-    , pOffset :: Int
+    { pElf :: ELFXX a
+    , pOff :: Int
     }
 
--- -- | Parsed ELF segment table entry
--- data SegmentXX c =
---     SegmentXX
---         { pType     :: ElfSegmentType -- ^ Type of segment
---         , pFlags    :: ElfSegmentFlag -- ^ Segment attributes
---         , pOffset   :: WordXX c       -- ^ Offset in file
---         , pVirtAddr :: WordXX c       -- ^ Virtual address in memory
---         , pPhysAddr :: WordXX c       -- ^ Physical address
---         , pFileSize :: WordXX c       -- ^ Size of segment in file
---         , pMemSize  :: WordXX c       -- ^ Size of segment in memory
---         , pAlign    :: WordXX c       -- ^ Alignment of segment
---         }
+-- | Type of segment
+pType :: SingI c => SegmentXX c -> ElfSegmentType
+pType = undefined
 
-segmets :: Fold (ELFXX c) (SegmentXX c)
+-- | Segment attributes
+pFlags :: SingI c => SegmentXX c -> ElfSegmentFlag
+pFlags = undefined
+
+-- | Offset in file
+pOffset :: SingI c => SegmentXX c -> WordXX c
+pOffset = undefined
+
+-- | Virtual address in memory
+pVirtAddr :: SingI c => SegmentXX c -> WordXX c
+pVirtAddr = undefined
+
+-- | Physical address
+pPhysAddr :: SingI c => SegmentXX c -> WordXX c
+pPhysAddr = undefined
+
+-- | Size of segment in file
+pFileSize :: SingI c => SegmentXX c -> WordXX c
+pFileSize = undefined
+
+-- | Size of segment in memory
+pMemSize :: SingI c => SegmentXX c -> WordXX c
+pMemSize = undefined
+
+-- | Alignment of segment
+pAlign :: SingI c => SegmentXX c -> WordXX c
+pAlign = undefined
+
+segmets :: IsElfClass c => Fold (ELFXX c) (SegmentXX c)
 segmets = folding $ \ elf -> [SegmentXX elf 0, SegmentXX elf 1, SegmentXX elf 2]
 
 ------------------------------------------------------------
