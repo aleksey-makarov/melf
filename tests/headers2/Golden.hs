@@ -297,7 +297,7 @@ elfsForHeader = [ "testdata/orig/bloated"
 main :: IO ()
 main = do
 
-    elfs <- traverseDir "testdata" isElf
+    _elfs <- traverseDir "testdata" isElf
 
     defaultMain $ testGroup "elf" [ testGroup "elf headers golden"  (mkGoldenTest        "elf_header"      printHeaderFile       <$> elfsForHeader)
                                   , testGroup "header golden"       [testCase "void" $ return ()] -- (mkGoldenTest        "header"          printHeadersFile      <$> elfs)

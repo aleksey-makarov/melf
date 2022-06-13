@@ -35,10 +35,10 @@
 module Data.Elf.Headers2 where
 
 -- import Control.Monad
-import Control.Monad.Catch
+-- import Control.Monad.Catch
 import Control.Monad.State
 import Data.Array.IO
-import Data.Array.MArray
+-- import Data.Array.MArray
 import Data.Array.Unboxed
 -- import Data.Binary
 -- import Data.Binary.Get
@@ -176,22 +176,23 @@ data ELFXX (a :: ElfClass) = ELFXX
 mkELF :: ElfClass -> UArray Int Word8 -> ElfData -> ELF
 mkELF c a d = withSomeSing c (:&: ELFXX a d)
 
-readELF' :: Handle -> IO ELF
-readELF' h = do
+hReadELF :: Handle -> IO ELF
+hReadELF h = do
     size <- hFileSize h
     let
         sizeInt = fromIntegral size
-    -- FIXME: check size
+    -- FIXME: check size of the id field
     a <- newArray_ (0, sizeInt)
-    sizeRead <- hGetArray h a sizeInt
+    _sizeRead <- hGetArray h a sizeInt
     -- FIXME: check sizeRead
     -- FIXME: check magic
+    -- FIXME: check ehSize
     c <- hClass' a
     d <- hData' a
     mkELF c <$> freeze a <*> pure d
 
 readELF :: FilePath -> IO ELF
-readELF p = withFile p ReadMode readELF'
+readELF p = withFile p ReadMode hReadELF
 
 writeElf :: FilePath -> ELF -> IO ()
 writeElf = undefined
@@ -299,39 +300,39 @@ hMachine elf = EM_EXT $ readWord16 elf 18 18
 
 -- ^ Entry point address
 hEntry :: IsElfClass c => ELFXX c -> WordXX c
-hEntry elf = readWordXX elf 20 20
+hEntry elf = readWordXX elf 24 24
 
 -- ^ Program header offset
 hPhOff :: IsElfClass c => ELFXX c -> WordXX c
-hPhOff elf = readWordXX elf 20 20
+hPhOff elf = readWordXX elf 28 32
 
 -- ^ Section header offset
 hShOff :: IsElfClass c => ELFXX c -> WordXX c
-hShOff elf = readWordXX elf 20 20
+hShOff elf = readWordXX elf 32 40
 
 -- ^ Processor-specific flags
 hFlags :: SingI c => ELFXX c -> Word32
-hFlags elf = readWord32 elf 20 20
+hFlags elf = readWord32 elf 36 48
 
 -- ^ Size of program header entry
 hPhEntSize :: SingI c => ELFXX c -> Word16
-hPhEntSize elf = readWord16 elf 20 20
+hPhEntSize elf = readWord16 elf 42 54
 
 -- ^ Number of program header entries
 hPhNum :: SingI c => ELFXX c -> Word16
-hPhNum elf = readWord16 elf 20 20
+hPhNum elf = readWord16 elf 44 56
 
 -- ^ Size of section header entry
 hShEntSize :: SingI c => ELFXX c -> Word16
-hShEntSize elf = readWord16 elf 20 20
+hShEntSize elf = readWord16 elf 46 58
 
 -- ^ Number of section header entries
 hShNum :: SingI c => ELFXX c -> Word16
-hShNum elf = readWord16 elf 20 20
+hShNum elf = readWord16 elf 48 60
 
 -- ^ Section name string table index
 hShStrNdx :: SingI c => ELFXX c -> ElfSectionIndex
-hShStrNdx elf = SHN_EXT $ readWord16 elf 20 20
+hShStrNdx elf = SHN_EXT $ readWord16 elf 50 62
 
 -- | Size of ELF header.
 headerSize :: Num a => ElfClass -> a
