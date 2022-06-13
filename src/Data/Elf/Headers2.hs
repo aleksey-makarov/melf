@@ -34,6 +34,7 @@
 
 module Data.Elf.Headers2 where
 
+import Control.Lens.Combinators
 -- import Control.Monad
 -- import Control.Monad.Catch
 import Control.Monad.State
@@ -366,6 +367,57 @@ withElfClass SELFCLASS32 x = x
 
 withELF :: ELF -> (forall c . IsElfClass c => ELFXX c -> a) -> a
 withELF (classS :&: elf) f = withElfClass classS f elf
+
+------------------------------------------------------------
+
+data SectionXX a = SectionXX
+    { sElf    :: ELFXX a
+    , sOffset :: Int
+    }
+
+-- | Parsed ELF section table entry
+-- data SectionXX c =
+--     SectionXX
+--         { sName      :: Word32         -- ^ Section name
+--         , sType      :: ElfSectionType -- ^ Section type
+--         , sFlags     :: WordXX c       -- ^ Section attributes
+--         , sAddr      :: WordXX c       -- ^ Virtual address in memory
+--         , sOffset    :: WordXX c       -- ^ Offset in file
+--         , sSize      :: WordXX c       -- ^ Size of section
+--         , sLink      :: Word32         -- ^ Link to other section
+--         , sInfo      :: Word32         -- ^ Miscellaneous information
+--         , sAddrAlign :: WordXX c       -- ^ Address alignment boundary
+--         , sEntSize   :: WordXX c       -- ^ Size of entries, if section has table
+--         }
+
+sections :: Fold (ELFXX c) (SectionXX c)
+-- sections = undefined
+sections = folding $ \ elf -> [SectionXX elf 0, SectionXX elf 1, SectionXX elf 2]
+
+------------------------------------------------------------
+
+data SegmentXX a = SegmentXX
+    { pElf    :: ELFXX a
+    , pOffset :: Int
+    }
+
+-- -- | Parsed ELF segment table entry
+-- data SegmentXX c =
+--     SegmentXX
+--         { pType     :: ElfSegmentType -- ^ Type of segment
+--         , pFlags    :: ElfSegmentFlag -- ^ Segment attributes
+--         , pOffset   :: WordXX c       -- ^ Offset in file
+--         , pVirtAddr :: WordXX c       -- ^ Virtual address in memory
+--         , pPhysAddr :: WordXX c       -- ^ Physical address
+--         , pFileSize :: WordXX c       -- ^ Size of segment in file
+--         , pMemSize  :: WordXX c       -- ^ Size of segment in memory
+--         , pAlign    :: WordXX c       -- ^ Alignment of segment
+--         }
+
+segmets :: Fold (ELFXX c) (SegmentXX c)
+segmets = folding $ \ elf -> [SegmentXX elf 0, SegmentXX elf 1, SegmentXX elf 2]
+
+------------------------------------------------------------
 
 -- getHeader' :: IsElfClass c => Sing c -> Get Header
 -- getHeader' classS = do

@@ -14,6 +14,8 @@ module Main (main) where
 
 import Prelude as P
 
+import Control.Lens.Combinators
+import Control.Lens.Fold
 import Control.Monad
 -- import Control.Monad.Catch
 -- import Data.Binary
@@ -24,6 +26,7 @@ import Data.Foldable as F
 import Data.Singletons
 -- import Data.Singletons.Sigma
 import Data.Word
+import Data.Function
 import Numeric
 import Prettyprinter
 import Prettyprinter.Render.Text
@@ -172,6 +175,57 @@ formatPairs ls = align $ vsep $ fmap f ls
         f (n, v) = fill w (pretty n <> ":") <+> v
         w = 1 + P.maximum (fmap (P.length . fst) ls)
 
+formatFold :: Fold s (Doc ()) -> s -> (Doc ())
+formatFold fd s = align $ vsep $ toListOf (fd . to f) s
+    where
+        f x = pretty '-' <+> x
+
+-- printSection :: SingI a => Int -> SectionXX a -> Doc ()
+-- printSection _n _s =
+printSection :: SingI a => SectionXX a -> Doc ()
+printSection _s =
+    formatPairs
+        [ ("N", "0")
+        , ("X", "1")
+        ]
+--        [ ("N",         viaShow n              )
+--        , ("Name",      viaShow sName          ) -- Word32
+--        , ("Type",      viaShow sType          ) -- ElfSectionType
+--        , ("Flags",     printWordXX sFlags     ) -- WordXX c
+--        , ("Addr",      printWordXX sAddr      ) -- WordXX c
+--        , ("Offset",    printWordXX sOffset    ) -- WordXX c
+--        , ("Size",      printWordXX sSize      ) -- WordXX c
+--        , ("Link",      viaShow sLink          ) -- Word32
+--        , ("Info",      viaShow sInfo          ) -- Word32
+--        , ("AddrAlign", printWordXX sAddrAlign ) -- WordXX c
+--        , ("EntSize",   printWordXX sEntSize   ) -- WordXX c
+--        ]
+
+-- printSegment :: SingI a => Int -> SegmentXX a -> Doc ()
+-- printSegment _n _s =
+printSegment :: SingI a => SegmentXX a -> Doc ()
+printSegment _s =
+    formatPairs
+        [ ("N", "0")
+        , ("X", "1")
+        ]
+--        [ ("N",        viaShow n             )
+--        , ("Type",     viaShow pType         ) -- ElfSegmentType
+--        , ("Flags",    viaShow $ splitBits pFlags ) -- ElfSegmentFlag
+--        , ("Offset",   printWordXX pOffset   ) -- WordXX c
+--        , ("VirtAddr", printWordXX pVirtAddr ) -- WordXX c
+--        , ("PhysAddr", printWordXX pPhysAddr ) -- WordXX c
+--        , ("FileSize", printWordXX pFileSize ) -- WordXX c
+--        , ("MemSize",  printWordXX pMemSize  ) -- WordXX c
+--        , ("Align",    printWordXX pAlign    ) -- WordXX c
+--        ]
+
+printSections :: IsElfClass c => ELFXX c -> Doc ()
+printSections elf = elf & formatFold (sections . to printSection)
+
+printSegments :: IsElfClass c => ELFXX c -> Doc ()
+printSegments elf = elf & formatFold (segmets . to printSegment)
+
 printHeader :: IsElfClass c => ELFXX c -> Doc ()
 printHeader elf = formatPairs
     [ ( "Class",      viaShow     $ hClass      elf)
@@ -191,10 +245,19 @@ printHeader elf = formatPairs
     , ( "ShStrNdx",   viaShow     $ hShStrNdx   elf)
     ]
 
-printHeaderFile :: FilePath -> IO (Doc ())
-printHeaderFile path = do
+-- | Print parsed header, section table and segment table.
+--   It's used in golden tests
+printHeaders :: IsElfClass a => ELFXX a -> Doc ()
+printHeaders elf = formatPairs
+    [ ("Header",   printHeader   elf)
+    , ("Sections", printSections elf)
+    , ("Segments", printSegments elf)
+    ]
+
+printHeadersFile :: FilePath -> IO (Doc ())
+printHeadersFile path = do
     elf <- readELF path
-    return $ withELF elf printHeader
+    return $ withELF elf printHeaders
 
 -- printHeadersFile :: FilePath -> IO (Doc ())
 -- printHeadersFile path = do
@@ -288,19 +351,12 @@ printHeaderFile path = do
 --                                        , mkSizeTest "symbol table entry 32" (Be testSymbolTableEntry32) (symbolTableEntrySize ELFCLASS32)
 --                                        ]
 
-elfsForHeader :: [String]
-elfsForHeader = [ "testdata/orig/bloated"
-                , "testdata/orig/tiny"
-                , "testdata/orig/vdso"
-                ]
-
 main :: IO ()
 main = do
 
-    _elfs <- traverseDir "testdata" isElf
+    elfs <- traverseDir "testdata" isElf
 
-    defaultMain $ testGroup "elf" [ testGroup "elf headers golden"  (mkGoldenTest        "elf_header"      printHeaderFile       <$> elfsForHeader)
-                                  , testGroup "header golden"       [testCase "void" $ return ()] -- (mkGoldenTest        "header"          printHeadersFile      <$> elfs)
+    defaultMain $ testGroup "elf" [ testGroup "header golden" (mkGoldenTest "header" printHeadersFile <$> elfs)
                                   -- , testGroup "headers round trip"  (mkTest <$> elfs)
                                   --   hdrSizeTests
                                   -- , testGroup "string table golden" (mkGoldenTest        "strtable"        printStrTableFile     <$> elfs)
