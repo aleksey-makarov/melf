@@ -415,7 +415,15 @@ sEntSize :: IsElfClass c => SectionXX c -> WordXX c
 sEntSize SectionXX { .. } = readWordXX sElf sOff 0 0
 
 sections :: IsElfClass c => Fold (ELFXX c) (SectionXX c)
-sections = folding $ \ elf -> [SectionXX elf 0, SectionXX elf 1, SectionXX elf 2]
+sections = folding $ \ elf ->
+    let
+        shN       = fromIntegral $ hShNum elf
+        shEntSize = fromIntegral $ hShEntSize elf
+        f x = SectionXX elf $ fromIntegral (hShOff elf + (x * shEntSize))
+    in
+        if shN <= 0
+            then []
+            else fmap f [0 .. shN - 1]
 
 ------------------------------------------------------------
 
@@ -457,7 +465,15 @@ pAlign :: IsElfClass c => SegmentXX c -> WordXX c
 pAlign SegmentXX { .. } = readWordXX pElf pOff 0 0
 
 segmets :: IsElfClass c => Fold (ELFXX c) (SegmentXX c)
-segmets = folding $ \ elf -> [SegmentXX elf 0, SegmentXX elf 1, SegmentXX elf 2]
+segmets = folding $ \ elf ->
+    let
+        phN       = fromIntegral $ hPhNum elf
+        phEntSize = fromIntegral $ hPhEntSize elf
+        f x = SegmentXX elf $ fromIntegral (hPhOff elf + (x * phEntSize))
+    in
+        if phN <= 0
+            then []
+            else fmap f [0 .. phN - 1]
 
 ------------------------------------------------------------
 
