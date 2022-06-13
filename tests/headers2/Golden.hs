@@ -182,15 +182,15 @@ formatPairs ls = align $ vsep $ fmap f ls
         f (n, v) = fill w (pretty n <> ":") <+> v
         w = 1 + P.maximum (fmap (P.length . fst) ls)
 
-formatFold :: Fold s (Doc ()) -> s -> (Doc ())
+formatFold :: Fold s (Doc ()) -> s -> Doc ()
 formatFold fd s = align $ vsep $ toListOf (fd . to f) s
     where
         f x = pretty '-' <+> x
 
-printSection :: IsElfClass a => SectionXX a -> Doc ()
-printSection s =
+printSection :: IsElfClass a => (Word16, SectionXX a) -> Doc ()
+printSection (n, s) =
     formatPairs
-        [ ("N",         viaShow     $ (0 :: Int)  )
+        [ ("N",         viaShow       n           )
         , ("Name",      viaShow     $ sName      s) -- Word32
         , ("Type",      viaShow     $ sType      s) -- ElfSectionType
         , ("Flags",     printWordXX $ sFlags     s) -- WordXX c
@@ -203,10 +203,10 @@ printSection s =
         , ("EntSize",   printWordXX $ sEntSize   s) -- WordXX c
         ]
 
-printSegment :: IsElfClass a => SegmentXX a -> Doc ()
-printSegment p =
+printSegment :: IsElfClass a => (Word16, SegmentXX a) -> Doc ()
+printSegment (n, p) =
     formatPairs
-        [ ("N",        viaShow             $ (0 :: Int) )
+        [ ("N",        viaShow               n          )
         , ("Type",     viaShow             $ pType     p) -- ElfSegmentType
         , ("Flags",    viaShow $ splitBits $ pFlags    p) -- ElfSegmentFlag
         , ("Offset",   printWordXX         $ pOffset   p) -- WordXX c
@@ -218,10 +218,10 @@ printSegment p =
         ]
 
 printSections :: IsElfClass c => ELFXX c -> Doc ()
-printSections elf = elf & formatFold (sections . to printSection)
+printSections elf = elf & formatFold (sections . withIndex . to printSection)
 
 printSegments :: IsElfClass c => ELFXX c -> Doc ()
-printSegments elf = elf & formatFold (segmets . to printSegment)
+printSegments elf = elf & formatFold (segmets . withIndex . to printSegment)
 
 printHeader :: IsElfClass c => ELFXX c -> Doc ()
 printHeader elf = formatPairs

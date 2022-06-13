@@ -414,12 +414,12 @@ sAddrAlign SectionXX { .. } = readWordXX sElf sOff 32 48
 sEntSize :: IsElfClass c => SectionXX c -> WordXX c
 sEntSize SectionXX { .. } = readWordXX sElf sOff 36 56
 
-sections :: IsElfClass c => Fold (ELFXX c) (SectionXX c)
-sections = folding $ \ elf ->
+sections :: IsElfClass c => IndexedFold Word16 (ELFXX c) (SectionXX c)
+sections = ifolding $ \ elf ->
     let
-        shN       = fromIntegral $ hShNum elf
+        shN       = hShNum elf
         shEntSize = fromIntegral $ hShEntSize elf
-        f x = SectionXX elf $ fromIntegral (hShOff elf + (x * shEntSize))
+        f x = (x, SectionXX elf $ fromIntegral $ hShOff elf + (fromIntegral x) * shEntSize)
     in
         if shN <= 0
             then []
@@ -464,12 +464,12 @@ pMemSize SegmentXX { .. } = readWordXX pElf pOff 20 40
 pAlign :: IsElfClass c => SegmentXX c -> WordXX c
 pAlign SegmentXX { .. } = readWordXX pElf pOff 28 48
 
-segmets :: IsElfClass c => Fold (ELFXX c) (SegmentXX c)
-segmets = folding $ \ elf ->
+segmets :: IsElfClass c => IndexedFold Word16 (ELFXX c) (SegmentXX c)
+segmets = ifolding $ \ elf ->
     let
-        phN       = fromIntegral $ hPhNum elf
+        phN       = hPhNum elf
         phEntSize = fromIntegral $ hPhEntSize elf
-        f x = SegmentXX elf $ fromIntegral (hPhOff elf + (x * phEntSize))
+        f x = (x, SegmentXX elf $ fromIntegral $ hPhOff elf + (fromIntegral x) * phEntSize)
     in
         if phN <= 0
             then []
