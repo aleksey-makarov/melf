@@ -254,23 +254,23 @@ readWord32' = read2 readWord16'
 readWord64' :: State ReadWordState Word64
 readWord64' = read2 readWord32'
 
-runReadWord :: forall a c . SingI c => (State ReadWordState a) -> ELFXX c -> Int -> Int -> a
-runReadWord m ELFXX { .. } o32 o64 = evalState m $ ReadWordState elfBytes elfData o
+runReadWord :: forall a c . SingI c => (State ReadWordState a) -> ELFXX c -> Int -> Int -> Int -> a
+runReadWord m ELFXX { .. } base o32 o64 = evalState m $ ReadWordState elfBytes elfData o
     where
         o = case sing @c of
-            SELFCLASS32 -> o32
-            SELFCLASS64 -> o64
+            SELFCLASS32 -> base + o32
+            SELFCLASS64 -> base + o64
 
-readWord16 :: SingI c => ELFXX c -> Int -> Int -> Word16
+readWord16 :: SingI c => ELFXX c -> Int -> Int -> Int -> Word16
 readWord16 = runReadWord readWord16'
 
-readWord32 :: SingI c => ELFXX c -> Int -> Int -> Word32
+readWord32 :: SingI c => ELFXX c -> Int -> Int -> Int -> Word32
 readWord32 = runReadWord readWord32'
 
-readWordXX :: IsElfClass c => ELFXX c -> Int -> Int -> WordXX c
+readWordXX :: IsElfClass c => ELFXX c -> Int -> Int -> Int -> WordXX c
 readWordXX = readWordXX' sing
     where
-        readWordXX' :: IsElfClass c => SElfClass c ->  ELFXX c -> Int -> Int -> WordXX c
+        readWordXX' :: IsElfClass c => SElfClass c ->  ELFXX c -> Int -> Int -> Int -> WordXX c
         readWordXX' SELFCLASS32 = runReadWord readWord32'
         readWordXX' SELFCLASS64 = runReadWord readWord64'
 
@@ -293,47 +293,47 @@ hABIVersion ELFXX { .. } = elfBytes ! 8
 
 -- | Object file type
 hType :: SingI c => ELFXX c -> ElfType
-hType elf = ET_EXT $ readWord16 elf 16 16
+hType elf = ET_EXT $ readWord16 elf 0 16 16
 
 -- | Machine type
 hMachine :: SingI c => ELFXX c -> ElfMachine
-hMachine elf = EM_EXT $ readWord16 elf 18 18
+hMachine elf = EM_EXT $ readWord16 elf 0 18 18
 
 -- | Entry point address
 hEntry :: IsElfClass c => ELFXX c -> WordXX c
-hEntry elf = readWordXX elf 24 24
+hEntry elf = readWordXX elf 0 24 24
 
 -- | Program header offset
 hPhOff :: IsElfClass c => ELFXX c -> WordXX c
-hPhOff elf = readWordXX elf 28 32
+hPhOff elf = readWordXX elf 0 28 32
 
 -- | Section header offset
 hShOff :: IsElfClass c => ELFXX c -> WordXX c
-hShOff elf = readWordXX elf 32 40
+hShOff elf = readWordXX elf 0 32 40
 
 -- | Processor-specific flags
 hFlags :: SingI c => ELFXX c -> Word32
-hFlags elf = readWord32 elf 36 48
+hFlags elf = readWord32 elf 0 36 48
 
 -- | Size of program header entry
 hPhEntSize :: SingI c => ELFXX c -> Word16
-hPhEntSize elf = readWord16 elf 42 54
+hPhEntSize elf = readWord16 elf 0 42 54
 
 -- | Number of program header entries
 hPhNum :: SingI c => ELFXX c -> Word16
-hPhNum elf = readWord16 elf 44 56
+hPhNum elf = readWord16 elf 0 44 56
 
 -- | Size of section header entry
 hShEntSize :: SingI c => ELFXX c -> Word16
-hShEntSize elf = readWord16 elf 46 58
+hShEntSize elf = readWord16 elf 0 46 58
 
 -- | Number of section header entries
 hShNum :: SingI c => ELFXX c -> Word16
-hShNum elf = readWord16 elf 48 60
+hShNum elf = readWord16 elf 0 48 60
 
 -- | Section name string table index
 hShStrNdx :: SingI c => ELFXX c -> ElfSectionIndex
-hShStrNdx elf = SHN_EXT $ readWord16 elf 50 62
+hShStrNdx elf = SHN_EXT $ readWord16 elf 0 50 62
 
 -- | Size of ELF header.
 headerSize :: Num a => ElfClass -> a
@@ -375,45 +375,44 @@ data SectionXX c = SectionXX
     , sOff :: Int
     }
 
-sName :: SectionXX c -> Word32
--- sName SectionXX { .. } = undefined
-sName = undefined
+sName :: SingI c => SectionXX c -> Word32
+sName SectionXX { .. } = readWord32 sElf sOff 0 0
 
 -- | Section type
-sType :: SectionXX c -> ElfSectionType
-sType = undefined
+sType :: SingI c => SectionXX c -> ElfSectionType
+sType SectionXX { .. } =  SHT_EXT $ readWord32 sElf sOff 0 0
 
 -- | Section attributes
-sFlags :: SectionXX c -> WordXX c
-sFlags = undefined
+sFlags :: IsElfClass c => SectionXX c -> WordXX c
+sFlags SectionXX { .. } = readWordXX sElf sOff 0 0
 
 -- | Virtual address in memory
-sAddr :: SectionXX c -> WordXX c
-sAddr = undefined
+sAddr :: IsElfClass c => SectionXX c -> WordXX c
+sAddr SectionXX { .. } = readWordXX sElf sOff 0 0
 
 -- | Offset in file
-sOffset :: SectionXX c -> WordXX c
-sOffset = undefined
+sOffset :: IsElfClass c => SectionXX c -> WordXX c
+sOffset SectionXX { .. } = readWordXX sElf sOff 0 0
 
 -- | Size of section
-sSize :: SectionXX c -> WordXX c
-sSize = undefined
+sSize :: IsElfClass c => SectionXX c -> WordXX c
+sSize SectionXX { .. } = readWordXX sElf sOff 0 0
 
 -- | Link to other section
-sLink :: SectionXX c -> Word32
-sLink = undefined
+sLink :: SingI c => SectionXX c -> Word32
+sLink SectionXX { .. } = readWord32 sElf sOff 0 0
 
 -- | Miscellaneous information
-sInfo :: SectionXX c -> Word32
-sInfo = undefined
+sInfo :: SingI c => SectionXX c -> Word32
+sInfo SectionXX { .. } = readWord32 sElf sOff 0 0
 
 -- | Address alignment boundary
-sAddrAlign :: SectionXX c -> WordXX c
-sAddrAlign = undefined
+sAddrAlign :: IsElfClass c => SectionXX c -> WordXX c
+sAddrAlign SectionXX { .. } = readWordXX sElf sOff 0 0
 
 -- | Size of entries, if section has table
-sEntSize :: SectionXX c -> WordXX c
-sEntSize = undefined
+sEntSize :: IsElfClass c => SectionXX c -> WordXX c
+sEntSize SectionXX { .. } = readWordXX sElf sOff 0 0
 
 sections :: IsElfClass c => Fold (ELFXX c) (SectionXX c)
 sections = folding $ \ elf -> [SectionXX elf 0, SectionXX elf 1, SectionXX elf 2]
@@ -427,35 +426,35 @@ data SegmentXX a = SegmentXX
 
 -- | Type of segment
 pType :: SingI c => SegmentXX c -> ElfSegmentType
-pType = undefined
+pType SegmentXX { .. } = PT_EXT $ readWord32 pElf pOff 0 0
 
 -- | Segment attributes
 pFlags :: SingI c => SegmentXX c -> ElfSegmentFlag
-pFlags = undefined
+pFlags SegmentXX { .. } = PF_EXT $ readWord32 pElf pOff 0 0
 
 -- | Offset in file
-pOffset :: SingI c => SegmentXX c -> WordXX c
-pOffset = undefined
+pOffset :: IsElfClass c => SegmentXX c -> WordXX c
+pOffset SegmentXX { .. } = readWordXX pElf pOff 0 0
 
 -- | Virtual address in memory
-pVirtAddr :: SingI c => SegmentXX c -> WordXX c
-pVirtAddr = undefined
+pVirtAddr :: IsElfClass c => SegmentXX c -> WordXX c
+pVirtAddr SegmentXX { .. } = readWordXX pElf pOff 0 0
 
 -- | Physical address
-pPhysAddr :: SingI c => SegmentXX c -> WordXX c
-pPhysAddr = undefined
+pPhysAddr :: IsElfClass c => SegmentXX c -> WordXX c
+pPhysAddr SegmentXX { .. } = readWordXX pElf pOff 0 0
 
 -- | Size of segment in file
-pFileSize :: SingI c => SegmentXX c -> WordXX c
-pFileSize = undefined
+pFileSize :: IsElfClass c => SegmentXX c -> WordXX c
+pFileSize SegmentXX { .. } = readWordXX pElf pOff 0 0
 
 -- | Size of segment in memory
-pMemSize :: SingI c => SegmentXX c -> WordXX c
-pMemSize = undefined
+pMemSize :: IsElfClass c => SegmentXX c -> WordXX c
+pMemSize SegmentXX { .. } = readWordXX pElf pOff 0 0
 
 -- | Alignment of segment
-pAlign :: SingI c => SegmentXX c -> WordXX c
-pAlign = undefined
+pAlign :: IsElfClass c => SegmentXX c -> WordXX c
+pAlign SegmentXX { .. } = readWordXX pElf pOff 0 0
 
 segmets :: IsElfClass c => Fold (ELFXX c) (SegmentXX c)
 segmets = folding $ \ elf -> [SegmentXX elf 0, SegmentXX elf 1, SegmentXX elf 2]

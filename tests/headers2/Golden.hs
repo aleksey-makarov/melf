@@ -187,7 +187,7 @@ formatFold fd s = align $ vsep $ toListOf (fd . to f) s
     where
         f x = pretty '-' <+> x
 
-printSection :: SingI a => SectionXX a -> Doc ()
+printSection :: IsElfClass a => SectionXX a -> Doc ()
 printSection s =
     formatPairs
         [ ("N",         viaShow     $ (0 :: Int)  )
@@ -203,7 +203,7 @@ printSection s =
         , ("EntSize",   printWordXX $ sEntSize   s) -- WordXX c
         ]
 
-printSegment :: SingI a => SegmentXX a -> Doc ()
+printSegment :: IsElfClass a => SegmentXX a -> Doc ()
 printSegment p =
     formatPairs
         [ ("N",        viaShow             $ (0 :: Int) )
