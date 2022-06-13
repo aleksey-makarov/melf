@@ -380,39 +380,39 @@ sName SectionXX { .. } = readWord32 sElf sOff 0 0
 
 -- | Section type
 sType :: SingI c => SectionXX c -> ElfSectionType
-sType SectionXX { .. } =  SHT_EXT $ readWord32 sElf sOff 0 0
+sType SectionXX { .. } =  SHT_EXT $ readWord32 sElf sOff 4 4
 
 -- | Section attributes
 sFlags :: IsElfClass c => SectionXX c -> WordXX c
-sFlags SectionXX { .. } = readWordXX sElf sOff 0 0
+sFlags SectionXX { .. } = readWordXX sElf sOff 8 8
 
 -- | Virtual address in memory
 sAddr :: IsElfClass c => SectionXX c -> WordXX c
-sAddr SectionXX { .. } = readWordXX sElf sOff 0 0
+sAddr SectionXX { .. } = readWordXX sElf sOff 12 16
 
 -- | Offset in file
 sOffset :: IsElfClass c => SectionXX c -> WordXX c
-sOffset SectionXX { .. } = readWordXX sElf sOff 0 0
+sOffset SectionXX { .. } = readWordXX sElf sOff 16 24
 
 -- | Size of section
 sSize :: IsElfClass c => SectionXX c -> WordXX c
-sSize SectionXX { .. } = readWordXX sElf sOff 0 0
+sSize SectionXX { .. } = readWordXX sElf sOff 20 32
 
 -- | Link to other section
 sLink :: SingI c => SectionXX c -> Word32
-sLink SectionXX { .. } = readWord32 sElf sOff 0 0
+sLink SectionXX { .. } = readWord32 sElf sOff 24 40
 
 -- | Miscellaneous information
 sInfo :: SingI c => SectionXX c -> Word32
-sInfo SectionXX { .. } = readWord32 sElf sOff 0 0
+sInfo SectionXX { .. } = readWord32 sElf sOff 28 44
 
 -- | Address alignment boundary
 sAddrAlign :: IsElfClass c => SectionXX c -> WordXX c
-sAddrAlign SectionXX { .. } = readWordXX sElf sOff 0 0
+sAddrAlign SectionXX { .. } = readWordXX sElf sOff 32 48
 
 -- | Size of entries, if section has table
 sEntSize :: IsElfClass c => SectionXX c -> WordXX c
-sEntSize SectionXX { .. } = readWordXX sElf sOff 0 0
+sEntSize SectionXX { .. } = readWordXX sElf sOff 36 56
 
 sections :: IsElfClass c => Fold (ELFXX c) (SectionXX c)
 sections = folding $ \ elf ->
@@ -438,31 +438,31 @@ pType SegmentXX { .. } = PT_EXT $ readWord32 pElf pOff 0 0
 
 -- | Segment attributes
 pFlags :: SingI c => SegmentXX c -> ElfSegmentFlag
-pFlags SegmentXX { .. } = PF_EXT $ readWord32 pElf pOff 0 0
+pFlags SegmentXX { .. } = PF_EXT $ readWord32 pElf pOff 24 4
 
 -- | Offset in file
 pOffset :: IsElfClass c => SegmentXX c -> WordXX c
-pOffset SegmentXX { .. } = readWordXX pElf pOff 0 0
+pOffset SegmentXX { .. } = readWordXX pElf pOff 4 8
 
 -- | Virtual address in memory
 pVirtAddr :: IsElfClass c => SegmentXX c -> WordXX c
-pVirtAddr SegmentXX { .. } = readWordXX pElf pOff 0 0
+pVirtAddr SegmentXX { .. } = readWordXX pElf pOff 8 16
 
 -- | Physical address
 pPhysAddr :: IsElfClass c => SegmentXX c -> WordXX c
-pPhysAddr SegmentXX { .. } = readWordXX pElf pOff 0 0
+pPhysAddr SegmentXX { .. } = readWordXX pElf pOff 12 24
 
 -- | Size of segment in file
 pFileSize :: IsElfClass c => SegmentXX c -> WordXX c
-pFileSize SegmentXX { .. } = readWordXX pElf pOff 0 0
+pFileSize SegmentXX { .. } = readWordXX pElf pOff 16 32
 
 -- | Size of segment in memory
 pMemSize :: IsElfClass c => SegmentXX c -> WordXX c
-pMemSize SegmentXX { .. } = readWordXX pElf pOff 0 0
+pMemSize SegmentXX { .. } = readWordXX pElf pOff 20 40
 
 -- | Alignment of segment
 pAlign :: IsElfClass c => SegmentXX c -> WordXX c
-pAlign SegmentXX { .. } = readWordXX pElf pOff 0 0
+pAlign SegmentXX { .. } = readWordXX pElf pOff 28 48
 
 segmets :: IsElfClass c => Fold (ELFXX c) (SegmentXX c)
 segmets = folding $ \ elf ->
