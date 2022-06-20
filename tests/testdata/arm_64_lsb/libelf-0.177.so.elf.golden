@@ -308,7 +308,7 @@ segment {
                             EntSize:   0x0000000000000000
                             Info:      0x00000000
                             Link:      0x00000000
-                            Data:      
+                            Data:      NoBits: 4
                         }
                 }
                 section 18 ".init_array" {
@@ -402,7 +402,7 @@ section 24 ".bss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 16
 }
 section 25 ".comment" {
     Type:      SHT_PROGBITS

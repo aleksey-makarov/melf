@@ -275,7 +275,7 @@ segment {
                     EntSize:   0x0000000000000018
                     Info:      0x00000000
                     Link:      0x00000000
-                    Data:      
+                    Data:      NoBits: 120
                 }
                 section 16 ".iplt" {
                     Type:      SHT_NOBITS
@@ -285,7 +285,7 @@ segment {
                     EntSize:   0x0000000000000000
                     Info:      0x00000000
                     Link:      0x00000000
-                    Data:      
+                    Data:      NoBits: 24
                 }
                 section 17 ".got" {
                     Type:      SHT_PROGBITS
@@ -340,7 +340,7 @@ section 20 ".bss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 360
 }
 string table section 21 ".shstrtab"
 section table

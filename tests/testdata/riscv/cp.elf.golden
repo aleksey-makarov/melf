@@ -383,7 +383,7 @@ section 22 ".bss" {
     EntSize:   0x00000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 1508
 }
 string table section 23 ".shstrtab"
 section table

@@ -402,7 +402,7 @@ section 24 ".sbss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 2488
 }
 section 25 ".bss" {
     Type:      SHT_NOBITS
@@ -412,7 +412,7 @@ section 25 ".bss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 53072
 }
 section 26 ".gnu_debuglink" {
     Type:      SHT_PROGBITS

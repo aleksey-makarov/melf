@@ -380,7 +380,7 @@ segment {
                     EntSize:   0x0000000000000018
                     Info:      0x00000000
                     Link:      0x00000000
-                    Data:      
+                    Data:      NoBits: 2520
                 }
                 raw align {
                     Offset: 0x0000000000040000
@@ -414,7 +414,7 @@ section 24 ".bss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 536
 }
 section 25 ".gnu.attributes" {
     Type:      SHT_EXT 1879048181

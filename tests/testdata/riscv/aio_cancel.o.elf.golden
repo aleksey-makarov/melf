@@ -40,7 +40,7 @@ section 4 ".bss" {
     EntSize:   0x00000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 0
 }
 section 5 ".rodata.str1.4" {
     Type:      SHT_PROGBITS

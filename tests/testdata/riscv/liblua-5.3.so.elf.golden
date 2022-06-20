@@ -305,7 +305,7 @@ section 18 ".bss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 8
 }
 section 19 ".gnu_debuglink" {
     Type:      SHT_PROGBITS

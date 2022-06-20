@@ -403,7 +403,7 @@ section 24 ".bss" {
     EntSize:   0x00000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 27132
 }
 section 25 ".comment" {
     Type:      SHT_PROGBITS

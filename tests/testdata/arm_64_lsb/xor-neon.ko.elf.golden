@@ -161,7 +161,7 @@ section 17 ".plt" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 1
 }
 section 18 ".init.plt" {
     Type:      SHT_NOBITS
@@ -171,7 +171,7 @@ section 18 ".init.plt" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 1
 }
 section 19 ".text.ftrace_trampoline" {
     Type:      SHT_NOBITS
@@ -181,7 +181,7 @@ section 19 ".text.ftrace_trampoline" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 1
 }
 section 20 ".bss" {
     Type:      SHT_NOBITS
@@ -191,7 +191,7 @@ section 20 ".bss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 0
 }
 section 21 ".comment" {
     Type:      SHT_PROGBITS

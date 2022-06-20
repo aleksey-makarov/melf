@@ -406,32 +406,38 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                 , ("Entry",      printWordXX ehEntry  ) -- WordXX c
                 , ("Flags",      printWord32 ehFlags  ) -- Word32
                 ]
-        printElf'' s@ElfSection{ esData = (ElfSectionData bs), ..} = do
-            (sectionName, dataDoc) <- if sectionIsSymbolTable esType
-                then do
-                    stes <- parseSymbolTable hData s elfs
-                    return ("symbol table section", if null stes then "" else line <> indent 4 (printElfSymbolTable full stes))
-                else if hMachine == EM_AARCH64
-                        && hData == ELFDATA2LSB
-                       && esType == SHT_RELA
-                    && esEntSize == withElfClass classS relocationTableAEntrySize then
-                        case classS of
-                            SELFCLASS64 -> ("section", ) <$> printRelocationTableA_AARCH64 full esLink elfs bs
-                            SELFCLASS32 -> $chainedError "invalid ELF: EM_AARCH64 and ELFCLASS32"
-                else
-                    return ("section", printData full bs)
-            return $ formatPairsBlock (sectionName <+> viaShow (fromIntegral esN :: Word) <+> dquotes (pretty esName))
-                [ ("Type",       viaShow esType          )
-                , ("Flags",      viaShow $ splitBits esFlags )
-                , ("Addr",       printWordXX esAddr      )
-                , ("AddrAlign",  printWordXX esAddrAlign )
-                , ("EntSize",    printWordXX esEntSize   )
-                , ("Info",       printWord32 esInfo      )
-                , ("Link",       printWord32 esLink      )
-                , ("Data",       dataDoc )
-                ]
-        printElf'' ElfSection{ esData = ElfSectionDataStringTable, ..} =
-            return $ "string table section" <+> viaShow (fromIntegral esN :: Word) <+> dquotes (pretty esName)
+        printElf'' s@ElfSection{ ..} =
+            let
+                printSection' sectionTitle dataDoc = formatPairsBlock (sectionTitle <+> viaShow (fromIntegral esN :: Word) <+> dquotes (pretty esName))
+                    [ ("Type",       viaShow esType          )
+                    , ("Flags",      viaShow $ splitBits esFlags )
+                    , ("Addr",       printWordXX esAddr      )
+                    , ("AddrAlign",  printWordXX esAddrAlign )
+                    , ("EntSize",    printWordXX esEntSize   )
+                    , ("Info",       printWord32 esInfo      )
+                    , ("Link",       printWord32 esLink      )
+                    , ("Data",       dataDoc )
+                    ]
+            in
+                case esData of
+                    ElfSectionDataNoBits { .. } ->
+                        return $ printSection' "section" ("NoBits:" <+> viaShow esdSize)
+                    ElfSectionDataStringTable ->
+                        return $ "string table section" <+> viaShow (fromIntegral esN :: Word) <+> dquotes (pretty esName)
+                    ElfSectionData bs ->
+                        if sectionIsSymbolTable esType
+                            then do
+                                stes <- parseSymbolTable hData s elfs
+                                return $ printSection' "symbol table section" $ if null stes then "" else line <> indent 4 (printElfSymbolTable full stes)
+                            else if hMachine == EM_AARCH64
+                                    && hData == ELFDATA2LSB
+                                && esType == SHT_RELA
+                                && esEntSize == withElfClass classS relocationTableAEntrySize then
+                                    case classS of
+                                        SELFCLASS64 -> printSection' "section" <$> printRelocationTableA_AARCH64 full esLink elfs bs
+                                        SELFCLASS32 -> $chainedError "invalid ELF: EM_AARCH64 and ELFCLASS32"
+                            else
+                                return $ printSection' "section" $ printData full bs
         printElf'' ElfSegment{..} = do
             dataDoc <- if null epData
                 then return ""

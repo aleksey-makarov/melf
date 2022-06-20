@@ -5,3 +5,4 @@ libelf-0.177.so filter=lfs diff=lfs merge=lfs -text
 xor-neon.ko filter=lfs diff=lfs merge=lfs -text
 chmod filter=lfs diff=lfs merge=lfs -text
 chmod.bad filter=lfs diff=lfs merge=lfs -text
+test_bss.o filter=lfs diff=lfs merge=lfs -text

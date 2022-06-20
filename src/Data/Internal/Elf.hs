@@ -296,9 +296,14 @@ type Elf = Sigma ElfClass (TyCon1 ElfList)
 -- | Section data may contain a string table.
 -- If a section contains a string table with section names, the data
 -- for such a section is generated and `esData` should contain `ElfSectionDataStringTable`
-data ElfSectionData
-    = ElfSectionData BSL.ByteString -- ^ Regular section data
+data ElfSectionData c
+    = ElfSectionData                -- ^ Regular section data
+        { esdData :: BSL.ByteString -- ^ The content of the section
+        }
     | ElfSectionDataStringTable     -- ^ Section data will be generated from section names
+    | ElfSectionDataNoBits          -- ^ SHT_NOBITS uninitialized section data: section has size but no content
+        { esdSize :: WordXX c       -- ^ Size of the section
+        }
 
 -- | The type of node that defines Elf structure.
 data ElfXX c
@@ -323,7 +328,7 @@ data ElfXX c
         , esN         :: ElfSectionIndex -- ^ Section number
         , esInfo      :: Word32         -- ^ Miscellaneous information
         , esLink      :: Word32         -- ^ Link to other section
-        , esData      :: ElfSectionData -- ^ The content of the section
+        , esData      :: ElfSectionData c -- ^ The content of the section
         }
     | ElfSegment
         { epType       :: ElfSegmentType -- ^ Type of segment
@@ -573,13 +578,12 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 , esN         = rbsN
                 , esInfo      = sInfo
                 , esLink      = sLink
-                , esData      = if rbsN == hShStrNdx
-                    then
-                        ElfSectionDataStringTable
-                    else
-                        ElfSectionData if I.empty $ sectionInterval s
-                            then BSL.empty
-                            else getSectionData bs s
+                , esData      =
+                    if rbsN == hShStrNdx
+                        then ElfSectionDataStringTable
+                        else if sType == SHT_NOBITS
+                            then ElfSectionDataNoBits sSize
+                            else ElfSectionData $ getSectionData bs s
                 }
         rBuilderToElf RBuilderSegment{ rbpHeader = SegmentXX{..}, ..} = do
             d <- mapM rBuilderToElf rbpData
@@ -755,14 +759,15 @@ serializeElf' elfs = do
         alignWord :: MonadThrow n => WBuilderState a -> n (WBuilderState a)
         alignWord = align 0 $ wordSize $ fromSing $ sing @a
 
-        dataIsEmpty :: ElfSectionData -> Bool
+        dataIsEmpty :: ElfSectionData c -> Bool
         dataIsEmpty (ElfSectionData bs)       = BSL.null bs
         dataIsEmpty ElfSectionDataStringTable = BSL.null stringTable
+        dataIsEmpty (ElfSectionDataNoBits _)  = True
 
         lastSectionIsEmpty :: [ElfXX a] -> Bool
         lastSectionIsEmpty [] = False
         lastSectionIsEmpty l = case L.last l of
-            ElfSection{..} -> esType == SHT_NOBITS || dataIsEmpty esData
+            ElfSection{..} -> dataIsEmpty esData
             _ -> False
 
         elf2WBuilder' :: MonadThrow n => ElfXX a -> WBuilderState a -> n (WBuilderState a)
@@ -791,13 +796,16 @@ serializeElf' elfs = do
         elf2WBuilder' ElfSection{esFlags = ElfSectionFlag f, ..} s = do
             when (f .&. fromIntegral (complement (maxBound @(WordXX a))) /= 0)
                 ($chainedError $ "section flags at section " ++ show esN ++ "don't fit")
-            WBuilderState{..} <- if esType == SHT_NOBITS
+            -- I don't see any sense in aligning NOBITS sections
+            -- still gcc does it for .o files
+            WBuilderState{..} <- if esType == SHT_NOBITS && (ehType header') /= ET_REL
                 then return s
                 else align 0 esAddrAlign s
             let
-                (d, shStrNdx) = case esData of
-                    ElfSectionData bs -> (bs, wbsShStrNdx)
-                    ElfSectionDataStringTable -> (stringTable, esN)
+                (d, shStrNdx, sz) = case esData of
+                    ElfSectionData { .. } -> (esdData, wbsShStrNdx, fromIntegral $ BSL.length esdData)
+                    ElfSectionDataStringTable -> (stringTable, esN, fromIntegral $ BSL.length stringTable)
+                    ElfSectionDataNoBits { .. } -> (BSL.empty, wbsShStrNdx, esdSize)
                 (n, ns) = case wbsNameIndexes of
                     n' : ns' -> (n', ns')
                     _ -> error "internal error: different number of sections in two iterations"
@@ -806,7 +814,7 @@ serializeElf' elfs = do
                 sFlags = fromIntegral f
                 sAddr = esAddr                         -- WXX c
                 sOffset = wbsOffset                    -- WXX c
-                sSize = fromIntegral $ BSL.length d    -- WXX c
+                sSize = sz                             -- WXX c
                 sLink = esLink                         -- Word32
                 sInfo = esInfo                         -- Word32
                 sAddrAlign = esAddrAlign               -- WXX c

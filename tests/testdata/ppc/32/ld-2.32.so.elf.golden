@@ -322,7 +322,7 @@ section 18 ".sbss" {
     EntSize:   0x00000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 28
 }
 section 19 ".bss" {
     Type:      SHT_NOBITS
@@ -332,7 +332,7 @@ section 19 ".bss" {
     EntSize:   0x00000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 160
 }
 section 20 ".gnu.attributes" {
     Type:      SHT_EXT 1879048181

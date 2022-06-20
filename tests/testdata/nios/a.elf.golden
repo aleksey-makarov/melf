@@ -87,7 +87,7 @@ section 5 ".sbss" {
     EntSize:   0x00000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 24
 }
 section 6 ".bss" {
     Type:      SHT_NOBITS
@@ -97,7 +97,7 @@ section 6 ".bss" {
     EntSize:   0x00000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 40
 }
 section 7 ".comment" {
     Type:      SHT_PROGBITS

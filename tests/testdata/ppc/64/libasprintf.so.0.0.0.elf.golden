@@ -315,7 +315,7 @@ segment {
                     EntSize:   0x0000000000000018
                     Info:      0x00000000
                     Link:      0x00000000
-                    Data:      
+                    Data:      NoBits: 312
                 }
                 raw align {
                     Offset: 0x0000000000010000
@@ -345,7 +345,7 @@ section 21 ".bss" {
     EntSize:   0x0000000000000000
     Info:      0x00000000
     Link:      0x00000000
-    Data:      
+    Data:      NoBits: 8
 }
 string table section 22 ".shstrtab"
 section table
