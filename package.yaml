@@ -31,6 +31,7 @@ library:
     - binary        >= 0.8.7 && < 0.9
     - bytestring    >= 0.10.10 && < 0.12
     - exceptions    >= 0.10.4 && < 0.11
+    - lens
     - mtl           >= 2.2.2 && < 2.3
     - prettyprinter >= 1.7.0 && < 1.8
     # In 3.0 they splitted singletons into

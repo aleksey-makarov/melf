@@ -25,6 +25,7 @@ import Data.Elf.Constants
 import Data.Elf.Headers
 import Data.Interval as I
 
+import Control.Lens.Combinators hiding (contains)
 import Control.Monad
 import Control.Monad.Catch
 import Control.Monad.State as MS
@@ -163,6 +164,8 @@ data WBuilderState a =
         , wbsNameIndexes      :: [Int64]
         }
 
+makeLenses ''WBuilderState
+
 headerInterval :: forall a . IsElfClass a => HeaderXX a -> Interval (WordXX a)
 headerInterval _ = I 0 $ headerSize $ fromSing $ sing @a
 
@@ -224,8 +227,8 @@ addRBuilders newts =
         addRBuilderEmpty t ts =
             -- (unsafePerformIO $ Prelude.putStrLn $ "Add Empty " ++ showRBuilder t ++ " to " ++ showERBList ts) `seq`
             let
-                to = offset $ rBuilderInterval t
-                (LZip l c' r) = findInterval rBuilderInterval to ts
+                to' = offset $ rBuilderInterval t
+                (LZip l c' r) = findInterval rBuilderInterval to' ts
 
                 -- Let `(le, lo)` is the result of `allEmptyStarting a l`.
                 -- Then `le` is the initial sublist of `l` each element of which is empty and starts at `a`,
@@ -245,16 +248,16 @@ addRBuilders newts =
                     d <- $addContext' $ addRBuilderEmpty t rbpData
                     return $ toList $ LZip l (Just RBuilderSegment{ rbpData = d, .. }) r
                 Just c ->
-                    if offset (rBuilderInterval c) /= to then
+                    if offset (rBuilderInterval c) /= to' then
                         $chainedError $ intersectMessage t c
                     else
                         let
-                            (ce, re) = allEmptyStartingAt to (c : r)
+                            (ce, re') = allEmptyStartingAt to' (c : r)
                         in case t of
                             RBuilderSegment{..} ->
-                                return $ toList $ LZip l (Just RBuilderSegment{ rbpData = ce, .. }) re
+                                return $ toList $ LZip l (Just RBuilderSegment{ rbpData = ce, .. }) re'
                             _ ->
-                                return $ toList $ LZip l Nothing (ce ++ (t : re))
+                                return $ toList $ LZip l Nothing (ce ++ (t : re'))
                 Nothing -> return $ toList $ LZip l (Just t) r
 
         addRBuilderNonEmpty :: (IsElfClass a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
