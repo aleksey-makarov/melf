@@ -1,3 +1,11 @@
+1.1.0
+=====
+
+- Compile with GHC 8.8, 9.0, 9.2.
+- Set up Github CI to build that.
+- Fix bug that did not allow to specify length of `NOBITS` sections.
+- Misc minor fixes
+
 1.0.2
 =====
 

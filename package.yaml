@@ -1,5 +1,5 @@
 name: melf
-version: '1.0.2'
+version: '1.1.0'
 synopsis: An Elf parser
 description: Parser for ELF object format
 category: Data
