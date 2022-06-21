@@ -40,23 +40,6 @@ import Data.Monoid
 import Data.Singletons
 import Data.Singletons.Sigma
 
--- import System.IO.Unsafe
-
-headerInterval :: forall a . IsElfClass a => HeaderXX a -> Interval (WordXX a)
-headerInterval _ = I 0 $ headerSize $ fromSing $ sing @a
-
-sectionTableInterval :: IsElfClass a => HeaderXX a -> Interval (WordXX a)
-sectionTableInterval HeaderXX{..} = I hShOff $ fromIntegral $ hShEntSize * hShNum
-
-segmentTableInterval :: IsElfClass a => HeaderXX a -> Interval (WordXX a)
-segmentTableInterval HeaderXX{..} = I hPhOff $ fromIntegral $ hPhEntSize * hPhNum
-
-sectionInterval :: IsElfClass a => SectionXX a -> Interval (WordXX a)
-sectionInterval SectionXX{..} = I sOffset if sType == SHT_NOBITS then 0 else sSize
-
-segmentInterval :: IsElfClass a => SegmentXX a -> Interval (WordXX a)
-segmentInterval SegmentXX{..} = I pOffset pFileSize
-
 -- | @RBuilder@ is an intermediate internal data type that is used by parser.
 -- It contains information about layout of the ELF file that can be used
 -- by `Data.Elf.PrettyPrint.printLayout`
@@ -88,6 +71,113 @@ data RBuilder c
         , rbraAlign  :: WordXX c
         }
 
+data LZip a = LZip [a] (Maybe a) [a]
+
+instance Foldable LZip where
+    foldMap f (LZip l  (Just c) r) = foldMap f $ LZip l Nothing (c : r)
+    foldMap f (LZip l  Nothing  r) = foldMap f $ L.reverse l ++ r
+
+-- FIXME: Use validity (https://hackage.haskell.org/package/validity) for constraints on the Elf type (???)
+
+-- | `Elf` is a forrest of trees of type `ElfXX`.
+-- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
+newtype ElfList c = ElfList [ElfXX c]
+
+-- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
+type Elf = Sigma ElfClass (TyCon1 ElfList)
+
+-- | Section data may contain a string table.
+-- If a section contains a string table with section names, the data
+-- for such a section is generated and `esData` should contain `ElfSectionDataStringTable`
+data ElfSectionData c
+    = ElfSectionData                -- ^ Regular section data
+        { esdData :: BSL.ByteString -- ^ The content of the section
+        }
+    | ElfSectionDataStringTable     -- ^ Section data will be generated from section names
+    | ElfSectionDataNoBits          -- ^ SHT_NOBITS uninitialized section data: section has size but no content
+        { esdSize :: WordXX c       -- ^ Size of the section
+        }
+
+-- | The type of node that defines Elf structure.
+data ElfXX c
+    = ElfHeader
+        { ehData       :: ElfData    -- ^ Data encoding (big- or little-endian)
+        , ehOSABI      :: ElfOSABI   -- ^ OS/ABI identification
+        , ehABIVersion :: Word8      -- ^ ABI version
+        , ehType       :: ElfType    -- ^ Object file type
+        , ehMachine    :: ElfMachine -- ^ Machine type
+        , ehEntry      :: WordXX c   -- ^ Entry point address
+        , ehFlags      :: Word32     -- ^ Processor-specific flags
+        }
+    | ElfSectionTable
+    | ElfSegmentTable
+    | ElfSection
+        { esName      :: String         -- ^ Section name (NB: string, not offset in the string table)
+        , esType      :: ElfSectionType -- ^ Section type
+        , esFlags     :: ElfSectionFlag -- ^ Section attributes
+        , esAddr      :: WordXX c       -- ^ Virtual address in memory
+        , esAddrAlign :: WordXX c       -- ^ Address alignment boundary
+        , esEntSize   :: WordXX c       -- ^ Size of entries, if section has table
+        , esN         :: ElfSectionIndex -- ^ Section number
+        , esInfo      :: Word32         -- ^ Miscellaneous information
+        , esLink      :: Word32         -- ^ Link to other section
+        , esData      :: ElfSectionData c -- ^ The content of the section
+        }
+    | ElfSegment
+        { epType       :: ElfSegmentType -- ^ Type of segment
+        , epFlags      :: ElfSegmentFlag -- ^ Segment attributes
+        , epVirtAddr   :: WordXX c       -- ^ Virtual address in memory
+        , epPhysAddr   :: WordXX c       -- ^ Physical address
+        , epAddMemSize :: WordXX c       -- ^ Add this amount of memory after the section when the section is loaded to memory by execution system.
+                                         --   Or, in other words this is how much `pMemSize` is bigger than `pFileSize`
+        , epAlign      :: WordXX c       -- ^ Alignment of segment
+        , epData       :: [ElfXX c]      -- ^ Content of the segment
+        }
+    | ElfRawData -- ^ Some ELF files (some executables) don't bother to define
+                 -- sections for linking and have just raw data in segments.
+        { edData :: BSL.ByteString -- ^ Raw data in ELF file
+        }
+    | ElfRawAlign -- ^ Align the next data in the ELF file.
+                  -- The offset of the next data in the ELF file
+                  -- will be the minimal @x@ such that
+                  -- @x mod eaAlign == eaOffset mod eaAlign @
+        { eaOffset :: WordXX c -- ^ Align value
+        , eaAlign  :: WordXX c -- ^ Align module
+        }
+
+data WBuilderData
+    = WBuilderDataHeader
+    | WBuilderDataByteStream { wbdData :: BSL.ByteString }
+    | WBuilderDataSectionTable
+    | WBuilderDataSegmentTable
+
+data WBuilderState a =
+    WBuilderState
+        { wbsSections         :: [(ElfSectionIndex, SectionXX a)]
+        , wbsSegmentsReversed :: [SegmentXX a]
+        , wbsDataReversed     :: [WBuilderData]
+        , wbsOffset           :: WordXX a
+        , wbsPhOff            :: WordXX a
+        , wbsShOff            :: WordXX a
+        , wbsShStrNdx         :: ElfSectionIndex
+        , wbsNameIndexes      :: [Int64]
+        }
+
+headerInterval :: forall a . IsElfClass a => HeaderXX a -> Interval (WordXX a)
+headerInterval _ = I 0 $ headerSize $ fromSing $ sing @a
+
+sectionTableInterval :: IsElfClass a => HeaderXX a -> Interval (WordXX a)
+sectionTableInterval HeaderXX{..} = I hShOff $ fromIntegral $ hShEntSize * hShNum
+
+segmentTableInterval :: IsElfClass a => HeaderXX a -> Interval (WordXX a)
+segmentTableInterval HeaderXX{..} = I hPhOff $ fromIntegral $ hPhEntSize * hPhNum
+
+sectionInterval :: IsElfClass a => SectionXX a -> Interval (WordXX a)
+sectionInterval SectionXX{..} = I sOffset if sType == SHT_NOBITS then 0 else sSize
+
+segmentInterval :: IsElfClass a => SegmentXX a -> Interval (WordXX a)
+segmentInterval SegmentXX{..} = I pOffset pFileSize
+
 rBuilderInterval :: IsElfClass a => RBuilder a -> Interval (WordXX a)
 rBuilderInterval RBuilderHeader{..}       = headerInterval rbhHeader
 rBuilderInterval RBuilderSectionTable{..} = sectionTableInterval rbstHeader
@@ -96,12 +186,6 @@ rBuilderInterval RBuilderSection{..}      = sectionInterval rbsHeader
 rBuilderInterval RBuilderSegment{..}      = segmentInterval rbpHeader
 rBuilderInterval RBuilderRawData{..}      = rbrdInterval
 rBuilderInterval RBuilderRawAlign{}       = undefined -- FIXME
-
-data LZip a = LZip [a] (Maybe a) [a]
-
-instance Foldable LZip where
-    foldMap f (LZip l  (Just c) r) = foldMap f $ LZip l Nothing (c : r)
-    foldMap f (LZip l  Nothing  r) = foldMap f $ L.reverse l ++ r
 
 findInterval :: (Ord t, Num t) => (a -> Interval t) -> t -> [a] -> LZip a
 findInterval f e = findInterval' []
@@ -283,74 +367,6 @@ addRBuilders newts =
 
     in
         addRBuilders' addRBuilderNonEmpty nonEmptyRBs [] >>= addRBuilders' addRBuilderEmpty emptyRBs
-
--- FIXME: Use validity (https://hackage.haskell.org/package/validity) for constraints on the Elf type (???)
-
--- | `Elf` is a forrest of trees of type `ElfXX`.
--- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
-newtype ElfList c = ElfList [ElfXX c]
-
--- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
-type Elf = Sigma ElfClass (TyCon1 ElfList)
-
--- | Section data may contain a string table.
--- If a section contains a string table with section names, the data
--- for such a section is generated and `esData` should contain `ElfSectionDataStringTable`
-data ElfSectionData c
-    = ElfSectionData                -- ^ Regular section data
-        { esdData :: BSL.ByteString -- ^ The content of the section
-        }
-    | ElfSectionDataStringTable     -- ^ Section data will be generated from section names
-    | ElfSectionDataNoBits          -- ^ SHT_NOBITS uninitialized section data: section has size but no content
-        { esdSize :: WordXX c       -- ^ Size of the section
-        }
-
--- | The type of node that defines Elf structure.
-data ElfXX c
-    = ElfHeader
-        { ehData       :: ElfData    -- ^ Data encoding (big- or little-endian)
-        , ehOSABI      :: ElfOSABI   -- ^ OS/ABI identification
-        , ehABIVersion :: Word8      -- ^ ABI version
-        , ehType       :: ElfType    -- ^ Object file type
-        , ehMachine    :: ElfMachine -- ^ Machine type
-        , ehEntry      :: WordXX c   -- ^ Entry point address
-        , ehFlags      :: Word32     -- ^ Processor-specific flags
-        }
-    | ElfSectionTable
-    | ElfSegmentTable
-    | ElfSection
-        { esName      :: String         -- ^ Section name (NB: string, not offset in the string table)
-        , esType      :: ElfSectionType -- ^ Section type
-        , esFlags     :: ElfSectionFlag -- ^ Section attributes
-        , esAddr      :: WordXX c       -- ^ Virtual address in memory
-        , esAddrAlign :: WordXX c       -- ^ Address alignment boundary
-        , esEntSize   :: WordXX c       -- ^ Size of entries, if section has table
-        , esN         :: ElfSectionIndex -- ^ Section number
-        , esInfo      :: Word32         -- ^ Miscellaneous information
-        , esLink      :: Word32         -- ^ Link to other section
-        , esData      :: ElfSectionData c -- ^ The content of the section
-        }
-    | ElfSegment
-        { epType       :: ElfSegmentType -- ^ Type of segment
-        , epFlags      :: ElfSegmentFlag -- ^ Segment attributes
-        , epVirtAddr   :: WordXX c       -- ^ Virtual address in memory
-        , epPhysAddr   :: WordXX c       -- ^ Physical address
-        , epAddMemSize :: WordXX c       -- ^ Add this amount of memory after the section when the section is loaded to memory by execution system.
-                                         --   Or, in other words this is how much `pMemSize` is bigger than `pFileSize`
-        , epAlign      :: WordXX c       -- ^ Alignment of segment
-        , epData       :: [ElfXX c]      -- ^ Content of the segment
-        }
-    | ElfRawData -- ^ Some ELF files (some executables) don't bother to define
-                 -- sections for linking and have just raw data in segments.
-        { edData :: BSL.ByteString -- ^ Raw data in ELF file
-        }
-    | ElfRawAlign -- ^ Align the next data in the ELF file.
-                  -- The offset of the next data in the ELF file
-                  -- will be the minimal @x@ such that
-                  -- @x mod eaAlign == eaOffset mod eaAlign @
-        { eaOffset :: WordXX c -- ^ Align value
-        , eaAlign  :: WordXX c -- ^ Align module
-        }
 
 foldMapElf :: Monoid m => (ElfXX a -> m) -> ElfXX a -> m
 foldMapElf f e@ElfSegment{..} = f e <> foldMapElfList f epData
@@ -616,24 +632,6 @@ parseElf bs = do
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
-
-data WBuilderData
-    = WBuilderDataHeader
-    | WBuilderDataByteStream { wbdData :: BSL.ByteString }
-    | WBuilderDataSectionTable
-    | WBuilderDataSegmentTable
-
-data WBuilderState a =
-    WBuilderState
-        { wbsSections         :: [(ElfSectionIndex, SectionXX a)]
-        , wbsSegmentsReversed :: [SegmentXX a]
-        , wbsDataReversed     :: [WBuilderData]
-        , wbsOffset           :: WordXX a
-        , wbsPhOff            :: WordXX a
-        , wbsShOff            :: WordXX a
-        , wbsShStrNdx         :: ElfSectionIndex
-        , wbsNameIndexes      :: [Int64]
-        }
 
 wbStateInit :: forall a . IsElfClass a => WBuilderState a
 wbStateInit = WBuilderState
