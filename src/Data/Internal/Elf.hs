@@ -704,7 +704,6 @@ mkStringTable sectionNames = (stringTable, os)
                                     ((i', o') : iosff, insff)
                             else (iosff, (i', n') : insff)
 
--- FIXME: rewrite serializeElf using lenses (???)
 serializeElf' :: forall a m . (IsElfClass a, MonadThrow m) => [ElfXX a] -> m BSL.ByteString
 serializeElf' elfs = do
 
