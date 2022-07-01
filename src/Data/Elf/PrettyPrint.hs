@@ -347,7 +347,7 @@ printElfSymbolTableEntryLine ElfSymbolXX{..} =  parens (dquotes (pretty steName)
                                                     <+> "value:"  <+> printWordXX steValue
                                                     <+> "size:"   <+> printWordXX steSize)
 
-printRelocationTableA_AARCH64 :: MonadThrow m => Bool -> Word32 -> [ElfXX 'ELFCLASS64] -> BSL.ByteString -> m (Doc ())
+printRelocationTableA_AARCH64 :: MonadThrow m => Bool -> Word32 -> ElfListXX 'ELFCLASS64 -> BSL.ByteString -> m (Doc ())
 printRelocationTableA_AARCH64 full sLink elfs bs = do
     symTableSection <- elfFindSection elfs sLink
     symTable <- parseSymbolTable ELFDATA2LSB symTableSection elfs
@@ -383,21 +383,25 @@ printElf = printElf_ False
 
 -- | Print ELF.  If first argument is False, don't dump all the data, print just the first two and the last lines.
 printElf_ :: MonadThrow m => Bool -> Elf -> m (Doc ())
-printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
+printElf_ full (classS :&: elfs) = withElfClass classS $ printElf_' full elfs
 
-    (hData, hMachine) <- do
-        header <- elfFindHeader elfs
-        case header of
-            ElfHeader{..} -> return (ehData, ehMachine)
-            _ -> $chainedError "not a header" -- FIXME
+printElf_' :: forall a m . (MonadThrow m, IsElfClass a) => Bool -> ElfListXX a -> m (Doc ())
+printElf_' full elfs = do
+
+    -- FIXME: lazy matching here is a workaround for some GHC bug, see
+    -- https://stackoverflow.com/questions/72803815/phantom-type-makes-pattern-matching-irrefutable-but-that-seemingly-does-not-wor
+    -- https://gitlab.haskell.org/ghc/ghc/-/issues/15681#note_165436
+    ~(ElfHeader { .. }) <- elfFindHeader elfs
 
     let
 
-        printElf' elfs' = align . vsep <$> mapM printElf'' elfs'
+        printElf' :: ElfListXX a -> m (Doc ())
+        printElf' elfs' = align . vsep <$> mapMElfList printElf'' elfs'
 
-        printElf'' ElfHeader{..} =
+        printElf'' :: ElfXX t' a -> m (Doc ())
+        printElf'' ElfHeader {} =
             return $ formatPairsBlock "header"
-                [ ("Class",      viaShow $ fromSing classS )
+                [ ("Class",      viaShow $ fromSing $ sing @a)
                 , ("Data",       viaShow ehData       ) -- ElfData
                 , ("OSABI",      viaShow ehOSABI      ) -- ElfOSABI
                 , ("ABIVersion", viaShow ehABIVersion ) -- Word8
@@ -427,21 +431,21 @@ printElf_ full (classS :&: ElfList elfs) = withElfClass classS do
                     ElfSectionData bs ->
                         if sectionIsSymbolTable esType
                             then do
-                                stes <- parseSymbolTable hData s elfs
+                                stes <- parseSymbolTable ehData s elfs
                                 return $ printSection' "symbol table section" $ if null stes then "" else line <> indent 4 (printElfSymbolTable full stes)
-                            else if hMachine == EM_AARCH64
-                                    && hData == ELFDATA2LSB
-                                && esType == SHT_RELA
-                                && esEntSize == withElfClass classS relocationTableAEntrySize then
-                                    case classS of
+                            else if ehMachine == EM_AARCH64
+                                    && ehData == ELFDATA2LSB
+                                    && esType == SHT_RELA
+                                 && esEntSize == relocationTableAEntrySize then
+                                    case sing @a of
                                         SELFCLASS64 -> printSection' "section" <$> printRelocationTableA_AARCH64 full esLink elfs bs
                                         SELFCLASS32 -> $chainedError "invalid ELF: EM_AARCH64 and ELFCLASS32"
                             else
                                 return $ printSection' "section" $ printData full bs
         printElf'' ElfSegment{..} = do
-            dataDoc <- if null epData
-                then return ""
-                else do
+            dataDoc <- case epData of
+                ElfListNull -> return ""
+                _ -> do
                     dataDoc' <- printElf' epData
                     return $ line <> indent 4 dataDoc'
             return $ formatPairsBlock "segment"

@@ -84,10 +84,19 @@ instance Foldable LZip where
 
 -- | `Elf` is a forrest of trees of type `ElfXX`.
 -- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
-newtype ElfList c = ElfList [ElfXX c]
+data ElfNodeType = Header | SectionTable | SegmentTable | Section | Segment | RawData | RawAlign
+data ElfListXX c
+    = ElfListHeader       (ElfXX 'Header c)       (ElfListXX c)
+    | ElfListSectionTable (ElfXX 'SectionTable c) (ElfListXX c)
+    | ElfListSegmentTable (ElfXX 'SegmentTable c) (ElfListXX c)
+    | ElfListSection      (ElfXX 'Section c)      (ElfListXX c)
+    | ElfListSegment      (ElfXX 'Segment c)      (ElfListXX c)
+    | ElfListRawData      (ElfXX 'RawData c)      (ElfListXX c)
+    | ElfListRawAlign     (ElfXX 'RawAlign c)     (ElfListXX c)
+    | ElfListNull
 
 -- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
-type Elf = Sigma ElfClass (TyCon1 ElfList)
+type Elf = Sigma ElfClass (TyCon1 ElfListXX)
 
 -- | Section data may contain a string table.
 -- If a section contains a string table with section names, the data
@@ -102,8 +111,8 @@ data ElfSectionData c
         }
 
 -- | The type of node that defines Elf structure.
-data ElfXX c
-    = ElfHeader
+data ElfXX t c where
+    ElfHeader ::
         { ehData       :: ElfData    -- ^ Data encoding (big- or little-endian)
         , ehOSABI      :: ElfOSABI   -- ^ OS/ABI identification
         , ehABIVersion :: Word8      -- ^ ABI version
@@ -111,10 +120,10 @@ data ElfXX c
         , ehMachine    :: ElfMachine -- ^ Machine type
         , ehEntry      :: WordXX c   -- ^ Entry point address
         , ehFlags      :: Word32     -- ^ Processor-specific flags
-        }
-    | ElfSectionTable
-    | ElfSegmentTable
-    | ElfSection
+        } -> ElfXX 'Header c
+    ElfSectionTable :: ElfXX 'SectionTable c
+    ElfSegmentTable :: ElfXX 'SegmentTable c
+    ElfSection ::
         { esName      :: String         -- ^ Section name (NB: string, not offset in the string table)
         , esType      :: ElfSectionType -- ^ Section type
         , esFlags     :: ElfSectionFlag -- ^ Section attributes
@@ -125,8 +134,8 @@ data ElfXX c
         , esInfo      :: Word32         -- ^ Miscellaneous information
         , esLink      :: Word32         -- ^ Link to other section
         , esData      :: ElfSectionData c -- ^ The content of the section
-        }
-    | ElfSegment
+        } -> ElfXX 'Section c
+    ElfSegment ::
         { epType       :: ElfSegmentType -- ^ Type of segment
         , epFlags      :: ElfSegmentFlag -- ^ Segment attributes
         , epVirtAddr   :: WordXX c       -- ^ Virtual address in memory
@@ -134,19 +143,19 @@ data ElfXX c
         , epAddMemSize :: WordXX c       -- ^ Add this amount of memory after the section when the section is loaded to memory by execution system.
                                          --   Or, in other words this is how much `pMemSize` is bigger than `pFileSize`
         , epAlign      :: WordXX c       -- ^ Alignment of segment
-        , epData       :: [ElfXX c]      -- ^ Content of the segment
-        }
-    | ElfRawData -- ^ Some ELF files (some executables) don't bother to define
-                 -- sections for linking and have just raw data in segments.
+        , epData       :: ElfListXX c    -- ^ Content of the segment
+        } -> ElfXX 'Segment c
+    ElfRawData :: -- ^ Some ELF files (some executables) don't bother to define
+                  -- sections for linking and have just raw data in segments.
         { edData :: BSL.ByteString -- ^ Raw data in ELF file
-        }
-    | ElfRawAlign -- ^ Align the next data in the ELF file.
-                  -- The offset of the next data in the ELF file
-                  -- will be the minimal @x@ such that
-                  -- @x mod eaAlign == eaOffset mod eaAlign @
+        } -> ElfXX 'RawData c
+    ElfRawAlign :: -- ^ Align the next data in the ELF file.
+                   -- The offset of the next data in the ELF file
+                   -- will be the minimal @x@ such that
+                   -- @x mod eaAlign == eaOffset mod eaAlign @
         { eaOffset :: WordXX c -- ^ Align value
         , eaAlign  :: WordXX c -- ^ Align module
-        }
+        } -> ElfXX 'RawAlign c
 
 data WBuilderData
     = WBuilderDataHeader
@@ -167,6 +176,40 @@ data WBuilderState a =
         }
 
 makeLenses ''WBuilderState
+
+infixr 9 ~:
+
+(~:) :: ElfXX t a -> ElfListXX a -> ElfListXX a
+(~:) v@ElfHeader {}       l = ElfListHeader       v l
+(~:) v@ElfSectionTable {} l = ElfListSectionTable v l
+(~:) v@ElfSegmentTable {} l = ElfListSegmentTable v l
+(~:) v@ElfSection {}      l = ElfListSection      v l
+(~:) v@ElfSegment {}      l = ElfListSegment      v l
+(~:) v@ElfRawData {}      l = ElfListRawData      v l
+(~:) v@ElfRawAlign {}     l = ElfListRawAlign     v l
+
+foldMapElfList :: Monoid m => (forall t' . (ElfXX t' a -> m)) -> ElfListXX a -> m
+foldMapElfList f (ElfListHeader       v l) = f v <> foldMapElfList f l -- FIXME: use coerce here (???)
+foldMapElfList f (ElfListSectionTable v l) = f v <> foldMapElfList f l
+foldMapElfList f (ElfListSegmentTable v l) = f v <> foldMapElfList f l
+foldMapElfList f (ElfListSection      v l) = f v <> foldMapElfList f l
+foldMapElfList f (ElfListSegment      v@(ElfSegment { .. }) l) = f v <> foldMapElfList f epData <> foldMapElfList f l
+foldMapElfList f (ElfListRawData      v l) = f v <> foldMapElfList f l
+foldMapElfList f (ElfListRawAlign     v l) = f v <> foldMapElfList f l
+foldMapElfList _  ElfListNull              = mempty
+
+foldMapElfList' :: Monoid m => (forall t' . (ElfXX t' a -> m)) -> ElfListXX a -> m
+foldMapElfList' f (ElfListHeader       v l) = f v <> foldMapElfList' f l -- FIXME: use coerce here (???)
+foldMapElfList' f (ElfListSectionTable v l) = f v <> foldMapElfList' f l
+foldMapElfList' f (ElfListSegmentTable v l) = f v <> foldMapElfList' f l
+foldMapElfList' f (ElfListSection      v l) = f v <> foldMapElfList' f l
+foldMapElfList' f (ElfListSegment      v l) = f v <> foldMapElfList' f l
+foldMapElfList' f (ElfListRawData      v l) = f v <> foldMapElfList' f l
+foldMapElfList' f (ElfListRawAlign     v l) = f v <> foldMapElfList' f l
+foldMapElfList' _  ElfListNull              = mempty
+
+mapMElfList :: Monad m => (forall t' . (ElfXX t' a -> m b)) -> ElfListXX a -> m [b]
+mapMElfList f l = sequence $ foldMapElfList' ((: []) . f) l
 
 headerInterval :: forall a . IsElfClass a => HeaderXX a -> Interval (WordXX a)
 headerInterval _ = I 0 $ headerSize $ fromSing $ sing @a
@@ -373,44 +416,40 @@ addRBuilders newts =
     in
         addRBuilders' addRBuilderNonEmpty nonEmptyRBs [] >>= addRBuilders' addRBuilderEmpty emptyRBs
 
-foldMapElf :: Monoid m => (ElfXX a -> m) -> ElfXX a -> m
-foldMapElf f e@ElfSegment{..} = f e <> foldMapElfList f epData
-foldMapElf f e = f e
-
-foldMapElfList :: Monoid m => (ElfXX a -> m) -> [ElfXX a] -> m
-foldMapElfList f = foldMap (foldMapElf f)
-
 -- | Find section with a given number
 elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b)
-               => [ElfXX a]   -- ^ Structured ELF data
-               -> b           -- ^ Number of the section
-               -> m (ElfXX a) -- ^ The section in question
+               => ElfListXX a          -- ^ Structured ELF data
+               -> b                    -- ^ Number of the section
+               -> m (ElfXX 'Section a) -- ^ The section in question
 elfFindSection elfs n = if n == 0
     then $chainedError "no section 0"
     else $maybeAddContext ("no section " ++ show n) maybeSection
         where
             maybeSection = getFirst $ foldMapElfList f elfs
+            f :: ElfXX t a -> First (ElfXX 'Section a)
             f s@ElfSection{..} | esN == fromIntegral n = First $ Just s
             f _ = First Nothing
 
 -- | Find section with a given name
 elfFindSectionByName :: forall a m . (SingI a, MonadThrow m)
-                     => [ElfXX a]   -- ^ Structured ELF data
-                     -> String      -- ^ Section name
-                     -> m (ElfXX a) -- ^ The section in question
+                     => ElfListXX a          -- ^ Structured ELF data
+                     -> String               -- ^ Section name
+                     -> m (ElfXX 'Section a) -- ^ The section in question
 elfFindSectionByName elfs n = $maybeAddContext ("no section \"" ++ show n ++ "\"") maybeSection
     where
         maybeSection = getFirst $ foldMapElfList f elfs
+        f :: ElfXX t a -> First (ElfXX 'Section a)
         f s@ElfSection{..} | esName == n = First $ Just s
         f _ = First Nothing
 
 -- | Find ELF header
 elfFindHeader :: forall a m . (SingI a, MonadThrow m)
-              => [ElfXX a]   -- ^ Structured ELF data
-              -> m (ElfXX a) -- ^ ELF header
+              => ElfListXX a         -- ^ Structured ELF data
+              -> m (ElfXX 'Header a) -- ^ ELF header
 elfFindHeader elfs = $maybeAddContext "no header" maybeHeader
     where
         maybeHeader = getFirst $ foldMapElfList f elfs
+        f :: ElfXX t a -> First (ElfXX 'Header a)
         f h@ElfHeader{} = First $ Just h
         f _ = First Nothing
 
@@ -573,9 +612,9 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
     rbs <- parseRBuilder hdr ss ps bs
 
     let
-        rBuilderToElf :: RBuilder a -> m (ElfXX a)
-        rBuilderToElf RBuilderHeader{} =
-            return ElfHeader
+        rBuilderToElf :: RBuilder a -> ElfListXX a -> m (ElfListXX a)
+        rBuilderToElf RBuilderHeader{} l =
+            return $ ElfListHeader ElfHeader
                 { ehData       = hData
                 , ehOSABI      = hOSABI
                 , ehABIVersion = hABIVersion
@@ -583,13 +622,13 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 , ehMachine    = hMachine
                 , ehEntry      = hEntry
                 , ehFlags      = hFlags
-                }
-        rBuilderToElf RBuilderSectionTable{} =
-            return ElfSectionTable
-        rBuilderToElf RBuilderSegmentTable{} =
-            return ElfSegmentTable
-        rBuilderToElf RBuilderSection{ rbsHeader = s@SectionXX{..}, ..} =
-            return ElfSection
+                } l
+        rBuilderToElf RBuilderSectionTable{} l =
+            return $ ElfListSectionTable ElfSectionTable l
+        rBuilderToElf RBuilderSegmentTable{} l =
+            return $ ElfListSegmentTable ElfSegmentTable l
+        rBuilderToElf RBuilderSection{ rbsHeader = s@SectionXX{..}, ..} l =
+            return $ ElfListSection ElfSection
                 { esName      = rbsName
                 , esType      = sType
                 , esFlags     = fromIntegral sFlags
@@ -605,13 +644,13 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                         else if sType == SHT_NOBITS
                             then ElfSectionDataNoBits sSize
                             else ElfSectionData $ getSectionData bs s
-                }
-        rBuilderToElf RBuilderSegment{ rbpHeader = SegmentXX{..}, ..} = do
-            d <- mapM rBuilderToElf rbpData
+                } l
+        rBuilderToElf RBuilderSegment{ rbpHeader = SegmentXX{..}, ..} l = do
+            d <- foldrM rBuilderToElf ElfListNull rbpData
             addMemSize <- if pMemSize /= 0 && pFileSize /= 0 && pMemSize < pFileSize
                 then $chainedError "memSize < fileSize"
                 else return (pMemSize - pFileSize)
-            return ElfSegment
+            return $ ElfListSegment ElfSegment
                 { epType        = pType
                 , epFlags       = pFlags
                 , epVirtAddr    = pVirtAddr
@@ -619,14 +658,14 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 , epAddMemSize  = addMemSize
                 , epAlign       = pAlign
                 , epData        = d
-                }
-        rBuilderToElf RBuilderRawData{ rbrdInterval = I o s } =
-            return $ ElfRawData $ cut bs (fromIntegral o) (fromIntegral s)
-        rBuilderToElf RBuilderRawAlign{..} =
-            return $ ElfRawAlign rbraOffset rbraAlign
+                } l
+        rBuilderToElf RBuilderRawData{ rbrdInterval = I o s } l =
+            return $ ElfListRawData (ElfRawData $ cut bs (fromIntegral o) (fromIntegral s)) l
+        rBuilderToElf RBuilderRawAlign{..} l =
+            return $ ElfListRawAlign (ElfRawAlign rbraOffset rbraAlign) l
 
-    el <- mapM rBuilderToElf rbs
-    return $ sing :&: ElfList el
+    el <- foldrM rBuilderToElf ElfListNull rbs --  mapM rBuilderToElf rbs
+    return $ sing :&: el
 
 -- | Parse ELF file
 parseElf :: MonadCatch m => BSL.ByteString -> m Elf
@@ -704,14 +743,13 @@ mkStringTable sectionNames = (stringTable, os)
                                     ((i', o') : iosff, insff)
                             else (iosff, (i', n') : insff)
 
-serializeElf' :: forall a m . (IsElfClass a, MonadThrow m) => [ElfXX a] -> m BSL.ByteString
+serializeElf' :: forall a m . (IsElfClass a, MonadCatch m) => ElfListXX a -> m BSL.ByteString
 serializeElf' elfs = do
 
-    (header', hData') <- do
-        header <- elfFindHeader elfs
-        case header of
-            ElfHeader{..} -> return (header, ehData)
-            _ -> $chainedError "not a header" -- FIXME
+    -- FIXME: lazy matching here is a workaround for some GHC bug, see
+    -- https://stackoverflow.com/questions/72803815/phantom-type-makes-pattern-matching-irrefutable-but-that-seemingly-does-not-wor
+    -- https://gitlab.haskell.org/ghc/ghc/-/issues/15681#note_165436
+    ~(ElfHeader { .. }) <- $addContext' $ elfFindHeader elfs
 
     let
 
@@ -726,6 +764,7 @@ serializeElf' elfs = do
         sectionNames :: [String]
         sectionNames = foldMapElfList f elfs
             where
+                f :: ElfXX t a -> [String]
                 f ElfSection{..} = [ esName ]
                 f _ = []
 
@@ -761,14 +800,34 @@ serializeElf' elfs = do
         dataIsEmpty ElfSectionDataStringTable = BSL.null stringTable
         dataIsEmpty (ElfSectionDataNoBits _)  = True
 
-        lastSectionIsEmpty :: [ElfXX a] -> Bool
-        lastSectionIsEmpty [] = False
-        lastSectionIsEmpty l = case L.last l of
-            ElfSection{..} -> dataIsEmpty esData
-            _ -> False
+        lastSection :: ElfListXX a -> (forall t' . (ElfXX t' a -> b)) -> b -> b
+        lastSection ElfListNull _ b = b
 
-        elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => ElfXX a -> n ()
+        lastSection (ElfListHeader       v ElfListNull) f _ = f v -- FIXME: use unsafe coercion
+        lastSection (ElfListSectionTable v ElfListNull) f _ = f v
+        lastSection (ElfListSegmentTable v ElfListNull) f _ = f v
+        lastSection (ElfListSection      v ElfListNull) f _ = f v
+        lastSection (ElfListSegment      v ElfListNull) f _ = f v
+        lastSection (ElfListRawData      v ElfListNull) f _ = f v
+        lastSection (ElfListRawAlign     v ElfListNull) f _ = f v
+
+        lastSection (ElfListHeader       _ l) f b = lastSection l f b -- FIXME: use unsafe coercion
+        lastSection (ElfListSectionTable _ l) f b = lastSection l f b
+        lastSection (ElfListSegmentTable _ l) f b = lastSection l f b
+        lastSection (ElfListSection      _ l) f b = lastSection l f b
+        lastSection (ElfListSegment      _ l) f b = lastSection l f b
+        lastSection (ElfListRawData      _ l) f b = lastSection l f b
+        lastSection (ElfListRawAlign     _ l) f b = lastSection l f b
+
+        lastSectionIsEmpty :: ElfListXX a -> Bool
+        lastSectionIsEmpty l = lastSection l f False
+            where
+                f ElfSection { .. } = dataIsEmpty esData
+                f _                 = False
+
+        elf2WBuilder :: (MonadThrow n, MonadState (WBuilderState a) n) => ElfXX t a -> n ()
         elf2WBuilder ElfHeader{} = do
+            -- FIXME: add push monad
             wbsDataReversed %= (WBuilderDataHeader :)
             wbsOffset += headerSize elfClass
         elf2WBuilder ElfSectionTable = do
@@ -786,7 +845,7 @@ serializeElf' elfs = do
                 $chainedError $ "section flags at section " ++ show esN ++ "don't fit"
             -- I don't see any sense in aligning NOBITS section data
             -- still gcc does it for .o files
-            when (esType /= SHT_NOBITS || (ehType header') == ET_REL) do
+            when (esType /= SHT_NOBITS || ehType == ET_REL) do
                 align 0 esAddrAlign
             (n, ns) <- uses wbsNameIndexes \case
                 n' : ns' -> (n', ns')
@@ -815,7 +874,7 @@ serializeElf' elfs = do
         elf2WBuilder ElfSegment { .. } = do
             align epVirtAddr epAlign
             offset <- use wbsOffset
-            mapM_ elf2WBuilder epData
+            void $ mapMElfList elf2WBuilder epData
             offset' <- use wbsOffset
             let
                 -- allocate one more byte in the end of segment if there exists an empty section
@@ -857,42 +916,39 @@ serializeElf' elfs = do
 
             let
                 f WBuilderDataHeader =
-                    case header' of
-                        ElfHeader{..} ->
-                            let
-                                hData       = ehData
-                                hOSABI      = ehOSABI
-                                hABIVersion = ehABIVersion
-                                hType       = ehType
-                                hMachine    = ehMachine
-                                hEntry      = ehEntry
-                                hPhOff      = _wbsPhOff
-                                hShOff      = _wbsShOff
-                                hFlags      = ehFlags
-                                hPhEntSize  = segmentTableEntrySize elfClass
-                                hPhNum      = segmentN
-                                hShEntSize  = sectionTableEntrySize elfClass
-                                hShNum      = if sectionTable then sectionN + 1 else 0
-                                hShStrNdx   = _wbsShStrNdx
+                    let
+                        hData       = ehData
+                        hOSABI      = ehOSABI
+                        hABIVersion = ehABIVersion
+                        hType       = ehType
+                        hMachine    = ehMachine
+                        hEntry      = ehEntry
+                        hPhOff      = _wbsPhOff
+                        hShOff      = _wbsShOff
+                        hFlags      = ehFlags
+                        hPhEntSize  = segmentTableEntrySize elfClass
+                        hPhNum      = segmentN
+                        hShEntSize  = sectionTableEntrySize elfClass
+                        hShNum      = if sectionTable then sectionN + 1 else 0
+                        hShStrNdx   = _wbsShStrNdx
 
-                                h :: Header
-                                h = sing @a :&: HeaderXX{..}
-                            in
-                                encode h
-                        _ -> error "this should be ElfHeader" -- FIXME
+                        h :: Header
+                        h = sing @a :&: HeaderXX{..}
+                    in
+                        encode h
                 f WBuilderDataByteStream {..} = wbdData
                 f WBuilderDataSectionTable =
-                    serializeBList hData' $ zeroSection : sections
+                    serializeBList ehData $ zeroSection : sections
                 f WBuilderDataSegmentTable =
-                    serializeBList hData' $ L.reverse _wbsSegmentsReversed
+                    serializeBList ehData $ L.reverse _wbsSegmentsReversed
 
             return $ foldMap f $ L.reverse _wbsDataReversed
 
-    execStateT (mapM_ elf2WBuilder elfs) wbStateInit{ _wbsNameIndexes = nameIndexes } >>= wbState2ByteString
+    execStateT (mapMElfList elf2WBuilder elfs) wbStateInit{ _wbsNameIndexes = nameIndexes } >>= wbState2ByteString
 
 -- | Serialze ELF file
-serializeElf :: MonadThrow m => Elf -> m BSL.ByteString
-serializeElf (classS :&: ElfList ls) = withElfClass classS serializeElf' ls
+serializeElf :: MonadCatch m => Elf -> m BSL.ByteString
+serializeElf (classS :&: ls) = withElfClass classS serializeElf' ls
 
 -------------------------------------------------------------------------------
 --
@@ -929,17 +985,22 @@ mkElfSymbolTableEntry stringTable SymbolXX{..} =
 -- | Parse symbol table
 parseSymbolTable :: (MonadThrow m, SingI a)
                  => ElfData           -- ^ Endianness of the ELF file
-                 -> ElfXX a           -- ^ Parsed section such that @`sectionIsSymbolTable` . `sType`@ is true.
-                 -> [ElfXX a]         -- ^ Structured ELF data
+                 -> ElfXX 'Section a  -- ^ Parsed section such that @`sectionIsSymbolTable` . `sType`@ is true.
+                 -> ElfListXX a       -- ^ Structured ELF data
                  -> m [ElfSymbolXX a] -- ^ Symbol table
-parseSymbolTable d ElfSection{ esData = ElfSectionData symbolTable, ..} elfs = do
+parseSymbolTable d symbolTableSection@(ElfSection { .. }) elfs = do
+
+    symbolTable <- case symbolTableSection of
+        ElfSection{ esData = ElfSectionData st } -> return st
+        _ -> $chainedError "wrong symbol table section data"
+
     section <- elfFindSection elfs esLink
-    case section of
-        ElfSection{ esData = ElfSectionData stringTable } -> do
-            st <- parseBList d symbolTable
-            return (mkElfSymbolTableEntry stringTable <$> st)
-        _ -> $chainedError "not a section" -- FIXME
-parseSymbolTable _ _ _ = $chainedError "incorrect args to parseSymbolTable" -- FIXME
+    stringTable <- case section of
+        ElfSection{ esData = ElfSectionData st } -> return st
+        _ -> $chainedError "wrong string table section data"
+
+    st <- parseBList d symbolTable
+    return (mkElfSymbolTableEntry stringTable <$> st)
 
 mkSymbolTableEntry :: SingI a => Word32 -> ElfSymbolXX a -> SymbolXX a
 mkSymbolTableEntry nameIndex ElfSymbolXX{..} =

@@ -269,8 +269,8 @@ assemble m = do
 
     (symbolTableData, stringTableData) <- serializeSymbolTable ELFDATA2LSB (zeroIndexStringItem : symbolTable)
 
-    return $ SELFCLASS64 :&: ElfList
-        [ ElfHeader
+    return $ SELFCLASS64 :&:
+        ElfHeader
             { ehData       = ELFDATA2LSB
             , ehOSABI      = ELFOSABI_SYSV
             , ehABIVersion = 0
@@ -279,7 +279,7 @@ assemble m = do
             , ehEntry      = 0
             , ehFlags      = 0
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".text"
             , esType      = SHT_PROGBITS
             , esFlags     = SHF_EXECINSTR .|. SHF_ALLOC
@@ -291,7 +291,7 @@ assemble m = do
             , esInfo      = 0
             , esData      = ElfSectionData txt
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".shstrtab"
             , esType      = SHT_STRTAB
             , esFlags     = 0
@@ -303,7 +303,7 @@ assemble m = do
             , esInfo      = 0
             , esData      = ElfSectionDataStringTable
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".symtab"
             , esType      = SHT_SYMTAB
             , esFlags     = 0
@@ -315,7 +315,7 @@ assemble m = do
             , esInfo      = 1
             , esData      = ElfSectionData symbolTableData
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".strtab"
             , esType      = SHT_STRTAB
             , esFlags     = 0
@@ -327,5 +327,5 @@ assemble m = do
             , esInfo      = 0
             , esData      = ElfSectionData stringTableData
             }
-        , ElfSectionTable
-        ]
+        ~: ElfSectionTable
+        ~: ElfListNull

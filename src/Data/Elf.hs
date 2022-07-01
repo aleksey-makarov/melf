@@ -11,10 +11,11 @@
 
 module Data.Elf (
     -- * Elf
-      ElfList (..)
+      ElfListXX (..)
     , Elf
     , ElfSectionData (..)
     , ElfXX (..)
+    , (~:)
     , parseElf
     , serializeElf
 

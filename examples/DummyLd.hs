@@ -30,40 +30,43 @@ getMachineConfig EM_AARCH64 = return $ MachineConfig 0x400000 0x10000
 getMachineConfig EM_X86_64  = return $ MachineConfig 0x400000 0x1000
 getMachineConfig _          = $chainedError "could not find machine config for this arch"
 
-dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfList a -> m (ElfList a)
-dummyLd' (ElfList es) = do
+dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfListXX a -> m (ElfListXX a)
+dummyLd' es = do
 
-    txtSection <- elfFindSectionByName es ".text"
-    txtSectionData <- case txtSection of
-        ElfSection { esData = ElfSectionData textData } -> return textData
+    -- FIXME: lazy matching here is a workaround for some GHC bug, see
+    -- https://stackoverflow.com/questions/72803815/phantom-type-makes-pattern-matching-irrefutable-but-that-seemingly-does-not-wor
+    -- https://gitlab.haskell.org/ghc/ghc/-/issues/15681#note_165436
+    ~(ElfSection { .. }) <- elfFindSectionByName es ".text"
+
+    txtSectionData <- case esData of
+        ElfSectionData textData -> return textData
         _ -> $chainedError "could not find correct \".text\" section"
 
-    header <- elfFindHeader es
-    case header of
-        ElfHeader { .. } -> do
-            MachineConfig { .. } <- getMachineConfig ehMachine
-            return $ ElfList
-                [ ElfSegment
-                    { epType       = PT_LOAD
-                    , epFlags      = PF_X .|. PF_R
-                    , epVirtAddr   = mcAddress
-                    , epPhysAddr   = mcAddress
-                    , epAddMemSize = 0
-                    , epAlign      = mcAlign
-                    , epData       =
-                        [ ElfHeader
-                            { ehType  = ET_EXEC
-                            , ehEntry = mcAddress + headerSize (fromSing $ sing @a)
-                            , ..
-                            }
-                        , ElfRawData
-                            { edData = txtSectionData
-                            }
-                        ]
+    -- FIXME: see note above
+    ~(ElfHeader { .. }) <- elfFindHeader es
+
+    MachineConfig { .. } <- getMachineConfig ehMachine
+    return $
+        ElfSegment
+            { epType       = PT_LOAD
+            , epFlags      = PF_X .|. PF_R
+            , epVirtAddr   = mcAddress
+            , epPhysAddr   = mcAddress
+            , epAddMemSize = 0
+            , epAlign      = mcAlign
+            , epData       =
+                ElfHeader
+                    { ehType  = ET_EXEC
+                    , ehEntry = mcAddress + headerSize (fromSing $ sing @a)
+                    , ..
                     }
-                , ElfSegmentTable
-                ]
-        _ -> $chainedError "could not find ELF header"
+                ~: ElfRawData
+                    { edData = txtSectionData
+                    }
+                ~: ElfListNull
+            }
+        ~: ElfSegmentTable
+        ~: ElfListNull
 
 -- | @dummyLd@ places the content of ".text" section of the input ELF
 -- into the loadable segment of the resulting ELF.
