@@ -746,10 +746,13 @@ mkStringTable sectionNames = (stringTable, os)
 serializeElf' :: forall a m . (IsElfClass a, MonadCatch m) => ElfListXX a -> m BSL.ByteString
 serializeElf' elfs = do
 
-    -- FIXME: lazy matching here is a workaround for some GHC bug, see
+    -- FIXME: it's better to match constructor here, but there is a bug that prevents to conclude that
+    -- the match is irrefutable:
     -- https://stackoverflow.com/questions/72803815/phantom-type-makes-pattern-matching-irrefutable-but-that-seemingly-does-not-wor
     -- https://gitlab.haskell.org/ghc/ghc/-/issues/15681#note_165436
-    ~(ElfHeader { .. }) <- $addContext' $ elfFindHeader elfs
+    -- But if I use lazy pattern match, then some other bug comes up that prevents type inference
+    -- on GHC 9.0.2
+    header' <- $addContext' $ elfFindHeader elfs
 
     let
 
@@ -845,7 +848,7 @@ serializeElf' elfs = do
                 $chainedError $ "section flags at section " ++ show esN ++ "don't fit"
             -- I don't see any sense in aligning NOBITS section data
             -- still gcc does it for .o files
-            when (esType /= SHT_NOBITS || ehType == ET_REL) do
+            when (esType /= SHT_NOBITS || (ehType header') == ET_REL) do
                 align 0 esAddrAlign
             (n, ns) <- uses wbsNameIndexes \case
                 n' : ns' -> (n', ns')
@@ -916,31 +919,33 @@ serializeElf' elfs = do
 
             let
                 f WBuilderDataHeader =
-                    let
-                        hData       = ehData
-                        hOSABI      = ehOSABI
-                        hABIVersion = ehABIVersion
-                        hType       = ehType
-                        hMachine    = ehMachine
-                        hEntry      = ehEntry
-                        hPhOff      = _wbsPhOff
-                        hShOff      = _wbsShOff
-                        hFlags      = ehFlags
-                        hPhEntSize  = segmentTableEntrySize elfClass
-                        hPhNum      = segmentN
-                        hShEntSize  = sectionTableEntrySize elfClass
-                        hShNum      = if sectionTable then sectionN + 1 else 0
-                        hShStrNdx   = _wbsShStrNdx
+                    case header' of
+                        ElfHeader{..} ->
+                            let
+                                hData       = ehData
+                                hOSABI      = ehOSABI
+                                hABIVersion = ehABIVersion
+                                hType       = ehType
+                                hMachine    = ehMachine
+                                hEntry      = ehEntry
+                                hPhOff      = _wbsPhOff
+                                hShOff      = _wbsShOff
+                                hFlags      = ehFlags
+                                hPhEntSize  = segmentTableEntrySize elfClass
+                                hPhNum      = segmentN
+                                hShEntSize  = sectionTableEntrySize elfClass
+                                hShNum      = if sectionTable then sectionN + 1 else 0
+                                hShStrNdx   = _wbsShStrNdx
 
-                        h :: Header
-                        h = sing @a :&: HeaderXX{..}
-                    in
-                        encode h
+                                h :: Header
+                                h = sing @a :&: HeaderXX{..}
+                            in
+                                encode h
                 f WBuilderDataByteStream {..} = wbdData
                 f WBuilderDataSectionTable =
-                    serializeBList ehData $ zeroSection : sections
+                    serializeBList (ehData header') $ zeroSection : sections
                 f WBuilderDataSegmentTable =
-                    serializeBList ehData $ L.reverse _wbsSegmentsReversed
+                    serializeBList (ehData header') $ L.reverse _wbsSegmentsReversed
 
             return $ foldMap f $ L.reverse _wbsDataReversed
 
