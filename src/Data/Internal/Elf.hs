@@ -140,14 +140,16 @@ data ElfXX t c where
         , epAlign      :: WordXX c       -- ^ Alignment of segment
         , epData       :: ElfListXX c    -- ^ Content of the segment
         } -> ElfXX 'Segment c
-    ElfRawData :: -- ^ Some ELF files (some executables) don't bother to define
-                  -- sections for linking and have just raw data in segments.
+    -- | Some ELF files (some executables) don't bother to define
+    -- sections for linking and have just raw data in segments.
+    ElfRawData ::
         { edData :: BSL.ByteString -- ^ Raw data in ELF file
         } -> ElfXX 'RawData c
-    ElfRawAlign :: -- ^ Align the next data in the ELF file.
-                   -- The offset of the next data in the ELF file
-                   -- will be the minimal @x@ such that
-                   -- @x mod eaAlign == eaOffset mod eaAlign @
+    -- | Align the next data in the ELF file.
+    -- The offset of the next data in the ELF file
+    -- will be the minimal @x@ such that
+    -- @x mod eaAlign == eaOffset mod eaAlign @
+    ElfRawAlign ::
         { eaOffset :: WordXX c -- ^ Align value
         , eaAlign  :: WordXX c -- ^ Align module
         } -> ElfXX 'RawAlign c
