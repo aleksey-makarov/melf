@@ -80,20 +80,15 @@ instance Foldable LZip where
     foldMap f (LZip l  (Just c) r) = foldMap f $ LZip l Nothing (c : r)
     foldMap f (LZip l  Nothing  r) = foldMap f $ L.reverse l ++ r
 
--- FIXME: Use validity (https://hackage.haskell.org/package/validity) for constraints on the Elf type (???)
+-- FIXME: Use validity (https://hackage.haskell.org/package/validity)
+-- for constraints on the Elf type (???)
 
 -- | `Elf` is a forrest of trees of type `ElfXX`.
 -- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
 data ElfNodeType = Header | SectionTable | SegmentTable | Section | Segment | RawData | RawAlign
-data ElfListXX c
-    = ElfListHeader       (ElfXX 'Header c)       (ElfListXX c)
-    | ElfListSectionTable (ElfXX 'SectionTable c) (ElfListXX c)
-    | ElfListSegmentTable (ElfXX 'SegmentTable c) (ElfListXX c)
-    | ElfListSection      (ElfXX 'Section c)      (ElfListXX c)
-    | ElfListSegment      (ElfXX 'Segment c)      (ElfListXX c)
-    | ElfListRawData      (ElfXX 'RawData c)      (ElfListXX c)
-    | ElfListRawAlign     (ElfXX 'RawAlign c)     (ElfListXX c)
-    | ElfListNull
+data ElfListXX c where
+    ElfListCons :: ElfXX t c -> ElfListXX c -> ElfListXX c
+    ElfListNull :: ElfListXX c
 
 -- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
 type Elf = Sigma ElfClass (TyCon1 ElfListXX)
@@ -180,33 +175,16 @@ makeLenses ''WBuilderState
 infixr 9 ~:
 
 (~:) :: ElfXX t a -> ElfListXX a -> ElfListXX a
-(~:) v@ElfHeader {}       l = ElfListHeader       v l
-(~:) v@ElfSectionTable {} l = ElfListSectionTable v l
-(~:) v@ElfSegmentTable {} l = ElfListSegmentTable v l
-(~:) v@ElfSection {}      l = ElfListSection      v l
-(~:) v@ElfSegment {}      l = ElfListSegment      v l
-(~:) v@ElfRawData {}      l = ElfListRawData      v l
-(~:) v@ElfRawAlign {}     l = ElfListRawAlign     v l
+(~:) = ElfListCons
 
 foldMapElfList :: Monoid m => (forall t' . (ElfXX t' a -> m)) -> ElfListXX a -> m
-foldMapElfList f (ElfListHeader       v l) = f v <> foldMapElfList f l -- FIXME: use coerce here (???)
-foldMapElfList f (ElfListSectionTable v l) = f v <> foldMapElfList f l
-foldMapElfList f (ElfListSegmentTable v l) = f v <> foldMapElfList f l
-foldMapElfList f (ElfListSection      v l) = f v <> foldMapElfList f l
-foldMapElfList f (ElfListSegment      v@(ElfSegment { .. }) l) = f v <> foldMapElfList f epData <> foldMapElfList f l
-foldMapElfList f (ElfListRawData      v l) = f v <> foldMapElfList f l
-foldMapElfList f (ElfListRawAlign     v l) = f v <> foldMapElfList f l
-foldMapElfList _  ElfListNull              = mempty
+foldMapElfList f (ElfListCons v@(ElfSegment { .. }) l) = f v <> foldMapElfList f epData <> foldMapElfList f l
+foldMapElfList f (ElfListCons v l)                     = f v <> foldMapElfList f l
+foldMapElfList _  ElfListNull                          = mempty
 
 foldMapElfList' :: Monoid m => (forall t' . (ElfXX t' a -> m)) -> ElfListXX a -> m
-foldMapElfList' f (ElfListHeader       v l) = f v <> foldMapElfList' f l -- FIXME: use coerce here (???)
-foldMapElfList' f (ElfListSectionTable v l) = f v <> foldMapElfList' f l
-foldMapElfList' f (ElfListSegmentTable v l) = f v <> foldMapElfList' f l
-foldMapElfList' f (ElfListSection      v l) = f v <> foldMapElfList' f l
-foldMapElfList' f (ElfListSegment      v l) = f v <> foldMapElfList' f l
-foldMapElfList' f (ElfListRawData      v l) = f v <> foldMapElfList' f l
-foldMapElfList' f (ElfListRawAlign     v l) = f v <> foldMapElfList' f l
-foldMapElfList' _  ElfListNull              = mempty
+foldMapElfList' f (ElfListCons v l) = f v <> foldMapElfList' f l
+foldMapElfList' _  ElfListNull      = mempty
 
 mapMElfList :: Monad m => (forall t' . (ElfXX t' a -> m b)) -> ElfListXX a -> m [b]
 mapMElfList f l = sequence $ foldMapElfList' ((: []) . f) l
@@ -614,7 +592,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
     let
         rBuilderToElf :: RBuilder a -> ElfListXX a -> m (ElfListXX a)
         rBuilderToElf RBuilderHeader{} l =
-            return $ ElfListHeader ElfHeader
+            return $ ElfListCons ElfHeader
                 { ehData       = hData
                 , ehOSABI      = hOSABI
                 , ehABIVersion = hABIVersion
@@ -624,11 +602,11 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 , ehFlags      = hFlags
                 } l
         rBuilderToElf RBuilderSectionTable{} l =
-            return $ ElfListSectionTable ElfSectionTable l
+            return $ ElfListCons ElfSectionTable l
         rBuilderToElf RBuilderSegmentTable{} l =
-            return $ ElfListSegmentTable ElfSegmentTable l
+            return $ ElfListCons ElfSegmentTable l
         rBuilderToElf RBuilderSection{ rbsHeader = s@SectionXX{..}, ..} l =
-            return $ ElfListSection ElfSection
+            return $ ElfListCons ElfSection
                 { esName      = rbsName
                 , esType      = sType
                 , esFlags     = fromIntegral sFlags
@@ -650,7 +628,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
             addMemSize <- if pMemSize /= 0 && pFileSize /= 0 && pMemSize < pFileSize
                 then $chainedError "memSize < fileSize"
                 else return (pMemSize - pFileSize)
-            return $ ElfListSegment ElfSegment
+            return $ ElfListCons ElfSegment
                 { epType        = pType
                 , epFlags       = pFlags
                 , epVirtAddr    = pVirtAddr
@@ -660,9 +638,9 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
                 , epData        = d
                 } l
         rBuilderToElf RBuilderRawData{ rbrdInterval = I o s } l =
-            return $ ElfListRawData (ElfRawData $ cut bs (fromIntegral o) (fromIntegral s)) l
+            return $ ElfListCons (ElfRawData $ cut bs (fromIntegral o) (fromIntegral s)) l
         rBuilderToElf RBuilderRawAlign{..} l =
-            return $ ElfListRawAlign (ElfRawAlign rbraOffset rbraAlign) l
+            return $ ElfListCons (ElfRawAlign rbraOffset rbraAlign) l
 
     el <- foldrM rBuilderToElf ElfListNull rbs --  mapM rBuilderToElf rbs
     return $ sing :&: el
@@ -805,22 +783,8 @@ serializeElf' elfs = do
 
         lastSection :: ElfListXX a -> (forall t' . (ElfXX t' a -> b)) -> b -> b
         lastSection ElfListNull _ b = b
-
-        lastSection (ElfListHeader       v ElfListNull) f _ = f v -- FIXME: use unsafe coercion
-        lastSection (ElfListSectionTable v ElfListNull) f _ = f v
-        lastSection (ElfListSegmentTable v ElfListNull) f _ = f v
-        lastSection (ElfListSection      v ElfListNull) f _ = f v
-        lastSection (ElfListSegment      v ElfListNull) f _ = f v
-        lastSection (ElfListRawData      v ElfListNull) f _ = f v
-        lastSection (ElfListRawAlign     v ElfListNull) f _ = f v
-
-        lastSection (ElfListHeader       _ l) f b = lastSection l f b -- FIXME: use unsafe coercion
-        lastSection (ElfListSectionTable _ l) f b = lastSection l f b
-        lastSection (ElfListSegmentTable _ l) f b = lastSection l f b
-        lastSection (ElfListSection      _ l) f b = lastSection l f b
-        lastSection (ElfListSegment      _ l) f b = lastSection l f b
-        lastSection (ElfListRawData      _ l) f b = lastSection l f b
-        lastSection (ElfListRawAlign     _ l) f b = lastSection l f b
+        lastSection (ElfListCons v ElfListNull) f _ = f v
+        lastSection (ElfListCons _ l) f b = lastSection l f b
 
         lastSectionIsEmpty :: ElfListXX a -> Bool
         lastSectionIsEmpty l = lastSection l f False
