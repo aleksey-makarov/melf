@@ -23,8 +23,8 @@ jobs:
     - run: nix-build
     - run: nix-shell                                  --run "ghc --version"
 
-    - run: nix-build --argstr compilerVersion ghc901
-    - run: nix-shell --argstr compilerVersion ghc901  --run "ghc --version"
+    - run: nix-build --argstr compilerVersion ghc902
+    - run: nix-shell --argstr compilerVersion ghc902  --run "ghc --version"
 
     - run: nix-build --argstr compilerVersion ghc8107
     - run: nix-shell --argstr compilerVersion ghc8107 --run "ghc --version"

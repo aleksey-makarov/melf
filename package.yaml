@@ -10,7 +10,7 @@ license: BSD3
 homepage: https://github.com/aleksey-makarov/melf
 dependencies:
     - base >=4.13 && <5.0
-tested-with: GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.1, GHC == 9.2.1
+tested-with: GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.2, GHC == 9.2.4
 ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
 extra-doc-files:
     - ChangeLog.md
@@ -31,13 +31,9 @@ library:
     - binary        >= 0.8.7 && < 0.9
     - bytestring    >= 0.10.10 && < 0.12
     - exceptions    >= 0.10.4 && < 0.11
-    - lens
+    - lens          >= 5.0.1 && < 5.2
     - mtl           >= 2.2.2 && < 2.3
     - prettyprinter >= 1.7.0 && < 1.8
-    # In 3.0 they splitted singletons into
-    # singletons, singletons-base and singletons-th
-    # and the latter works only for the very last GHC
-    - singletons    >= 2.6 && < 3.2
     - template-haskell >= 2.15 && < 2.19
   source-dirs: src
   other-modules:
@@ -53,11 +49,19 @@ library:
     - Data.Elf.Headers
     - Data.Elf.PrettyPrint
     - Control.Exception.ChainedException
+    # In 3.0 they splitted singletons into
+    # singletons, singletons-base and singletons-th
+    # and the latter works only for the very last GHC
   when:
     - condition: impl(ghc >= 9.0)
-      dependencies:
-        - singletons-th >= 3.0 && < 3.2
-        - singletons-base >= 3.0 && < 3.2
+      then:
+        dependencies:
+          - singletons      >= 3.0.1 && < 3.1
+          - singletons-th   >= 3.0 && < 3.2
+          - singletons-base >= 3.0 && < 3.2
+      else:
+        dependencies:
+          - singletons >= 2.6 && < 2.8
 
 tests:
   golden:
@@ -93,15 +97,19 @@ tests:
       - filepath
       - melf
       - mtl
-      - singletons
       - tasty
       - tasty-golden
       - tasty-hunit
       - unix >= 2.7.2.2 && < 2.8
     when:
       - condition: impl(ghc >= 9.0)
-        dependencies:
-          - singletons-th
+        then:
+          dependencies:
+            - singletons
+            - singletons-th
+        else:
+          dependencies:
+            - singletons
 
 executables:
   hobjdump:
