@@ -104,12 +104,10 @@ import Data.Singletons.Sigma
 import Data.Singletons.TH
 import Data.Typeable (Typeable)
 
-#if defined(MIN_VERSION_GLASGOW_HASKELL)
-#if MIN_VERSION_GLASGOW_HASKELL(9,0,0,0)
+#if MIN_VERSION_singletons(3,0,0)
 import Data.Eq.Singletons
 import Text.Show.Singletons
 import Data.Bool.Singletons
-#endif
 #endif
 
 import Control.Exception.ChainedException
