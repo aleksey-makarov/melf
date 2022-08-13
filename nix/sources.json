@@ -5,10 +5,10 @@
         "homepage": null,
         "owner": "aleksey-makarov",
         "repo": "melf",
-        "rev": "v1.0.1",
-        "sha256": "130bb8q5w8g9m94j3h3bjfmmfqsmp2k6xg5ci1f4zfq7l6blpwh1",
+        "rev": "v1.1.0",
+        "sha256": "0jk6pgh0hcyb9biga96hf3cv0blrk9zjzlbv5av695al05yzk147",
         "type": "tarball",
-        "url": "https://github.com/aleksey-makarov/melf/archive/v1.0.1.tar.gz",
+        "url": "https://github.com/aleksey-makarov/melf/archive/v1.1.0.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
