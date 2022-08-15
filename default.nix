@@ -21,9 +21,9 @@ let
   };
   source-overrides-902 = {};
   source-overrides-924 = {
-      singletons-base = "3.1";
-      singletons-th = "3.1";
-    };
+    singletons-base = "3.1";
+    singletons-th = "3.1";
+  };
   source-overrides-941 = {};
 
   source-overrides = if compilerVersion == "ghc884"  then source-overrides-884  else
