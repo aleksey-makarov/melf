@@ -26,12 +26,13 @@ let
   };
   source-overrides-941 = {};
 
-  source-overrides = if compilerVersion == "ghc884"  then source-overrides-884  else
-                     if compilerVersion == "ghc8107" then source-overrides-8107 else
-                     if compilerVersion == "ghc902"  then source-overrides-902  else
-                     if compilerVersion == "ghc924"  then source-overrides-924  else
-                     # if compilerVersion == "ghc941"  then source-overrides-941  else
-                throw "version ${compilerVersion} is not supported";
+  source-overrides =
+    if compilerVersion == "ghc884"  then source-overrides-884  else
+    if compilerVersion == "ghc8107" then source-overrides-8107 else
+    if compilerVersion == "ghc902"  then source-overrides-902  else
+    if compilerVersion == "ghc924"  then source-overrides-924  else
+    # if compilerVersion == "ghc941"  then source-overrides-941  else
+    throw "version ${compilerVersion} is not supported";
 
   myHaskellPackages = pkgs.haskell.packages."${compilerVersion}";
 
@@ -48,5 +49,5 @@ in
           niv
         ]
       );
-    source-overrides = source-overrides;
+    inherit source-overrides;
   }
