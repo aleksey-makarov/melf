@@ -7,12 +7,12 @@
 ## Parsing the header and table entries
 
 Module
-[`Data.Elf.Headers`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html)
+[`Data.Elf.Headers`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html)
 implements parsing and serialization of the ELF file header and the entries of section and segment tables.
 
 ELF files come in two flavors: 64-bit and 32-bit.
 To differentiate between them type
-[`ElfClass`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:ElfClass)
+[`ElfClass`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:ElfClass)
 is defined:
 
 ``` Haskell
@@ -24,7 +24,7 @@ data ElfClass
 
 Some fields of the header and table entries have different bitwidth for 64-bit and 32-bit files.
 So the type
-[`WordXX a`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:WordXX)
+[`WordXX a`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:WordXX)
 was borrowed from the `data-elf` package:
 
 ``` Haskell
@@ -59,7 +59,7 @@ instance IsElfClass 'ELFCLASS64 where
 ```
 
 The header of the ELF file is represented with the type
-[`HeaderXX a`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:HeaderXX):
+[`HeaderXX a`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:HeaderXX):
 
 ``` Haskell
 -- | Parsed ELF header
@@ -84,7 +84,7 @@ data HeaderXX c =
 
 So we have two types `HeaderXX 'ELFCLASS64` and `HeaderXX 'ELFCLASS32`.
 To be able to work with headers uniformly the type
-[`Header`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:Header)
+[`Header`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:Header)
 was introduced:
 
 ``` Haskell
@@ -124,7 +124,7 @@ The function
 is defined in the package
 [`binary`](https://hackage.haskell.org/package/binary).
 The function
-[`withElfClass`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#v:withElfClass)
+[`withElfClass`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#v:withElfClass)
 creates a context with an implicit word width available and looks like
 [`withSingI`](https://hackage.haskell.org/package/singletons-3.0.1/docs/Data-Singletons.html#v:withSingI):
 
@@ -138,23 +138,25 @@ withElfClass SELFCLASS32 x = x
 ```
 
 The module `Data.Elf.Headers` also defines the types
-[`SectionXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:SectionXX),
-[`SegmentXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:SegmentXX) and
-[`SymbolXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf-Headers.html#t:SymbolXX)
+[`SectionXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:SectionXX),
+[`SegmentXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:SegmentXX) and
+[`SymbolXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:SymbolXX)
 for the elements of section, segment and symbol tables.
 
 ## Parsing the whole ELF file
 
 The module
-[`Data.Elf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html)
+[`Data.Elf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html)
 implements parsing and serialization of the whole ELF files.
 To parse ELF file it reads ELF header, section table and segment table and uses that data to create
-a list of elements of the type
-[`ElfXX`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#t:ElfXX)
+a list of type
+[`ElfListXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#t:ElfListXX)
+of elements of the type
+[`ElfXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#t:ElfXX)
 representing the recursive structure of the ELF file.
 It also restores section names from the the string table indexes.
 That results in creating an object of type
-[`Elf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#t:Elf):
+[`Elf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#t:Elf):
 
 ``` Haskell
 -- | `Elf` is a forrest of trees of type `ElfXX`.
@@ -250,9 +252,9 @@ Not each object of that type can be serialized.
     node `ElfSegmentTable`.
 
 Correctly composed ELF object can be serialized with the function
-[`serializeElf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:serializeElf)
+[`serializeElf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:serializeElf)
 and parsed with the function
-[`parseElf`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:parseElf):
+[`parseElf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:parseElf):
 
 ``` Haskell
 serializeElf :: MonadThrow m => Elf -> m ByteString
@@ -267,7 +269,7 @@ is not an instance of the class `MonadFail`.
 
 To create machine code that is used in the examples a pair of modules were created.
 The module
-[`AsmAArch64`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/AsmAArch64.hs)
+[`AsmAArch64`](https://github.com/aleksey-makarov/melf/blob/v1.2.0/examples/AsmAArch64.hs)
 provides a DSL embedded in Haskell.
 This DSL is a kind of assembler language for the AArch64 platform.
 It exports some primitives to generate machine instructions and organize machine code.
@@ -282,10 +284,10 @@ The idea was inspired by the article
 ["Monads to Machine Code"](https://www.stephendiehl.com/posts/monads_machine_code.html)
 by Stephen Diehl.
 Detailed description of this module is available in russian:
-[README_ru.md](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/README_ru.md).
+[README_ru.md](https://github.com/aleksey-makarov/melf/blob/v1.2.0/examples/README_ru.md) (outdated).
 
 The module
-[`HelloWorld`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/HelloWorld.hs)
+[`HelloWorld`](https://github.com/aleksey-makarov/melf/blob/v1.2.0/examples/HelloWorld.hs)
 uses primitives from `AsmAArch64` to compose relocatable executable code that uses system calls
 to output a "Hello World!" message into standard output and exit:
 
@@ -408,16 +410,16 @@ It works.
 ## Generation of executable files
 
 The module
-[`DummyLd`](https://github.com/aleksey-makarov/melf/blob/v1.0.2/examples/DummyLd.hs)
+[`DummyLd`](https://github.com/aleksey-makarov/melf/blob/v1.2.0/examples/DummyLd.hs)
 uses the section `.text` of object file to create an executable file.
 Code relocation and symbol resolution is not implemented so that procedure works only
 for position-independent code that does not refer to external translation units,
 for example, it works with the code described above.
 
 Function `dummyLd` consumes an object of the type `Elf` and finds a section `.text`
-(using [`elfFindSectionByName`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:elfFindSectionByName))
+(using [`elfFindSectionByName`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:elfFindSectionByName))
 and header
-(using [`elfFindHeader`](https://hackage.haskell.org/package/melf-1.0.1/docs/Data-Elf.html#v:elfFindHeader))
+(using [`elfFindHeader`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:elfFindHeader))
 in it.
 Then the header type is changed to `ET_EXEC`, the address of the first executable instruction is specified and
 a loadable segment containing the header and the content of `.text` is formed:

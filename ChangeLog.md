@@ -1,3 +1,12 @@
+1.2.0
+=====
+
+- Test with GHC 8.8.4, 8.10.7, 9.0.2, 9.2.4, 9.2.5, 9.4.4
+- Add a fantom parameter type to `ElfXX` to differentiate
+  between nodes on the type level.
+- Revise warning options
+- Use monad optics for ELF write builder
+
 1.1.0
 =====
 

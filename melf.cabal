@@ -5,7 +5,7 @@ cabal-version: 1.18
 -- see: https://github.com/sol/hpack
 
 name:           melf
-version:        1.1.0
+version:        1.2.0
 synopsis:       An Elf parser
 description:    Parser for ELF object format
 category:       Data
