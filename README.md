@@ -159,21 +159,29 @@ That results in creating an object of type
 ``` Haskell
 -- | `Elf` is a forrest of trees of type `ElfXX`.
 -- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
-newtype ElfList c = ElfList [ElfXX c]
+data ElfNodeType = Header | SectionTable | SegmentTable | Section | Segment | RawData | RawAlign
+data ElfListXX c where
+    ElfListCons :: ElfXX t c -> ElfListXX c -> ElfListXX c
+    ElfListNull :: ElfListXX c
 
 -- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
-type Elf = Sigma ElfClass (TyCon1 ElfList)
+type Elf = Sigma ElfClass (TyCon1 ElfListXX)
 
 -- | Section data may contain a string table.
 -- If a section contains a string table with section names, the data
 -- for such a section is generated and `esData` should contain `ElfSectionDataStringTable`
-data ElfSectionData
-    = ElfSectionData BSL.ByteString -- ^ Regular section data
+data ElfSectionData c
+    = ElfSectionData                -- ^ Regular section data
+        { esdData :: BSL.ByteString -- ^ The content of the section
+        }
     | ElfSectionDataStringTable     -- ^ Section data will be generated from section names
+    | ElfSectionDataNoBits          -- ^ SHT_NOBITS uninitialized section data: section has size but no content
+        { esdSize :: WordXX c       -- ^ Size of the section
+        }
 
 -- | The type of node that defines Elf structure.
-data ElfXX (c :: ElfClass)
-    = ElfHeader
+data ElfXX t c where
+    ElfHeader ::
         { ehData       :: ElfData    -- ^ Data encoding (big- or little-endian)
         , ehOSABI      :: ElfOSABI   -- ^ OS/ABI identification
         , ehABIVersion :: Word8      -- ^ ABI version
@@ -181,10 +189,10 @@ data ElfXX (c :: ElfClass)
         , ehMachine    :: ElfMachine -- ^ Machine type
         , ehEntry      :: WordXX c   -- ^ Entry point address
         , ehFlags      :: Word32     -- ^ Processor-specific flags
-        }
-    | ElfSectionTable
-    | ElfSegmentTable
-    | ElfSection
+        } -> ElfXX 'Header c
+    ElfSectionTable :: ElfXX 'SectionTable c
+    ElfSegmentTable :: ElfXX 'SegmentTable c
+    ElfSection ::
         { esName      :: String         -- ^ Section name (NB: string, not offset in the string table)
         , esType      :: ElfSectionType -- ^ Section type
         , esFlags     :: ElfSectionFlag -- ^ Section attributes
@@ -194,9 +202,9 @@ data ElfXX (c :: ElfClass)
         , esN         :: ElfSectionIndex -- ^ Section number
         , esInfo      :: Word32         -- ^ Miscellaneous information
         , esLink      :: Word32         -- ^ Link to other section
-        , esData      :: ElfSectionData -- ^ The content of the section
-        }
-    | ElfSegment
+        , esData      :: ElfSectionData c -- ^ The content of the section
+        } -> ElfXX 'Section c
+    ElfSegment ::
         { epType       :: ElfSegmentType -- ^ Type of segment
         , epFlags      :: ElfSegmentFlag -- ^ Segment attributes
         , epVirtAddr   :: WordXX c       -- ^ Virtual address in memory
@@ -204,20 +212,24 @@ data ElfXX (c :: ElfClass)
         , epAddMemSize :: WordXX c       -- ^ Add this amount of memory after the section when the section is loaded to memory by execution system.
                                          --   Or, in other words this is how much `pMemSize` is bigger than `pFileSize`
         , epAlign      :: WordXX c       -- ^ Alignment of segment
-        , epData       :: [ElfXX c]      -- ^ Content of the segment
-        }
-    | ElfRawData -- ^ Some ELF files (some executables) don't bother to define
-                 -- sections for linking and have just raw data in segments.
+        , epData       :: ElfListXX c    -- ^ Content of the segment
+        } -> ElfXX 'Segment c
+    -- | Some ELF files (some executables) don't bother to define
+    -- sections for linking and have just raw data in segments.
+    ElfRawData ::
         { edData :: BSL.ByteString -- ^ Raw data in ELF file
-        }
-    | ElfRawAlign -- ^ Align the next data in the ELF file.
-                  -- The offset of the next data in the ELF file
-                  -- will be the minimal @x@ such that
-                  -- @x mod eaAlign == eaOffset mod eaAlign @
+        } -> ElfXX 'RawData c
+    -- | Align the next data in the ELF file.
+    -- The offset of the next data in the ELF file
+    -- will be the minimal @x@ such that
+    -- @x mod eaAlign == eaOffset mod eaAlign @
+    ElfRawAlign ::
         { eaOffset :: WordXX c -- ^ Align value
         , eaAlign  :: WordXX c -- ^ Align module
-        }
+        } -> ElfXX 'RawAlign c
 
+(~:) :: ElfXX t a -> ElfListXX a -> ElfListXX a
+(~:) = ElfListCons
 ```
 
 Not each object of that type can be serialized.
@@ -284,8 +296,8 @@ helloWorld :: MonadCatch m => StateT CodeState m ()
 Function `assemble` uses the `melf` library to generate an object file:
 
 ``` Haskell
-    return $ SELFCLASS64 :&: ElfList
-        [ ElfHeader
+    return $ SELFCLASS64 :&:
+        ElfHeader
             { ehData       = ELFDATA2LSB
             , ehOSABI      = ELFOSABI_SYSV
             , ehABIVersion = 0
@@ -294,7 +306,7 @@ Function `assemble` uses the `melf` library to generate an object file:
             , ehEntry      = 0
             , ehFlags      = 0
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".text"
             , esType      = SHT_PROGBITS
             , esFlags     = SHF_EXECINSTR .|. SHF_ALLOC
@@ -306,7 +318,7 @@ Function `assemble` uses the `melf` library to generate an object file:
             , esInfo      = 0
             , esData      = ElfSectionData txt
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".shstrtab"
             , esType      = SHT_STRTAB
             , esFlags     = 0
@@ -318,7 +330,7 @@ Function `assemble` uses the `melf` library to generate an object file:
             , esInfo      = 0
             , esData      = ElfSectionDataStringTable
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".symtab"
             , esType      = SHT_SYMTAB
             , esFlags     = 0
@@ -330,7 +342,7 @@ Function `assemble` uses the `melf` library to generate an object file:
             , esInfo      = 1
             , esData      = ElfSectionData symbolTableData
             }
-        , ElfSection
+        ~: ElfSection
             { esName      = ".strtab"
             , esType      = SHT_STRTAB
             , esFlags     = 0
@@ -342,8 +354,8 @@ Function `assemble` uses the `melf` library to generate an object file:
             , esInfo      = 0
             , esData      = ElfSectionData stringTableData
             }
-        , ElfSectionTable
-        ]
+        ~: ElfSectionTable
+        ~: ElfListNull
 ```
 
 It runs the `State` monad that was passed as an argument.
@@ -411,7 +423,7 @@ Then the header type is changed to `ET_EXEC`, the address of the first executabl
 a loadable segment containing the header and the content of `.text` is formed:
 
 ``` Haskell
-data MachineConfig (a :: ElfClass)
+data MachineConfig a
     = MachineConfig
         { mcAddress :: WordXX a -- ^ Virtual address of the executable segment
         , mcAlign   :: WordXX a -- ^ Required alignment of the executable segment
@@ -423,20 +435,23 @@ getMachineConfig EM_AARCH64 = return $ MachineConfig 0x400000 0x10000
 getMachineConfig EM_X86_64  = return $ MachineConfig 0x400000 0x1000
 getMachineConfig _          = $chainedError "could not find machine config for this arch"
 
-dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfList a -> m (ElfList a)
-dummyLd' (ElfList es) = do
+dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfListXX a -> m (ElfListXX a)
+dummyLd' es = do
 
-    txtSection <- elfFindSectionByName es ".text"
-    txtSectionData <- case txtSection of
-        ElfSection { esData = ElfSectionData textData } -> return textData
+    section' <- elfFindSectionByName es ".text"
+
+    txtSectionData <- case esData section' of
+        ElfSectionData textData -> return textData
         _ -> $chainedError "could not find correct \".text\" section"
 
-    header <- elfFindHeader es
-    case header of
-        ElfHeader { .. } -> do
-            MachineConfig { .. } <- getMachineConfig ehMachine
-            return $ ElfList
-                [ ElfSegment
+    header' <- elfFindHeader es
+
+    MachineConfig { .. } <- getMachineConfig (ehMachine header')
+
+    return $
+        case header' of
+            ElfHeader { .. } ->
+                ElfSegment
                     { epType       = PT_LOAD
                     , epFlags      = PF_X .|. PF_R
                     , epVirtAddr   = mcAddress
@@ -444,19 +459,18 @@ dummyLd' (ElfList es) = do
                     , epAddMemSize = 0
                     , epAlign      = mcAlign
                     , epData       =
-                        [ ElfHeader
+                        ElfHeader
                             { ehType  = ET_EXEC
                             , ehEntry = mcAddress + headerSize (fromSing $ sing @a)
                             , ..
                             }
-                        , ElfRawData
+                        ~: ElfRawData
                             { edData = txtSectionData
                             }
-                        ]
+                        ~: ElfListNull
                     }
-                , ElfSegmentTable
-                ]
-        _ -> $chainedError "could not find ELF header"
+                ~: ElfSegmentTable
+                ~: ElfListNull
 
 -- | @dummyLd@ places the content of ".text" section of the input ELF
 -- into the loadable segment of the resulting ELF.
