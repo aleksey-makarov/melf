@@ -898,9 +898,9 @@ serializeElf' elfs = do
                                 hShOff      = _wbsShOff
                                 hFlags      = ehFlags
                                 hPhEntSize  = segmentTableEntrySize elfClass
-                                hPhNum      = segmentN
+                                hPhNum      = segmentN :: Word16
                                 hShEntSize  = sectionTableEntrySize elfClass
-                                hShNum      = if sectionTable then sectionN + 1 else 0
+                                hShNum      = (if sectionTable then sectionN + 1 else 0) :: Word16
                                 hShStrNdx   = _wbsShStrNdx
 
                                 h :: Header
@@ -973,7 +973,7 @@ parseSymbolTable d symbolTableSection@(ElfSection { .. }) elfs = do
     st <- parseBList d symbolTable
     return (mkElfSymbolTableEntry stringTable <$> st)
 
-mkSymbolTableEntry :: SingI a => Word32 -> ElfSymbolXX a -> SymbolXX a
+mkSymbolTableEntry :: Word32 -> ElfSymbolXX a -> SymbolXX a
 mkSymbolTableEntry nameIndex ElfSymbolXX{..} =
     let
         ElfSymbolBinding b = steBind
@@ -981,7 +981,7 @@ mkSymbolTableEntry nameIndex ElfSymbolXX{..} =
 
         stName  = nameIndex
         stInfo  = b `shift` 4 .|. t
-        stOther = 0
+        stOther = 0 :: Word8
         stShNdx = steShNdx
         stValue = steValue
         stSize  = steSize
@@ -999,7 +999,7 @@ serializeSymbolTable d ss = do
         (stringTable, stringIndexes) = mkStringTable $ fmap steName ss
         ssWithNameIndexes = L.zip ss stringIndexes
 
-        f :: SingI a => (ElfSymbolXX a, Int64) -> SymbolXX a
+        f :: (ElfSymbolXX a, Int64) -> SymbolXX a
         f (s, n) = mkSymbolTableEntry (fromIntegral n) s
 
         symbolTable = serializeBList d $ fmap f ssWithNameIndexes

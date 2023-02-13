@@ -22,6 +22,7 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
     let patternName s = mkName (patternPrefixString ++ s)
     let defaultPatternName = mkName defaultPatternNameString
     let
+        baseTypeT :: Q Type
         baseTypeT =
             case baseType of
                 BaseWord8  -> conT $ mkName "Word8"
@@ -55,7 +56,9 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                 (normalB [| patternPrefixString ++ s |])
                 []
 
-    let showClauses = map mkShowClause enums
+    let
+        showClauses :: [Q Clause]
+        showClauses = map mkShowClause enums
 
     (nP, nE) <- newNamePE "n"
     let
@@ -149,6 +152,7 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
     localName3 <- newName "n"
 
     let
+        defaultPatternDef :: Q Dec
         defaultPatternDef =
             patSynD
                 defaultPatternName

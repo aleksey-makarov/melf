@@ -242,6 +242,7 @@ printRBuilder rbs = vsep ldoc
                                 let
                                     xs = concatMap printRBuilder' rbpData
                                     l = longest xs
+                                    appendSectionBar :: [(a1, String, c1)] -> [(a1, String, c1)]
                                     appendSectionBar = fmap (mapL ('│' : ))
                                     xsf = appendSectionBar $ equalize l xs
                                     b = '┌' : replicate l '─'
@@ -252,6 +253,7 @@ printRBuilder rbs = vsep ldoc
                                     [(if empty i then o else o + s - 1, e, [] )]
                 f RBuilderRawData{} =
                     let
+                        doc :: [Doc ()]
                         doc = [ "R" ]
                     in
                         [(o,         "╓", doc)

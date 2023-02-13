@@ -9,7 +9,7 @@ module Data.Interval
 
 data Interval a = I { offset :: !a, size :: !a }
 
-instance (Ord a, Eq a, Num a) => Eq (Interval a) where
+instance (Ord a, Num a) => Eq (Interval a) where
     (==) (I o1 s1) (I o2 s2) | s1 >  0 && s2 >  0 = o1 == o2 && s1 == s2
                              | s1 <= 0 && s2 <= 0 = o1 == o2
                              | otherwise          = False

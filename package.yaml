@@ -11,7 +11,8 @@ homepage: https://github.com/aleksey-makarov/melf
 dependencies:
     - base >=4.13 && <5.0
 tested-with: GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.2, GHC == 9.2.4, GHC == 9.2.5, GHC == 9.4.4
-ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
+ghc-options: -Wall -Wcompat
+
 extra-doc-files:
     - ChangeLog.md
     - README.md
@@ -92,7 +93,6 @@ tests:
     source-dirs: examples
     dependencies:
       - bytestring
-      - containers >= 0.6.2.1 && < 0.7
       - exceptions
       - filepath
       - melf
@@ -115,7 +115,7 @@ executables:
   hobjdump:
     main: hObjDump.hs
     source-dirs: app
-    ghc-options: -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N
     dependencies:
       - melf
       - binary
@@ -125,7 +125,7 @@ executables:
   hobjlayout:
     main: hObjLayout.hs
     source-dirs: app
-    ghc-options: -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+    ghc-options: -threaded -rtsopts -with-rtsopts=-N
     dependencies:
       - melf
       - binary

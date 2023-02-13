@@ -596,7 +596,7 @@ relaSym32 :: Word32 -> Word32
 relaSym32 v = v `shiftR` 8
 
 relaType32 :: Word32 -> Word32
-relaType32 v = fromIntegral $ v .&. 0xff
+relaType32 v = v .&. 0xff
 
 relaSym64 :: Word64 -> Word32
 relaSym64 v = fromIntegral $ v `shiftR` 32
