@@ -69,7 +69,7 @@ library
       Data.BList
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
+  ghc-options: -Wall -Wcompat
   build-depends:
       base >=4.13 && <5.0
     , binary >=0.8.7 && <0.9
@@ -95,7 +95,7 @@ executable hobjdump
       Paths_melf
   hs-source-dirs:
       app
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.13 && <5.0
     , binary
@@ -111,7 +111,7 @@ executable hobjlayout
       Paths_melf
   hs-source-dirs:
       app
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints -fno-warn-unused-do-bind -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.13 && <5.0
     , binary
@@ -132,11 +132,10 @@ test-suite examples
       Paths_melf
   hs-source-dirs:
       examples
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
+  ghc-options: -Wall -Wcompat
   build-depends:
       base >=4.13 && <5.0
     , bytestring
-    , containers >=0.6.2.1 && <0.7
     , exceptions
     , filepath
     , melf
@@ -161,7 +160,7 @@ test-suite exceptions
       Paths_melf
   hs-source-dirs:
       tests/exceptions
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
+  ghc-options: -Wall -Wcompat
   build-depends:
       base >=4.13 && <5.0
     , exceptions
@@ -177,7 +176,7 @@ test-suite golden
       Paths_melf
   hs-source-dirs:
       tests
-  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wno-redundant-constraints
+  ghc-options: -Wall -Wcompat
   build-depends:
       base >=4.13 && <5.0
     , binary

@@ -261,7 +261,7 @@ assemble m = do
                 steType  = STT_NoType
                 steShNdx = textSecN
                 steValue = fromIntegral $ findOffset poolOffset r
-                steSize  = 0
+                steSize  = 0 :: Word64
             in
                 ElfSymbolXX{..}
 

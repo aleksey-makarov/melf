@@ -5,7 +5,6 @@ module ForwardLabel (forwardLabel) where
 
 import Prelude as P
 
-import Control.Monad.Catch
 import Control.Monad.Fix
 import Control.Monad.State
 import Data.Word
@@ -23,7 +22,7 @@ sysExit, sysWrite :: Word16
 sysWrite = 64
 sysExit = 93
 
-forwardLabel :: (MonadCatch m, MonadFix m) => StateT CodeState m ()
+forwardLabel :: MonadFix m => StateT CodeState m ()
 forwardLabel = mdo
 
     label >>= exportSymbol "_start"
