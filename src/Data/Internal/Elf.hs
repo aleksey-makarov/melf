@@ -23,7 +23,8 @@ module Data.Internal.Elf where
 
 import Control.Exception.ChainedException
 import Data.Elf.Constants
-import Data.Elf.Headers
+import Data.Elf.Headers hiding (Header)
+import qualified Data.Elf.Headers as H
 import Data.Interval as I
 
 import Control.Lens.Combinators hiding (contains)
@@ -40,8 +41,6 @@ import Data.Int
 import qualified Data.List as L
 import Data.Maybe
 import Data.Monoid
-import Data.Singletons
-import Data.Singletons.Sigma
 
 -- | @RBuilder@ is an intermediate internal data type that is used by parser.
 -- It contains information about layout of the ELF file that can be used
@@ -91,7 +90,7 @@ data ElfListXX c where
     ElfListNull :: ElfListXX c
 
 -- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
-type Elf = Sigma ElfClass (TyCon1 ElfListXX)
+data Elf = forall a . Elf (SingElfClass a) (ElfListXX a)
 
 -- | Section data may contain a string table.
 -- If a section contains a string table with section names, the data
@@ -191,22 +190,22 @@ foldMapElfList' _  ElfListNull      = mempty
 mapMElfList :: Monad m => (forall t' . (ElfXX t' a -> m b)) -> ElfListXX a -> m [b]
 mapMElfList f l = sequence $ foldMapElfList' ((: []) . f) l
 
-headerInterval :: forall a . IsElfClass a => HeaderXX a -> Interval (WordXX a)
-headerInterval _ = I 0 $ headerSize $ fromSing $ sing @a
+headerInterval :: forall a . SingElfClassI a => HeaderXX a -> Interval (WordXX a)
+headerInterval _ = I 0 $ headerSize $ fromSingElfClass $ singElfClass @a
 
-sectionTableInterval :: IsElfClass a => HeaderXX a -> Interval (WordXX a)
+sectionTableInterval :: SingElfClassI a => HeaderXX a -> Interval (WordXX a)
 sectionTableInterval HeaderXX{..} = I hShOff $ fromIntegral $ hShEntSize * hShNum
 
-segmentTableInterval :: IsElfClass a => HeaderXX a -> Interval (WordXX a)
+segmentTableInterval :: SingElfClassI a => HeaderXX a -> Interval (WordXX a)
 segmentTableInterval HeaderXX{..} = I hPhOff $ fromIntegral $ hPhEntSize * hPhNum
 
-sectionInterval :: IsElfClass a => SectionXX a -> Interval (WordXX a)
+sectionInterval :: SingElfClassI a => SectionXX a -> Interval (WordXX a)
 sectionInterval SectionXX{..} = I sOffset if sType == SHT_NOBITS then 0 else sSize
 
-segmentInterval :: IsElfClass a => SegmentXX a -> Interval (WordXX a)
+segmentInterval :: SingElfClassI a => SegmentXX a -> Interval (WordXX a)
 segmentInterval SegmentXX{..} = I pOffset pFileSize
 
-rBuilderInterval :: IsElfClass a => RBuilder a -> Interval (WordXX a)
+rBuilderInterval :: SingElfClassI a => RBuilder a -> Interval (WordXX a)
 rBuilderInterval RBuilderHeader{..}       = headerInterval rbhHeader
 rBuilderInterval RBuilderSectionTable{..} = sectionTableInterval rbstHeader
 rBuilderInterval RBuilderSegmentTable{..} = segmentTableInterval rbptHeader
@@ -234,21 +233,21 @@ showRBuilder' RBuilderSegment{..}    = "segment " ++ show rbpN
 showRBuilder' RBuilderRawData{}      = "raw data" -- should not be called
 showRBuilder' RBuilderRawAlign{}     = "alignment" -- should not be called
 
-showRBuilder :: IsElfClass a => RBuilder a -> String
+showRBuilder :: SingElfClassI a => RBuilder a -> String
 showRBuilder v = showRBuilder' v ++ " (" ++ show (rBuilderInterval v) ++ ")"
 
--- showERBList :: IsElfClass a => [RBuilder a] -> String
+-- showERBList :: SingElfClassI a => [RBuilder a] -> String
 -- showERBList l = "[" ++ (L.concat $ L.intersperse ", " $ fmap showRBuilder l) ++ "]"
 
-intersectMessage :: IsElfClass a => RBuilder a -> RBuilder a -> String
+intersectMessage :: SingElfClassI a => RBuilder a -> RBuilder a -> String
 intersectMessage x y = showRBuilder x ++ " and " ++ showRBuilder y ++ " intersect"
 
-addRBuilders :: forall a m . (IsElfClass a, MonadCatch m) => [RBuilder a] -> m [RBuilder a]
+addRBuilders :: forall a m . (SingElfClassI a, MonadCatch m) => [RBuilder a] -> m [RBuilder a]
 addRBuilders newts =
     let
         addRBuilders' f newts' l = foldM (flip f) l newts'
 
-        addRBuilderEmpty :: (IsElfClass a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
+        addRBuilderEmpty :: (SingElfClassI a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
         addRBuilderEmpty t ts =
             -- (unsafePerformIO $ Prelude.putStrLn $ "Add Empty " ++ showRBuilder t ++ " to " ++ showERBList ts) `seq`
             let
@@ -285,14 +284,14 @@ addRBuilders newts =
                                 return $ toList $ LZip l Nothing (ce ++ (t : re'))
                 Nothing -> return $ toList $ LZip l (Just t) r
 
-        addRBuilderNonEmpty :: (IsElfClass a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
+        addRBuilderNonEmpty :: (SingElfClassI a, MonadCatch m) => RBuilder a -> [RBuilder a] -> m [RBuilder a]
         addRBuilderNonEmpty t ts =
             -- (unsafePerformIO $ Prelude.putStrLn $ "Add NonEmpty " ++ showRBuilder t ++ " to " ++ showERBList ts) `seq`
             let
                 ti = rBuilderInterval t
                 (LZip l c' r) = findInterval rBuilderInterval (offset ti) ts
 
-                addRBuildersNonEmpty :: (IsElfClass a, MonadCatch m) => [RBuilder a] -> RBuilder a -> m (RBuilder a)
+                addRBuildersNonEmpty :: (SingElfClassI a, MonadCatch m) => [RBuilder a] -> RBuilder a -> m (RBuilder a)
                 addRBuildersNonEmpty [] x = return x
                 addRBuildersNonEmpty ts' RBuilderSegment{..} = do
                     d <- $addContext' $ addRBuilders' addRBuilderNonEmpty ts' rbpData
@@ -397,7 +396,7 @@ addRBuilders newts =
         addRBuilders' addRBuilderNonEmpty nonEmptyRBs [] >>= addRBuilders' addRBuilderEmpty emptyRBs
 
 -- | Find section with a given number
-elfFindSection :: forall a m b . (SingI a, MonadThrow m, Integral b, Show b)
+elfFindSection :: forall a m b . (SingElfClassI a, MonadThrow m, Integral b, Show b)
                => ElfListXX a          -- ^ Structured ELF data
                -> b                    -- ^ Number of the section
                -> m (ElfXX 'Section a) -- ^ The section in question
@@ -411,7 +410,7 @@ elfFindSection elfs n = if n == 0
             f _ = First Nothing
 
 -- | Find section with a given name
-elfFindSectionByName :: forall a m . (SingI a, MonadThrow m)
+elfFindSectionByName :: forall a m . (SingElfClassI a, MonadThrow m)
                      => ElfListXX a          -- ^ Structured ELF data
                      -> String               -- ^ Section name
                      -> m (ElfXX 'Section a) -- ^ The section in question
@@ -423,7 +422,7 @@ elfFindSectionByName elfs n = $maybeAddContext ("no section \"" ++ show n ++ "\"
         f _ = First Nothing
 
 -- | Find ELF header
-elfFindHeader :: forall a m . (SingI a, MonadThrow m)
+elfFindHeader :: forall a m . (SingElfClassI a, MonadThrow m)
               => ElfListXX a         -- ^ Structured ELF data
               -> m (ElfXX 'Header a) -- ^ ELF header
 elfFindHeader elfs = $maybeAddContext "no header" maybeHeader
@@ -443,7 +442,7 @@ cut :: BSL.ByteString -> Int64 -> Int64 -> BSL.ByteString
 cut content offset size = BSL.take size $ BSL.drop offset content
 
 -- | Get section data
-getSectionData :: IsElfClass a
+getSectionData :: SingElfClassI a
                => BSL.ByteString -- ^ ELF file
                -> SectionXX a    -- ^ Parsed section entry
                -> BSL.ByteString -- ^ Section Data
@@ -456,7 +455,7 @@ tail' :: [a] -> [a]
 tail' [] = []
 tail' (_ : xs) = xs
 
-nextOffset :: IsElfClass a => WordXX a -> WordXX a -> WordXX a -> WordXX a
+nextOffset :: SingElfClassI a => WordXX a -> WordXX a -> WordXX a -> WordXX a
 nextOffset _ 0 a = a
 nextOffset t m a | m .&. (m - 1) /= 0 = error $ "align module is not power of two " ++ show m
                  | otherwise          = if a' + t' < a then a' + m + t' else a' + t'
@@ -464,7 +463,7 @@ nextOffset t m a | m .&. (m - 1) /= 0 = error $ "align module is not power of tw
         a' = a .&. complement (m - 1)
         t' = t .&. (m - 1)
 
-addRawData :: forall a . IsElfClass a => BSL.ByteString -> [RBuilder a] -> [RBuilder a]
+addRawData :: forall a . SingElfClassI a => BSL.ByteString -> [RBuilder a] -> [RBuilder a]
 addRawData _ [] = []
 addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
     where
@@ -528,7 +527,7 @@ addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
                         eAddrAlign = case rbs' of
                             (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pAlign
                             (RBuilderSection{rbsHeader = SectionXX{..}} : _) -> sAddrAlign
-                            _ -> wordSize $ fromSing $ sing @a
+                            _ -> wordSize $ fromSingElfClass $ singElfClass @a
                         -- e' here is the address of the next section/segment
                         -- according to the regular alignment rules
                         e' = nextOffset eAddr eAddrAlign b
@@ -547,7 +546,7 @@ infix 9 !!?
     go _ []     = Nothing
 
 -- | Parse ELF file and produce [`RBuilder`]
-parseRBuilder :: (IsElfClass a, MonadCatch m)
+parseRBuilder :: (SingElfClassI a, MonadCatch m)
               => HeaderXX a     -- ^ ELF header
               -> [SectionXX a]  -- ^ Section table
               -> [SegmentXX a]  -- ^ Segment table
@@ -559,12 +558,12 @@ parseRBuilder hdr@HeaderXX{..} ss ps bs = do
     let
         maybeStringSectionData = getSectionData bs <$> (ss !!? hShStrNdx)
 
-        mkRBuilderSection :: (SingI a, MonadCatch m) => (ElfSectionIndex, SectionXX a) -> m (RBuilder a)
+        mkRBuilderSection :: (SingElfClassI a, MonadCatch m) => (ElfSectionIndex, SectionXX a) -> m (RBuilder a)
         mkRBuilderSection (n, s@SectionXX{..}) = do
             stringSectionData <- $maybeAddContext "No string table" maybeStringSectionData
             return $ RBuilderSection s n $ getString stringSectionData $ fromIntegral sName
 
-        mkRBuilderSegment :: (SingI a, MonadCatch m) => (Word16, SegmentXX a) -> m (RBuilder a)
+        mkRBuilderSegment :: (SingElfClassI a, MonadCatch m) => (Word16, SegmentXX a) -> m (RBuilder a)
         mkRBuilderSegment (n, p) = return $ RBuilderSegment p n []
 
     sections <- mapM mkRBuilderSection $ tail' $ Prelude.zip [0 .. ] ss
@@ -582,11 +581,11 @@ parseRBuilder hdr@HeaderXX{..} ss ps bs = do
                                    ++ sections
     return $ addRawData bs rbs
 
-parseElf' :: forall a m . (IsElfClass a, MonadCatch m) =>
-                                            HeaderXX a ->
-                                         [SectionXX a] ->
-                                         [SegmentXX a] ->
-                                        BSL.ByteString -> m Elf
+parseElf' :: forall a m . (SingElfClassI a, MonadCatch m) =>
+                                               HeaderXX a ->
+                                            [SectionXX a] ->
+                                            [SegmentXX a] ->
+                                           BSL.ByteString -> m Elf
 parseElf' hdr@HeaderXX{..} ss ps bs = do
 
     rbs <- parseRBuilder hdr ss ps bs
@@ -645,19 +644,19 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
             return $ ElfListCons (ElfRawAlign rbraOffset rbraAlign) l
 
     el <- foldrM rBuilderToElf ElfListNull rbs --  mapM rBuilderToElf rbs
-    return $ sing :&: el
+    return $ Elf singElfClass el
 
 -- | Parse ELF file
 parseElf :: MonadCatch m => BSL.ByteString -> m Elf
 parseElf bs = do
-    classS :&: HeadersXX (hdr, ss, ps) <- parseHeaders bs
-    withElfClass classS parseElf' hdr ss ps bs
+    Headers classS (HeadersXX (hdr, ss, ps)) <- parseHeaders bs
+    withSingElfClassI classS parseElf' hdr ss ps bs
 
 -------------------------------------------------------------------------------
 --
 -------------------------------------------------------------------------------
 
-wbStateInit :: forall a . IsElfClass a => WBuilderState a
+wbStateInit :: forall a . SingElfClassI a => WBuilderState a
 wbStateInit = WBuilderState
     { _wbsSections         = []
     , _wbsSegmentsReversed = []
@@ -669,7 +668,7 @@ wbStateInit = WBuilderState
     , _wbsNameIndexes      = []
     }
 
-zeroSection :: forall a . IsElfClass a => SectionXX a
+zeroSection :: forall a . SingElfClassI a => SectionXX a
 zeroSection = SectionXX 0 0 0 0 0 0 0 0 0 0
 
 neighbours :: [a] -> (a -> a -> b) -> [b]
@@ -723,7 +722,7 @@ mkStringTable sectionNames = (stringTable, os)
                                     ((i', o') : iosff, insff)
                             else (iosff, (i', n') : insff)
 
-serializeElf' :: forall a m . (IsElfClass a, MonadCatch m) => ElfListXX a -> m BSL.ByteString
+serializeElf' :: forall a m . (SingElfClassI a, MonadCatch m) => ElfListXX a -> m BSL.ByteString
 serializeElf' elfs = do
 
     -- FIXME: it's better to match constructor here, but there is a bug that prevents to conclude that
@@ -736,7 +735,7 @@ serializeElf' elfs = do
 
     let
 
-        elfClass = fromSing $ sing @a
+        elfClass = fromSingElfClass $ singElfClass @a
 
         sectionN :: Num b => b
         sectionN = getSum $ foldMapElfList f elfs
@@ -776,7 +775,7 @@ serializeElf' elfs = do
             wbsDataReversed %= (WBuilderDataByteStream (BSL.replicate (fromIntegral $ offset' - offset) 0) :)
 
         alignWord :: (MonadThrow n, MonadState (WBuilderState a) n) => n ()
-        alignWord = align 0 $ wordSize $ fromSing $ sing @a
+        alignWord = align 0 $ wordSize $ fromSingElfClass $ singElfClass @a
 
         dataIsEmpty :: ElfSectionData c -> Bool
         dataIsEmpty (ElfSectionData bs)       = BSL.null bs
@@ -903,8 +902,8 @@ serializeElf' elfs = do
                                 hShNum      = (if sectionTable then sectionN + 1 else 0) :: Word16
                                 hShStrNdx   = _wbsShStrNdx
 
-                                h :: Header
-                                h = sing @a :&: HeaderXX{..}
+                                h :: H.Header
+                                h = H.Header (singElfClass @a) HeaderXX{..}
                             in
                                 encode h
                 f WBuilderDataByteStream {..} = wbdData
@@ -919,7 +918,7 @@ serializeElf' elfs = do
 
 -- | Serialze ELF file
 serializeElf :: MonadCatch m => Elf -> m BSL.ByteString
-serializeElf (classS :&: ls) = withElfClass classS serializeElf' ls
+serializeElf (Elf classS ls) = withSingElfClassI classS serializeElf' ls
 
 -------------------------------------------------------------------------------
 --
@@ -941,7 +940,7 @@ data ElfSymbolXX c =
 getStringFromData :: BSL.ByteString -> Word32 -> String
 getStringFromData stringTable offset = BSL8.unpack $ BSL.takeWhile (/= 0) $ BSL.drop (fromIntegral offset) stringTable
 
-mkElfSymbolTableEntry :: SingI a => BSL.ByteString -> SymbolXX a -> ElfSymbolXX a
+mkElfSymbolTableEntry :: SingElfClassI a => BSL.ByteString -> SymbolXX a -> ElfSymbolXX a
 mkElfSymbolTableEntry stringTable SymbolXX{..} =
     let
         steName  = getStringFromData stringTable stName
@@ -954,7 +953,7 @@ mkElfSymbolTableEntry stringTable SymbolXX{..} =
         ElfSymbolXX{..}
 
 -- | Parse symbol table
-parseSymbolTable :: (MonadThrow m, SingI a)
+parseSymbolTable :: (MonadThrow m, SingElfClassI a)
                  => ElfData           -- ^ Endianness of the ELF file
                  -> ElfXX 'Section a  -- ^ Parsed section such that @`sectionIsSymbolTable` . `sType`@ is true.
                  -> ElfListXX a       -- ^ Structured ELF data
@@ -989,7 +988,7 @@ mkSymbolTableEntry nameIndex ElfSymbolXX{..} =
         SymbolXX{..}
 
 -- | Serialize symbol table
-serializeSymbolTable :: (MonadThrow m, SingI a)
+serializeSymbolTable :: (MonadThrow m, SingElfClassI a)
                      => ElfData                            -- ^ Endianness of the ELF file
                      -> [ElfSymbolXX a]                    -- ^ Symbol table
                      -> m (BSL.ByteString, BSL.ByteString) -- ^ Pair of symbol table section data and string table section data

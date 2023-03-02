@@ -50,19 +50,6 @@ library:
     - Data.Elf.Headers
     - Data.Elf.PrettyPrint
     - Control.Exception.ChainedException
-    # In 3.0 they splitted singletons into
-    # singletons, singletons-base and singletons-th
-    # and the latter works only for the very last GHC
-  when:
-    - condition: impl(ghc >= 9.0)
-      then:
-        dependencies:
-          - singletons      >= 3.0 && < 3.1
-          - singletons-th   >= 3.0 && < 3.2
-          - singletons-base >= 3.0 && < 3.2
-      else:
-        dependencies:
-          - singletons >= 2.6 && < 2.8
 
 tests:
   golden:
@@ -76,7 +63,6 @@ tests:
       - filepath >= 1.4.2.1 && < 1.5
       - melf
       - prettyprinter
-      - singletons
       - tasty >= 1.4.1 && < 1.5
       - tasty-golden >= 2.3.4 && < 2.4
       - tasty-hunit >= 0.10.0.3 && < 0.11
@@ -101,15 +87,6 @@ tests:
       - tasty-golden
       - tasty-hunit
       - unix >= 2.7.2.2 && < 2.8
-    when:
-      - condition: impl(ghc >= 9.0)
-        then:
-          dependencies:
-            - singletons
-            - singletons-th
-        else:
-          dependencies:
-            - singletons
 
 executables:
   hobjdump:

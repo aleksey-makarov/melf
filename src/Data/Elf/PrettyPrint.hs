@@ -40,17 +40,15 @@ import Control.Monad
 import Control.Monad.Catch
 import Data.Bits
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy.Char8 as BSL8
 import qualified Data.ByteString.Lazy as BSL
+import qualified Data.ByteString.Lazy.Char8 as BSL8
 import Data.Char
 import Data.Int
 import qualified Data.List as L
-import Data.Singletons
-import Data.Singletons.Sigma
-import Prettyprinter
-import Prettyprinter.Render.Text
 import Data.Word
 import Numeric
+import Prettyprinter
+import Prettyprinter.Render.Text
 import System.IO
 
 import Control.Exception.ChainedException
@@ -92,18 +90,18 @@ printWord32 n = pretty $ padLeadingZeros 8 $ showHex n ""
 printWord64 :: Word64 -> Doc ()
 printWord64 n = pretty $ padLeadingZeros 16 $ showHex n ""
 
-printWordXXS :: Sing a -> WordXX a -> Doc ()
+printWordXXS :: SingElfClass a -> WordXX a -> Doc ()
 printWordXXS SELFCLASS32 = printWord32
 printWordXXS SELFCLASS64 = printWord64
 
-printWordXX :: SingI a => WordXX a -> Doc ()
-printWordXX = withSing printWordXXS
+printWordXX :: SingElfClassI a => WordXX a -> Doc ()
+printWordXX = withSingElfClass printWordXXS
 
 -- | Print ELF header.  It's used in golden tests
-printHeader :: forall a . SingI a => HeaderXX a -> Doc ()
+printHeader :: forall a . SingElfClassI a => HeaderXX a -> Doc ()
 printHeader HeaderXX{..} =
     formatPairs
-        [ ("Class",      viaShow $ fromSing $ sing @a )
+        [ ("Class",      viaShow $ fromSingElfClass $ singElfClass @a )
         , ("Data",       viaShow hData           ) -- ElfData
         , ("OSABI",      viaShow hOSABI          ) -- ElfOSABI
         , ("ABIVersion", viaShow hABIVersion     ) -- Word8
@@ -120,7 +118,7 @@ printHeader HeaderXX{..} =
         , ("ShStrNdx",   viaShow hShStrNdx       ) -- Word16
         ]
 
-printSection :: SingI a => (Int, SectionXX a) -> Doc ()
+printSection :: SingElfClassI a => (Int, SectionXX a) -> Doc ()
 printSection (n, SectionXX{..}) =
     formatPairs
         [ ("N",         viaShow n              )
@@ -136,7 +134,7 @@ printSection (n, SectionXX{..}) =
         , ("EntSize",   printWordXX sEntSize   ) -- WordXX c
         ]
 
-printSegment :: SingI a => (Int, SegmentXX a) -> Doc ()
+printSegment :: SingElfClassI a => (Int, SegmentXX a) -> Doc ()
 printSegment (n, SegmentXX{..}) =
     formatPairs
         [ ("N",        viaShow n             )
@@ -152,7 +150,7 @@ printSegment (n, SegmentXX{..}) =
 
 -- | Print parsed header, section table and segment table.
 --   It's used in golden tests
-printHeaders :: SingI a => HeaderXX a -> [SectionXX a] -> [SegmentXX a] -> Doc ()
+printHeaders :: SingElfClassI a => HeaderXX a -> [SectionXX a] -> [SegmentXX a] -> Doc ()
 printHeaders hdr ss ps =
     let
         h  = printHeader hdr
@@ -169,7 +167,7 @@ printHeaders hdr ss ps =
 --
 --------------------------------------------------------------------
 
-printRBuilder :: IsElfClass a => [RBuilder a] -> Doc ()
+printRBuilder :: SingElfClassI a => [RBuilder a] -> Doc ()
 printRBuilder rbs = vsep ldoc
 
     where
@@ -263,8 +261,8 @@ printRBuilder rbs = vsep ldoc
 
 -- | Print ELF layout.  First parse ELF with `parseHeaders`, then use this function to
 --   format the layout.
-printLayout :: MonadCatch m => Sigma ElfClass (TyCon1 HeadersXX) -> BSL.ByteString -> m (Doc ())
-printLayout (classS :&: HeadersXX (hdr, ss, ps)) bs = withElfClass classS do
+printLayout :: MonadCatch m => Headers -> BSL.ByteString -> m (Doc ())
+printLayout (Headers classS (HeadersXX (hdr, ss, ps))) bs = withSingElfClassI classS do
     rbs <- parseRBuilder hdr ss ps bs
     return $ printRBuilder rbs
 
@@ -275,7 +273,7 @@ printLayout (classS :&: HeadersXX (hdr, ss, ps)) bs = withElfClass classS do
 formatPairsBlock :: Doc a -> [(String, Doc a)] -> Doc a
 formatPairsBlock name pairs = vsep [ name <+> "{", indent 4 $ formatPairs pairs, "}" ]
 
-printElfSymbolTableEntry :: SingI a => ElfSymbolXX a -> Doc ()
+printElfSymbolTableEntry :: SingElfClassI a => ElfSymbolXX a -> Doc ()
 printElfSymbolTableEntry ElfSymbolXX{..} =
     formatPairsBlock ("symbol" <+> dquotes (pretty steName))
         [ ("Bind",  viaShow steBind      ) -- ElfSymbolBinding
@@ -285,7 +283,7 @@ printElfSymbolTableEntry ElfSymbolXX{..} =
         , ("Size",  printWordXX steSize  ) -- WordXX c
         ]
 
-printElfSymbolTable :: SingI a => Bool -> [ElfSymbolXX a] -> Doc ()
+printElfSymbolTable :: SingElfClassI a => Bool -> [ElfSymbolXX a] -> Doc ()
 printElfSymbolTable full l = if full then printElfSymbolTableFull else printElfSymbolTable'
     where
         printElfSymbolTableFull = align . vsep $ fmap printElfSymbolTableEntry l
@@ -341,7 +339,7 @@ printData full bs = if full then printDataFull else printData'
                 chunks -> L.map formatBytestringLine chunks
         cl = BSL.drop (BSL.length bs - 16) bs
 
-printElfSymbolTableEntryLine :: SingI a => ElfSymbolXX a -> Doc ()
+printElfSymbolTableEntryLine :: SingElfClassI a => ElfSymbolXX a -> Doc ()
 printElfSymbolTableEntryLine ElfSymbolXX{..} =  parens (dquotes (pretty steName)
                                                     <+> "bind:"   <+> viaShow steBind
                                                     <+> "type:"   <+> viaShow steType
@@ -385,9 +383,9 @@ printElf = printElf_ False
 
 -- | Print ELF.  If first argument is False, don't dump all the data, print just the first two and the last lines.
 printElf_ :: MonadThrow m => Bool -> Elf -> m (Doc ())
-printElf_ full (classS :&: elfs) = withElfClass classS $ printElf_' full elfs
+printElf_ full (Elf classS elfs) = withSingElfClassI classS $ printElf_' full elfs
 
-printElf_' :: forall a m . (MonadThrow m, IsElfClass a) => Bool -> ElfListXX a -> m (Doc ())
+printElf_' :: forall a m . (MonadThrow m, SingElfClassI a) => Bool -> ElfListXX a -> m (Doc ())
 printElf_' full elfs = do
 
     -- FIXME: lazy matching here is a workaround for some GHC bug, see
@@ -403,7 +401,7 @@ printElf_' full elfs = do
         printElf'' :: ElfXX t' a -> m (Doc ())
         printElf'' ElfHeader {} =
             return $ formatPairsBlock "header"
-                [ ("Class",      viaShow $ fromSing $ sing @a)
+                [ ("Class",      viaShow $ fromSingElfClass $ singElfClass @a)
                 , ("Data",       viaShow ehData       ) -- ElfData
                 , ("OSABI",      viaShow ehOSABI      ) -- ElfOSABI
                 , ("ABIVersion", viaShow ehABIVersion ) -- Word8
@@ -439,7 +437,7 @@ printElf_' full elfs = do
                                     && ehData == ELFDATA2LSB
                                     && esType == SHT_RELA
                                  && esEntSize == relocationTableAEntrySize then
-                                    case sing @a of
+                                    case singElfClass @a of
                                         SELFCLASS64 -> printSection' "section" <$> printRelocationTableA_AARCH64 full esLink elfs bs
                                         SELFCLASS32 -> $chainedError "invalid ELF: EM_AARCH64 and ELFCLASS32"
                             else

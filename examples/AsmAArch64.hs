@@ -46,15 +46,27 @@ import Data.ByteString.Builder
 import Data.ByteString.Lazy as BSL
 import Data.ByteString.Lazy.Char8 as BSLC
 import Data.Int
-import Data.Singletons.Sigma
-import Data.Singletons.TH
+import Data.Kind
 import Data.Word
 
 import Data.Elf
 import Data.Elf.Constants
 import Data.Elf.Headers
 
-$(singletons [d| data RegisterWidth = X | W |])
+data RegisterWidth = X | W
+
+data SingRegisterWidth :: RegisterWidth -> Type where
+    SX :: SingRegisterWidth 'X
+    SW :: SingRegisterWidth 'W
+
+class SingRegisterWidthI (c :: RegisterWidth) where
+    singRegisterWidth :: SingRegisterWidth c
+
+instance SingRegisterWidthI 'X where
+    singRegisterWidth = SX
+
+instance SingRegisterWidthI 'W where
+    singRegisterWidth = SW
 
 newtype Register (c :: RegisterWidth) = R Word32
 
@@ -124,8 +136,8 @@ align a n = (n + a' - 1) .&. complement (a' - 1)
 builderRepeatZero :: Int -> Builder
 builderRepeatZero n = mconcat $ P.replicate n (word8 0)
 
-b64 :: forall w . SingI w => Register w -> Word32
-b64 _ = case sing @w of
+b64 :: forall w . SingRegisterWidthI w => Register w -> Word32
+b64 _ = case singRegisterWidth @w of
     SX -> 1
     SW -> 0
 
@@ -167,7 +179,7 @@ b rr = emit' f where
         return $ Instruction $  0x14000000 .|. imm26
 
 -- | C6.2.187 MOV (wide immediate)
-mov :: (MonadState CodeState m, SingI w) => Register w -> Word16 -> m ()
+mov :: (MonadState CodeState m, SingRegisterWidthI w) => Register w -> Word16 -> m ()
 mov r@(R n) imm = emit $ Instruction $ (b64 r `shift` 31)
                                     .|. 0x52800000
                                     .|. (fromIntegral imm `shift` 5)
@@ -186,7 +198,7 @@ findOffset _poolOffset (CodeRef codeOffset)   = codeOffset
 findOffset  poolOffset (PoolRef offsetInPool) = poolOffset + offsetInPool
 
 -- | C6.2.132 LDR (literal)
-ldr :: (MonadState CodeState m, SingI w) => Register w -> Label -> m ()
+ldr :: (MonadState CodeState m, SingRegisterWidthI w) => Register w -> Label -> m ()
 ldr r@(R n) rr = emit' f where
 
     offsetToImm19 :: CodeOffset -> Either String Word32
@@ -269,7 +281,7 @@ assemble m = do
 
     (symbolTableData, stringTableData) <- serializeSymbolTable ELFDATA2LSB (zeroIndexStringItem : symbolTable)
 
-    return $ SELFCLASS64 :&:
+    return $ Elf SELFCLASS64 $
         ElfHeader
             { ehData       = ELFDATA2LSB
             , ehOSABI      = ELFOSABI_SYSV
