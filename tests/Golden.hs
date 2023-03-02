@@ -24,8 +24,6 @@ import Data.ByteString.Lazy as BSL
 import Data.Foldable as F
 -- import Data.Functor.Identity
 import Data.Int
-import Data.Singletons
-import Data.Singletons.Sigma
 import Prettyprinter
 import Prettyprinter.Render.Text
 import System.Directory
@@ -38,7 +36,8 @@ import Test.Tasty.HUnit
 import Control.Exception.ChainedException
 import Data.Elf
 import Data.Elf.PrettyPrint
-import Data.Elf.Headers
+import qualified Data.Elf.Headers as H
+import Data.Elf.Headers hiding (Header)
 import Data.Endian
 
 partitionM :: Monad m => (a -> m Bool) -> [a] -> m ([a], [a])
@@ -66,7 +65,7 @@ decodeOrFailAssertion bs = case decodeOrFail bs of
     Left (_, off, err) -> assertFailure (err ++ " @" ++ show off)
     Right (_, off, a) -> return (off, a)
 
-mkTest'' :: forall a . IsElfClass a => HeaderXX a -> ByteString -> Assertion
+mkTest'' :: forall a . SingElfClassI a => HeaderXX a -> ByteString -> Assertion
 mkTest'' HeaderXX{..} bs = do
 
     let
@@ -82,11 +81,11 @@ mkTest'' HeaderXX{..} bs = do
 
 mkTest' :: ByteString -> Assertion
 mkTest' bs = do
-    (off, elfh@(classS :&: hxx) :: Header) <- decodeOrFailAssertion bs
-    assertBool "Incorrect header size" (headerSize (fromSing classS) == off)
+    (off, elfh@(H.Header classS hxx)) <- decodeOrFailAssertion bs
+    assertBool "Incorrect header size" (headerSize (fromSingElfClass classS) == off)
     assertEqual "Header round trip does not work" (BSL.take off bs) (encode elfh)
 
-    withElfClass classS mkTest'' hxx bs
+    withSingElfClassI classS mkTest'' hxx bs
 
 mkTest :: FilePath -> TestTree
 mkTest p = testCase p $ withBinaryFile p ReadMode (BSL.hGetContents >=> mkTest')
@@ -123,8 +122,8 @@ index' (_:xs) n | n > 0     = index' xs (n-1)
                 | otherwise = $chainedError "index': negative argument."
 index' _ _                  = $chainedError "index': index too large."
 
-getStringTable :: MonadThrow m => Sigma ElfClass (TyCon1 HeadersXX) -> BSL.ByteString -> m BSL.ByteString
-getStringTable (classS :&: HeadersXX (HeaderXX{..}, ss, _)) bs = withElfClass classS
+getStringTable :: MonadThrow m => Headers -> BSL.ByteString -> m BSL.ByteString
+getStringTable (Headers classS (HeadersXX (HeaderXX{..}, ss, _))) bs = withSingElfClassI classS
     if hShStrNdx == 0
         then return BSL.empty
         else do
@@ -137,11 +136,11 @@ copyElf bs = parseElf bs >>= serializeElf
 ---------------------------------------------------------------------
 
 -- This is for examples/README.md
-withHeader :: BSL.ByteString -> (forall a . IsElfClass a => HeaderXX a -> b) -> Either String b
+withHeader :: BSL.ByteString -> (forall a . SingElfClassI a => HeaderXX a -> b) -> Either String b
 withHeader bs f =
     case decodeOrFail bs of
         Left (_, _, err) -> Left err
-        Right (_, _, (classS :&: hxx) :: Header) -> Right $ withElfClass classS f hxx
+        Right (_, _, (H.Header classS hxx)) -> Right $ withSingElfClassI classS f hxx
 
 printHeaderFile :: FilePath -> IO (Doc ())
 printHeaderFile path = do
@@ -151,8 +150,8 @@ printHeaderFile path = do
 printHeadersFile :: FilePath -> IO (Doc ())
 printHeadersFile path = do
     bs <- fromStrict <$> BS.readFile path
-    (classS :&: HeadersXX (hdr, ss, ps)) <- parseHeaders bs
-    return $ withSingI classS $ printHeaders hdr ss ps
+    (Headers classS (HeadersXX (hdr, ss, ps))) <- parseHeaders bs
+    return $ withSingElfClassI classS $ printHeaders hdr ss ps
 
 printStrTableFile :: FilePath -> IO (Doc ())
 printStrTableFile path = do
@@ -197,11 +196,11 @@ printCopyElfFile path = do
 
 -----------------------------------------------------------------------
 
-testHeader64 :: Header
-testHeader64 = SELFCLASS64 :&: HeaderXX ELFDATA2LSB 0 0 0 0 0 0 0 0 0 0 0 0 0
+testHeader64 :: H.Header
+testHeader64 = H.Header SELFCLASS64 (HeaderXX ELFDATA2LSB 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
-testHeader32 :: Header
-testHeader32 = SELFCLASS32 :&: HeaderXX ELFDATA2MSB 0 0 0 0 0 0 0 0 0 0 0 0 0
+testHeader32 :: H.Header
+testHeader32 = H.Header SELFCLASS32 (HeaderXX ELFDATA2MSB 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 testSection64 :: SectionXX 'ELFCLASS64
 testSection64 = SectionXX 0 0 0 0 0 0 0 0 0 0

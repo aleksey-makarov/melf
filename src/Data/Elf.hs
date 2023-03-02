@@ -13,7 +13,7 @@ module Data.Elf (
     -- * Elf
       ElfNodeType (..)
     , ElfListXX (..)
-    , Elf
+    , Elf (..)
     , ElfSectionData (..)
     , ElfXX (..)
     , (~:)

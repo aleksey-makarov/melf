@@ -10,8 +10,6 @@ module DummyLd (dummyLd) where
 
 import Control.Monad.Catch
 import Data.Bits
-import Data.Singletons
-import Data.Singletons.Sigma
 
 import Data.Elf
 import Data.Elf.Constants
@@ -25,12 +23,12 @@ data MachineConfig a
                                 --   in physical memory (depends on max page size)
         }
 
-getMachineConfig :: (IsElfClass a, MonadThrow m) => ElfMachine -> m (MachineConfig a)
+getMachineConfig :: (SingElfClassI a, MonadThrow m) => ElfMachine -> m (MachineConfig a)
 getMachineConfig EM_AARCH64 = return $ MachineConfig 0x400000 0x10000
 getMachineConfig EM_X86_64  = return $ MachineConfig 0x400000 0x1000
 getMachineConfig _          = $chainedError "could not find machine config for this arch"
 
-dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfListXX a -> m (ElfListXX a)
+dummyLd' :: forall a m . (MonadThrow m, SingElfClassI a) => ElfListXX a -> m (ElfListXX a)
 dummyLd' es = do
 
     section' <- elfFindSectionByName es ".text"
@@ -62,7 +60,7 @@ dummyLd' es = do
                     , epData       =
                         ElfHeader
                             { ehType  = ET_EXEC
-                            , ehEntry = mcAddress + headerSize (fromSing $ sing @a)
+                            , ehEntry = mcAddress + headerSize (fromSingElfClass $ singElfClass @a)
                             , ..
                             }
                         ~: ElfRawData
@@ -77,4 +75,4 @@ dummyLd' es = do
 -- into the loadable segment of the resulting ELF.
 -- This could work if there are no relocations or references to external symbols.
 dummyLd :: MonadThrow m => Elf -> m Elf
-dummyLd (c :&: l) = (c :&:) <$> withElfClass c dummyLd' l
+dummyLd (Elf c l) = Elf c <$> withSingElfClassI c dummyLd' l
