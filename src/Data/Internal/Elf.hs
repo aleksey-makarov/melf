@@ -432,24 +432,8 @@ elfFindHeader elfs = $maybeAddContext "no header" maybeHeader
         f h@ElfHeader{} = First $ Just h
         f _ = First Nothing
 
--- | Get string from string table
-getString :: BSL.ByteString -- ^ Section data of a string table section
-          -> Int64          -- ^ Offset to the start of the string in that data
-          -> String
-getString bs offset = BSL8.unpack $ BSL.takeWhile (/= 0) $ BSL.drop offset bs
-
 cut :: BSL.ByteString -> Int64 -> Int64 -> BSL.ByteString
 cut content offset size = BSL.take size $ BSL.drop offset content
-
--- | Get section data
-getSectionData :: SingElfClassI a
-               => BSL.ByteString -- ^ ELF file
-               -> SectionXX a    -- ^ Parsed section entry
-               -> BSL.ByteString -- ^ Section Data
-getSectionData bs SectionXX{..} = cut bs o s
-    where
-        o = fromIntegral sOffset
-        s = fromIntegral sSize
 
 tail' :: [a] -> [a]
 tail' [] = []

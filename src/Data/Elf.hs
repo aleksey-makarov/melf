@@ -21,8 +21,6 @@ module Data.Elf (
     , serializeElf
 
     -- * Misc
-    , getSectionData -- FIXME: Should be moved to Data.Elf.Headers (requires bumping major version)
-    , getString      -- FIXME: ...
     , elfFindSection
     , elfFindSectionByName
     , elfFindHeader
