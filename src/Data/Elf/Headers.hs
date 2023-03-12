@@ -43,16 +43,16 @@ module Data.Elf.Headers (
     -- * Data definition
       elfMagic
     , ElfClass (..)
-    , SingElfClass (..)
     , ElfData (..)
 
+    -- * Singletons
+
+    , SingElfClass (..)
     , SingElfClassI (..)
     , withSingElfClass
     , withSingElfClassI
     , fromSingElfClass
     , withElfClass
-
-    , wordSize
 
     -- * Types of ELF header
     , HeaderXX (..)
@@ -94,6 +94,7 @@ module Data.Elf.Headers (
     , sectionIsSymbolTable
     , getSectionData
     , getString
+    , wordSize
 
     ) where
 
@@ -123,9 +124,10 @@ data ElfClass
     | ELFCLASS64 -- ^ 64-bit ELF format
     deriving (Eq, Show)
 
+-- | Singletons for ElfClass
 data SingElfClass :: ElfClass -> Type where
-    SELFCLASS32 :: SingElfClass 'ELFCLASS32
-    SELFCLASS64 :: SingElfClass 'ELFCLASS64
+    SELFCLASS32 :: SingElfClass 'ELFCLASS32  -- ^ Singleton for `ELFCLASS32`
+    SELFCLASS64 :: SingElfClass 'ELFCLASS64  -- ^ Singleton for `ELFCLASS64`
 
 instance Binary ElfClass where
     get = getWord8 >>= getElfClass_
@@ -211,6 +213,7 @@ putLe = putEndian ELFDATA2LSB
 
 -- | @SingElfClassI a@ is defined for each constructor of `ElfClass`.
 --   It defines @WordXX a@, which is `Word32` for `ELFCLASS32` and `Word64` for `ELFCLASS64`.
+--   Also it defines singletons for each of the `ElfClass` type.
 class ( Typeable c
       , Typeable (WordXX c)
       , Data (WordXX c)
@@ -239,14 +242,21 @@ instance SingElfClassI 'ELFCLASS64 where
     type WordXX 'ELFCLASS64 = Word64
     singElfClass = SELFCLASS64
 
--- | Convenience function for creating a context with an implicit `SingElfClass` available.
+-- | Convenience function for creating a context with an implicit singleton available.
+--   See also [@withSing@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:withSingI)
 withSingElfClassI :: SingElfClass c -> (SingElfClassI c => r) -> r
 withSingElfClassI SELFCLASS64 x = x
 withSingElfClassI SELFCLASS32 x = x
 
+-- | A convenience function useful when we need to name a singleton value multiple times.
+--   Without this function, each use of sing could potentially refer to a different singleton,
+--   and one has to use type signatures (often with ScopedTypeVariables) to ensure that they are the same.
+--   See also [@withSingI@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:withSing)
 withSingElfClass :: SingElfClassI c => (SingElfClass c -> r) -> r
 withSingElfClass f = f singElfClass
 
+-- | Convert a singleton to its unrefined version.
+--   See also [@fromSing@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:fromSing)
 fromSingElfClass :: SingElfClass c -> ElfClass
 fromSingElfClass SELFCLASS32 = ELFCLASS32
 fromSingElfClass SELFCLASS64 = ELFCLASS64
@@ -255,7 +265,7 @@ withElfClass' :: ElfClass -> (forall c . SingElfClass c -> r) -> r
 withElfClass' ELFCLASS32 f = f SELFCLASS32
 withElfClass' ELFCLASS64 f = f SELFCLASS64
 
--- | This is instead of toSing
+-- | Use this instead of [@toSing@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:toSing)
 withElfClass :: ElfClass -> (forall c . SingElfClassI c => SingElfClass c -> r) -> r
 withElfClass c f = withElfClass' c (\s -> withSingElfClassI s $ f s)
 
@@ -282,7 +292,7 @@ data HeaderXX c =
         , hShStrNdx   :: ElfSectionIndex -- ^ Section name string table index
         }
 
--- | Sigma type where `ElfClass` defines the type of `HeaderXX`
+-- | Header is a sigma type where the first entry defines the type of the second one
 data Header = forall a . Header (SingElfClass a) (HeaderXX a)
 
 -- | Size of ELF header.
@@ -704,6 +714,7 @@ serializeBList d as = case d of
     ELFDATA2LSB -> encode $ Le $ BList as
     ELFDATA2MSB -> encode $ Be $ BList as
 
+-- | Sigma type to hold the ELF header and section and segment tables for a given `ElfClass`.
 data Headers = forall a . Headers (SingElfClass a) (HeaderXX a) [SectionXX a] [SegmentXX a]
 
 parseHeaders' :: (SingElfClassI a, MonadThrow m) => HeaderXX a -> BSL.ByteString -> m Headers
