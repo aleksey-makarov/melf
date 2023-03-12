@@ -262,7 +262,7 @@ printRBuilder rbs = vsep ldoc
 -- | Print ELF layout.  First parse ELF with `parseHeaders`, then use this function to
 --   format the layout.
 printLayout :: MonadCatch m => Headers -> BSL.ByteString -> m (Doc ())
-printLayout (Headers classS (HeadersXX (hdr, ss, ps))) bs = withSingElfClassI classS do
+printLayout (Headers classS hdr ss ps) bs = withSingElfClassI classS do
     rbs <- parseRBuilder hdr ss ps bs
     return $ printRBuilder rbs
 

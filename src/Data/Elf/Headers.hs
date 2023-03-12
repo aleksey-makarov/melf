@@ -78,7 +78,6 @@ module Data.Elf.Headers (
     , relocationTableAEntrySize
 
     -- * Parse header and section and segment tables
-    , HeadersXX (..)
     , Headers (..)
     , parseHeaders
 
@@ -691,11 +690,7 @@ serializeBList d as = case d of
     ELFDATA2LSB -> encode $ Le $ BList as
     ELFDATA2MSB -> encode $ Be $ BList as
 
--- FIXME: how to get rid of this? (Can we use some combinators for Sigma)
--- | The type that helps to make the sigma type of the result
---   of the `parseHeaders` function
-newtype HeadersXX a = HeadersXX (HeaderXX a, [SectionXX a], [SegmentXX a])
-data Headers = forall a . Headers (SingElfClass a) (HeadersXX a)
+data Headers = forall a . Headers (SingElfClass a) (HeaderXX a) [SectionXX a] [SegmentXX a]
 
 parseHeaders' :: (SingElfClassI a, MonadThrow m) => HeaderXX a -> BSL.ByteString -> m Headers
 parseHeaders' hxx@HeaderXX{..} bs =
@@ -706,7 +701,7 @@ parseHeaders' hxx@HeaderXX{..} bs =
     in do
         ss <- parseBList hData bsSections
         ps <- parseBList hData bsSegments
-        return $ Headers singElfClass $ HeadersXX (hxx, ss, ps)
+        return $ Headers singElfClass hxx ss ps
 
 -- | Parse ELF file and produce header and section and segment tables
 parseHeaders :: MonadThrow m => BSL.ByteString -> m Headers

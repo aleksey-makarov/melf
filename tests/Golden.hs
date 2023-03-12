@@ -123,7 +123,7 @@ index' (_:xs) n | n > 0     = index' xs (n-1)
 index' _ _                  = $chainedError "index': index too large."
 
 getStringTable :: MonadThrow m => Headers -> BSL.ByteString -> m BSL.ByteString
-getStringTable (Headers classS (HeadersXX (HeaderXX{..}, ss, _))) bs = withSingElfClassI classS
+getStringTable (Headers classS HeaderXX{..} ss _) bs = withSingElfClassI classS
     if hShStrNdx == 0
         then return BSL.empty
         else do
@@ -150,7 +150,7 @@ printHeaderFile path = do
 printHeadersFile :: FilePath -> IO (Doc ())
 printHeadersFile path = do
     bs <- fromStrict <$> BS.readFile path
-    (Headers classS (HeadersXX (hdr, ss, ps))) <- parseHeaders bs
+    Headers classS hdr ss ps <- parseHeaders bs
     return $ withSingElfClassI classS $ printHeaders hdr ss ps
 
 printStrTableFile :: FilePath -> IO (Doc ())
