@@ -92,6 +92,8 @@ module Data.Elf.Headers (
 
     -- * Misc helpers
     , sectionIsSymbolTable
+    , getSectionData
+    , getString
 
     ) where
 
@@ -103,7 +105,9 @@ import Data.Binary.Put
 import Data.Bits
 import Data.ByteString       as BS
 import Data.ByteString.Lazy  as BSL
+import Data.ByteString.Lazy.Char8 as BSL8
 import Data.Data (Data)
+import Data.Int
 import Data.Kind
 import qualified Data.List as L
 import Data.Typeable (Typeable)
@@ -519,6 +523,16 @@ instance forall (a :: ElfClass) . SingElfClassI a => Binary (Le (SegmentXX a)) w
     put = putSegment singElfClass putLe . fromLe
     get = Le <$> getSegment singElfClass getLe
 
+-- | Get section data
+getSectionData :: SingElfClassI a
+               => BSL.ByteString -- ^ ELF file
+               -> SectionXX a    -- ^ Parsed section entry
+               -> BSL.ByteString -- ^ Section Data
+getSectionData bs SectionXX{..} = BSL.take s $ BSL.drop o bs
+    where
+        o = fromIntegral sOffset
+        s = fromIntegral sSize
+
 --------------------------------------------------------------------------
 -- Symbol table entry
 --------------------------------------------------------------------------
@@ -708,3 +722,9 @@ parseHeaders :: MonadThrow m => BSL.ByteString -> m Headers
 parseHeaders bs = do
     Header classS hxx <- elfDecodeOrFail bs
     withSingElfClassI classS parseHeaders' hxx bs
+
+-- | Get string from string table
+getString :: BSL.ByteString -- ^ Section data of a string table section
+          -> Int64          -- ^ Offset to the start of the string in that data
+          -> String
+getString bs offset = BSL8.unpack $ BSL.takeWhile (/= 0) $ BSL.drop offset bs
