@@ -7,6 +7,7 @@ module Data.Elf.Constants.TH ( mkDeclarations
 
 import Control.Monad
 import Language.Haskell.TH
+import Language.Haskell.TH.Syntax
 
 data BaseWord = BaseWord8 | BaseWord16 | BaseWord32 | BaseWord64
 
@@ -15,7 +16,7 @@ newNamePE s = do
     n <- newName s
     return (varP n, varE n)
 
-mkDeclarations :: BaseWord -> String -> String -> String -> [(String, Integer)] -> Q [Dec]
+mkDeclarations :: BaseWord -> String -> String -> String -> [(String, Integer, String)] -> Q [Dec]
 mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameString enums = do
 
     let typeName = mkName typeNameString
@@ -50,7 +51,7 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                 ]
 
     let
-        mkShowClause (s, n) =
+        mkShowClause (s, n, _) =
             clause
                 [ conP typeName [litP $ IntegerL n] ]
                 (normalB [| patternPrefixString ++ s |])
@@ -132,7 +133,7 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                 BaseWord64 -> binaryInstancesXe [| putWord64le |] [| getWord64le |] [| putWord64be |] [| getWord64be |]
 
     let
-        mkPatterns (s, n) =
+        mkPatterns (s, n, _) =
             [ patSynSigD
                 (patternName s)
                 (conT typeName)
@@ -142,6 +143,8 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                 implBidir
                 (conP typeName [litP $ IntegerL n])
             ]
+
+        mkPatternDocs (s, _, doc) = putDoc (DeclDoc $ patternName s) doc
 
     let
         defaultPatternSig =
@@ -162,4 +165,6 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
 
     let patterns = join (map mkPatterns enums) ++ [ defaultPatternSig, defaultPatternDef ]
 
+    mapM_ (addModFinalizer . mkPatternDocs) enums
+    addModFinalizer $ putDoc (DeclDoc defaultPatternName) "default"
     sequence $ newTypeDef : showInstance : patterns ++ binaryInstances
