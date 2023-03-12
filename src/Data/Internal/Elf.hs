@@ -79,17 +79,16 @@ instance Foldable LZip where
     foldMap f (LZip l  (Just c) r) = foldMap f $ LZip l Nothing (c : r)
     foldMap f (LZip l  Nothing  r) = foldMap f $ L.reverse l ++ r
 
--- FIXME: Use validity (https://hackage.haskell.org/package/validity)
--- for constraints on the Elf type (???)
-
 -- | `Elf` is a forrest of trees of type `ElfXX`.
 -- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
 data ElfNodeType = Header | SectionTable | SegmentTable | Section | Segment | RawData | RawAlign
+
+-- | List of ELF nodes.
 data ElfListXX c where
     ElfListCons :: ElfXX t c -> ElfListXX c -> ElfListXX c
     ElfListNull :: ElfListXX c
 
--- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
+-- | Elf is a sigma type where the first entry defines the type of the second one
 data Elf = forall a . Elf (SingElfClass a) (ElfListXX a)
 
 -- | Section data may contain a string table.
@@ -175,6 +174,7 @@ makeLenses ''WBuilderState
 
 infixr 9 ~:
 
+-- | Helper for `ElfListCons`
 (~:) :: ElfXX t a -> ElfListXX a -> ElfListXX a
 (~:) = ElfListCons
 
