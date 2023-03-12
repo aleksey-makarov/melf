@@ -649,7 +649,7 @@ parseElf' hdr@HeaderXX{..} ss ps bs = do
 -- | Parse ELF file
 parseElf :: MonadCatch m => BSL.ByteString -> m Elf
 parseElf bs = do
-    Headers classS (HeadersXX (hdr, ss, ps)) <- parseHeaders bs
+    Headers classS hdr ss ps <- parseHeaders bs
     withSingElfClassI classS parseElf' hdr ss ps bs
 
 -------------------------------------------------------------------------------
