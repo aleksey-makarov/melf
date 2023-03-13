@@ -1,5 +1,5 @@
  ┌── 0x00000000 P PT_LOAD [PF_R]
- │ - 0x00000000 P PT_EXT 1685382481 [PF_W,PF_R]
+ │ - 0x00000000 P ElfSegmentType 1685382481 [PF_W,PF_R]
  │ ┎ 0x00000000 H
  │ ┖ 0x0000003f
  │┌─ 0x00000040 P PT_PHDR [PF_R]
@@ -16,15 +16,15 @@
  ││╓ 0x000002e8 S3 ".note.ABI-tag" SHT_NOTE [SHF_ALLOC]
  ││╙ 0x00000307
  │└─ 0x00000307
- │ ╓ 0x00000308 S4 ".gnu.hash" SHT_EXT 1879048182 [SHF_ALLOC]
+ │ ╓ 0x00000308 S4 ".gnu.hash" ElfSectionType 1879048182 [SHF_ALLOC]
  │ ╙ 0x00003407
  │ ╓ 0x00003408 S5 ".dynsym" SHT_DYNSYM [SHF_ALLOC]
  │ ╙ 0x0000e627
  │ ╓ 0x0000e628 S6 ".dynstr" SHT_STRTAB [SHF_ALLOC]
  │ ╙ 0x00015653
- │ ╓ 0x00015654 S7 ".gnu.version" SHT_EXT 1879048191 [SHF_ALLOC]
+ │ ╓ 0x00015654 S7 ".gnu.version" ElfSectionType 1879048191 [SHF_ALLOC]
  │ ╙ 0x0001652b
- │ ╓ 0x00016530 S8 ".gnu.version_r" SHT_EXT 1879048190 [SHF_ALLOC]
+ │ ╓ 0x00016530 S8 ".gnu.version_r" ElfSectionType 1879048190 [SHF_ALLOC]
  │ ╙ 0x000165df
  │ ╓ 0x000165e0 S9 ".rela.dyn" SHT_RELA [SHF_ALLOC]
  │ ╙ 0x0001efdf
@@ -40,7 +40,7 @@
  ┌── 0x000a9000 P PT_LOAD [PF_R]
  │ ╓ 0x000a9000 S13 ".rodata" SHT_PROGBITS [SHF_ALLOC]
  │ ╙ 0x000c185f
- │┌─ 0x000c1860 P PT_EXT 1685382480 [PF_R]
+ │┌─ 0x000c1860 P ElfSegmentType 1685382480 [PF_R]
  ││╓ 0x000c1860 S14 ".eh_frame_hdr" SHT_PROGBITS [SHF_ALLOC]
  ││╙ 0x000c4afb
  │└─ 0x000c4afb
@@ -48,10 +48,10 @@
  │ ╙ 0x000d6867
  └── 0x000d6867
 ┌─── 0x000d6cd0 P PT_LOAD [PF_W,PF_R]
-│┌── 0x000d6cd0 P PT_EXT 1685382482 [PF_R]
-││ ╓ 0x000d6cd0 S16 ".init_array" SHT_EXT 14 [SHF_WRITE,SHF_ALLOC]
+│┌── 0x000d6cd0 P ElfSegmentType 1685382482 [PF_R]
+││ ╓ 0x000d6cd0 S16 ".init_array" ElfSectionType 14 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x000d6cd7
-││ ╓ 0x000d6cd8 S17 ".fini_array" SHT_EXT 15 [SHF_WRITE,SHF_ALLOC]
+││ ╓ 0x000d6cd8 S17 ".fini_array" ElfSectionType 15 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x000d6cdf
 ││ ╓ 0x000d6ce0 S18 ".data.rel.ro" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x000d844f
@@ -66,7 +66,7 @@
 │  ╙ 0x000dc1cf
 └─── 0x000dc1cf
    - 0x000dc1d0 S22 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
-   ╓ 0x000dc1d0 S23 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+   ╓ 0x000dc1d0 S23 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
    ╙ 0x000dc21b
    ╓ 0x000dc21c S24 ".shstrtab" SHT_STRTAB []
    ╙ 0x000dc308

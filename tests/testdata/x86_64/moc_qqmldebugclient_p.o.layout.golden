@@ -1,30 +1,30 @@
 ┎ 0x00000000 H
 ┖ 0x0000003f
-╓ 0x00000040 S1 ".group" SHT_EXT 17 []
+╓ 0x00000040 S1 ".group" ElfSectionType 17 []
 ╙ 0x0000004b
-╓ 0x0000004c S2 ".group" SHT_EXT 17 []
+╓ 0x0000004c S2 ".group" ElfSectionType 17 []
 ╙ 0x00000053
-╓ 0x00000054 S3 ".group" SHT_EXT 17 []
+╓ 0x00000054 S3 ".group" ElfSectionType 17 []
 ╙ 0x0000005f
-╓ 0x00000060 S4 ".group" SHT_EXT 17 []
+╓ 0x00000060 S4 ".group" ElfSectionType 17 []
 ╙ 0x0000006b
 ╓ 0x00000070 S5 ".text" SHT_PROGBITS [SHF_ALLOC,SHF_EXECINSTR]
 ╙ 0x0000025c
 - 0x0000025d S7 ".data" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 - 0x0000025d S8 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
-╓ 0x00000260 S9 ".qtversion" SHT_PROGBITS [SHF_ALLOC,SHF_EXT 512]
+╓ 0x00000260 S9 ".qtversion" SHT_PROGBITS [SHF_ALLOC,ElfSectionFlag 512]
 ╙ 0x0000026f
-╓ 0x00000270 S11 ".rodata._ZTS15QQmlDebugClient" SHT_PROGBITS [SHF_ALLOC,SHF_EXT 512]
+╓ 0x00000270 S11 ".rodata._ZTS15QQmlDebugClient" SHT_PROGBITS [SHF_ALLOC,ElfSectionFlag 512]
 ╙ 0x00000281
-╓ 0x00000288 S12 ".data.rel.ro._ZTI15QQmlDebugClient" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC,SHF_EXT 512]
+╓ 0x00000288 S12 ".data.rel.ro._ZTI15QQmlDebugClient" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC,ElfSectionFlag 512]
 ╙ 0x0000029f
-╓ 0x000002a0 S14 ".data.rel.ro._ZTV15QQmlDebugClient" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC,SHF_EXT 512]
+╓ 0x000002a0 S14 ".data.rel.ro._ZTV15QQmlDebugClient" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC,ElfSectionFlag 512]
 ╙ 0x00000317
 ╓ 0x00000320 S16 ".data.rel.ro" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ╙ 0x0000034f
 ╓ 0x00000360 S18 ".rodata" SHT_PROGBITS [SHF_ALLOC]
 ╙ 0x00000467
-╓ 0x00000468 S19 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x00000468 S19 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x00000488
 - 0x00000489 S20 ".note.GNU-stack" SHT_PROGBITS []
 ╓ 0x00000490 S21 ".eh_frame" SHT_PROGBITS [SHF_ALLOC]
@@ -33,17 +33,17 @@
 ╙ 0x00000a27
 ╓ 0x00000a28 S24 ".strtab" SHT_STRTAB []
 ╙ 0x00000ed0
-╓ 0x00000ed8 S6 ".rela.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00000ed8 S6 ".rela.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000100f
-╓ 0x00001010 S10 ".rela.qtversion" SHT_RELA [SHF_EXT 64,SHF_EXT 512]
+╓ 0x00001010 S10 ".rela.qtversion" SHT_RELA [ElfSectionFlag 64,ElfSectionFlag 512]
 ╙ 0x00001027
-╓ 0x00001028 S13 ".rela.data.rel.ro._ZTI15QQmlDebugClient" SHT_RELA [SHF_EXT 64,SHF_EXT 512]
+╓ 0x00001028 S13 ".rela.data.rel.ro._ZTI15QQmlDebugClient" SHT_RELA [ElfSectionFlag 64,ElfSectionFlag 512]
 ╙ 0x0000106f
-╓ 0x00001070 S15 ".rela.data.rel.ro._ZTV15QQmlDebugClient" SHT_RELA [SHF_EXT 64,SHF_EXT 512]
+╓ 0x00001070 S15 ".rela.data.rel.ro._ZTV15QQmlDebugClient" SHT_RELA [ElfSectionFlag 64,ElfSectionFlag 512]
 ╙ 0x000011bf
-╓ 0x000011c0 S17 ".rela.data.rel.ro" SHT_RELA [SHF_EXT 64]
+╓ 0x000011c0 S17 ".rela.data.rel.ro" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000121f
-╓ 0x00001220 S22 ".rela.eh_frame" SHT_RELA [SHF_EXT 64]
+╓ 0x00001220 S22 ".rela.eh_frame" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x000012af
 ╓ 0x000012b0 S25 ".shstrtab" SHT_STRTAB []
 ╙ 0x000013a7

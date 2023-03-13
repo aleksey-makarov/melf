@@ -60,7 +60,7 @@ Segments: - N:        0
             MemSize:  0x00005f34
             Align:    0x00000004
           - N:        5
-            Type:     PT_EXT 1685382480
+            Type:     ElfSegmentType 1685382480
             Flags:    [PF_R]
             Offset:   0x00081b68
             VirtAddr: 0x00481b68
@@ -69,7 +69,7 @@ Segments: - N:        0
             MemSize:  0x0000002c
             Align:    0x00000004
           - N:        6
-            Type:     PT_EXT 1685382481
+            Type:     ElfSegmentType 1685382481
             Flags:    [PF_X,PF_W,PF_R]
             Offset:   0x00000000
             VirtAddr: 0x00000000

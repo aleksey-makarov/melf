@@ -14,9 +14,9 @@
 ╙ 0x00000b87
 ╓ 0x00000b88 S11 ".debug_line" SHT_PROGBITS []
 ╙ 0x00000d02
-╓ 0x00000d03 S13 ".debug_str" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x00000d03 S13 ".debug_str" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x000011b6
-╓ 0x000011b7 S14 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x000011b7 S14 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x000011e3
 ╓ 0x000011e4 S15 ".debug_frame" SHT_PROGBITS []
 ╙ 0x0000121b
@@ -24,15 +24,15 @@
 ╙ 0x0000130b
 ╓ 0x0000130c S18 ".strtab" SHT_STRTAB []
 ╙ 0x0000131c
-╓ 0x00001320 S2 ".rela.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00001320 S2 ".rela.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00001343
-╓ 0x00001344 S7 ".rela.debug_info" SHT_RELA [SHF_EXT 64]
+╓ 0x00001344 S7 ".rela.debug_info" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00001973
-╓ 0x00001974 S10 ".rela.debug_aranges" SHT_RELA [SHF_EXT 64]
+╓ 0x00001974 S10 ".rela.debug_aranges" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000198b
-╓ 0x0000198c S12 ".rela.debug_line" SHT_RELA [SHF_EXT 64]
+╓ 0x0000198c S12 ".rela.debug_line" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00001997
-╓ 0x00001998 S16 ".rela.debug_frame" SHT_RELA [SHF_EXT 64]
+╓ 0x00001998 S16 ".rela.debug_frame" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x000019af
 ╓ 0x000019b0 S19 ".shstrtab" SHT_STRTAB []
 ╙ 0x00001a52

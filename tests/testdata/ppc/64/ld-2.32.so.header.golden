@@ -12,7 +12,7 @@ Header:   Class:      ELFCLASS64
           PhNum:      5
           ShEntSize:  0x0040
           ShNum:      22
-          ShStrNdx:   SHN_EXT 21
+          ShStrNdx:   ElfSectionIndex 21
 Sections: - N:         0
             Name:      0
             Type:      SHT_NULL
@@ -26,7 +26,7 @@ Sections: - N:         0
             EntSize:   0x0000000000000000
           - N:         1
             Name:      11
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     0x0000000000000002
             Addr:      0x0000000000000158
             Offset:    0x0000000000000158
@@ -59,7 +59,7 @@ Sections: - N:         0
             EntSize:   0x0000000000000000
           - N:         4
             Name:      37
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     0x0000000000000002
             Addr:      0x000000000000087a
             Offset:    0x000000000000087a
@@ -70,7 +70,7 @@ Sections: - N:         0
             EntSize:   0x0000000000000002
           - N:         5
             Name:      50
-            Type:      SHT_EXT 1879048189
+            Type:      ElfSectionType 1879048189
             Flags:     0x0000000000000002
             Addr:      0x00000000000008c8
             Offset:    0x00000000000008c8
@@ -283,7 +283,7 @@ Segments: - N:        0
             MemSize:  0x0000000000000190
             Align:    0x0000000000000008
           - N:        3
-            Type:     PT_EXT 1685382480
+            Type:     ElfSegmentType 1685382480
             Flags:    [PF_R]
             Offset:   0x000000000002cec4
             VirtAddr: 0x000000000002cec4
@@ -292,7 +292,7 @@ Segments: - N:        0
             MemSize:  0x0000000000000744
             Align:    0x0000000000000004
           - N:        4
-            Type:     PT_EXT 1685382482
+            Type:     ElfSegmentType 1685382482
             Flags:    [PF_R]
             Offset:   0x000000000003dac0
             VirtAddr: 0x000000000004dac0

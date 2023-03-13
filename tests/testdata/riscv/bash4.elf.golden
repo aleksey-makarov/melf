@@ -12,7 +12,7 @@ segment {
             OSABI:      ELFOSABI_SYSV
             ABIVersion: 0
             Type:       ET_EXEC
-            Machine:    EM_EXT 243
+            Machine:    ElfMachine 243
             Entry:      0x0000000000029f58
             Flags:      0x00000005
         }
@@ -80,7 +80,7 @@ segment {
                 }
         }
         section 4 ".gnu.hash" {
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000010268
             AddrAlign: 0x0000000000000008
@@ -120,7 +120,7 @@ segment {
                 symbol "_end" {
                     Bind:  STB_Global
                     Type:  STT_NoType
-                    ShNdx: SHN_EXT 25
+                    ShNdx: ElfSectionIndex 25
                     Value: 0x00000000000a10c0
                     Size:  0x0000000000000000
                 }
@@ -141,7 +141,7 @@ segment {
                        total: 27573
         }
         section 7 ".gnu.version" {
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000024dce
             AddrAlign: 0x0000000000000002
@@ -155,7 +155,7 @@ segment {
                        total: 3654
         }
         section 8 ".gnu.version_r" {
-            Type:      SHT_EXT 1879048190
+            Type:      ElfSectionType 1879048190
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000025c18
             AddrAlign: 0x0000000000000008
@@ -184,7 +184,7 @@ segment {
         }
         section 10 ".rela.plt" {
             Type:      SHT_RELA
-            Flags:     [SHF_ALLOC,SHF_EXT 64]
+            Flags:     [SHF_ALLOC,ElfSectionFlag 64]
             Addr:      0x0000000000026350
             AddrAlign: 0x0000000000000008
             EntSize:   0x0000000000000018
@@ -239,7 +239,7 @@ segment {
                        total: 51696
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x000000000008ea00
             PhysAddr:   0x000000000008ea00
@@ -280,7 +280,7 @@ segment {
     Align:      0x0000000000001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382482
+            Type:       ElfSegmentType 1685382482
             Flags:      [PF_R]
             VirtAddr:   0x000000000008fde0
             PhysAddr:   0x000000000008fde0
@@ -288,7 +288,7 @@ segment {
             Align:      0x0000000000000001
             Data:       
                 section 16 ".preinit_array" {
-                    Type:      SHT_EXT 16
+                    Type:      ElfSectionType 16
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x000000000008fde0
                     AddrAlign: 0x0000000000000001
@@ -298,7 +298,7 @@ segment {
                     Data:      84 9f 02 00 00 00 00 00                         # ........
                 }
                 section 17 ".init_array" {
-                    Type:      SHT_EXT 14
+                    Type:      ElfSectionType 14
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x000000000008fde8
                     AddrAlign: 0x0000000000000008
@@ -308,7 +308,7 @@ segment {
                     Data:      0a a0 02 00 00 00 00 00                         # ........
                 }
                 section 18 ".fini_array" {
-                    Type:      SHT_EXT 15
+                    Type:      ElfSectionType 15
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x000000000008fdf0
                     AddrAlign: 0x0000000000000008

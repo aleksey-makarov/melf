@@ -13,19 +13,19 @@
  ││╓ 0x00000158 S2 ".note.ABI-tag" SHT_NOTE [SHF_ALLOC]
  ││╙ 0x00000177
  │└─ 0x00000177
- │ ╓ 0x00000178 S3 ".gnu.hash" SHT_EXT 1879048182 [SHF_ALLOC]
+ │ ╓ 0x00000178 S3 ".gnu.hash" ElfSectionType 1879048182 [SHF_ALLOC]
  │ ╙ 0x0000020f
  │ ╓ 0x00000210 S4 ".dynsym" SHT_DYNSYM [SHF_ALLOC]
  │ ╙ 0x00000acf
  │ ╓ 0x00000ad0 S5 ".dynstr" SHT_STRTAB [SHF_ALLOC]
  │ ╙ 0x00001059
- │ ╓ 0x0000105a S6 ".gnu.version" SHT_EXT 1879048191 [SHF_ALLOC]
+ │ ╓ 0x0000105a S6 ".gnu.version" ElfSectionType 1879048191 [SHF_ALLOC]
  │ ╙ 0x00001171
- │ ╓ 0x00001174 S7 ".gnu.version_r" SHT_EXT 1879048190 [SHF_ALLOC]
+ │ ╓ 0x00001174 S7 ".gnu.version_r" ElfSectionType 1879048190 [SHF_ALLOC]
  │ ╙ 0x000011b3
  │ ╓ 0x000011b4 S8 ".rela.dyn" SHT_RELA [SHF_ALLOC]
  │ ╙ 0x0000169f
- │ ╓ 0x000016a0 S9 ".rela.plt" SHT_RELA [SHF_ALLOC,SHF_EXT 64]
+ │ ╓ 0x000016a0 S9 ".rela.plt" SHT_RELA [SHF_ALLOC,ElfSectionFlag 64]
  │ ╙ 0x00001bf7
  │ ╓ 0x00001c00 S10 ".plt" SHT_PROGBITS [SHF_ALLOC,SHF_EXECINSTR]
  │ ╙ 0x0000233f
@@ -33,7 +33,7 @@
  │ ╙ 0x00012b3f
  │ ╓ 0x00012b40 S12 ".rodata" SHT_PROGBITS [SHF_ALLOC]
  │ ╙ 0x000165a3
- │┌─ 0x000165a4 P PT_EXT 1685382480 [PF_R]
+ │┌─ 0x000165a4 P ElfSegmentType 1685382480 [PF_R]
  ││╓ 0x000165a4 S13 ".eh_frame_hdr" SHT_PROGBITS [SHF_ALLOC]
  ││╙ 0x000165c7
  │└─ 0x000165c7
@@ -41,12 +41,12 @@
  │ ╙ 0x0001661b
  └── 0x0001661b
 ┌─── 0x00016c84 P PT_LOAD [PF_W,PF_R]
-│┌── 0x00016c84 P PT_EXT 1685382482 [PF_R]
-││ ╓ 0x00016c84 S15 ".preinit_array" SHT_EXT 16 [SHF_WRITE,SHF_ALLOC]
+│┌── 0x00016c84 P ElfSegmentType 1685382482 [PF_R]
+││ ╓ 0x00016c84 S15 ".preinit_array" ElfSectionType 16 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x00016c87
-││ ╓ 0x00016c88 S16 ".init_array" SHT_EXT 14 [SHF_WRITE,SHF_ALLOC]
+││ ╓ 0x00016c88 S16 ".init_array" ElfSectionType 14 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x00016c8b
-││ ╓ 0x00016c8c S17 ".fini_array" SHT_EXT 15 [SHF_WRITE,SHF_ALLOC]
+││ ╓ 0x00016c8c S17 ".fini_array" ElfSectionType 15 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x00016c8f
 ││ ╓ 0x00016c90 S18 ".data.rel.ro" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x00016f07

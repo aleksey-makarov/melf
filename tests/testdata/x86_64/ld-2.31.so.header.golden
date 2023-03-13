@@ -12,7 +12,7 @@ Header:   Class:      ELFCLASS64
           PhNum:      11
           ShEntSize:  0x0040
           ShNum:      29
-          ShStrNdx:   SHN_EXT 28
+          ShStrNdx:   ElfSectionIndex 28
 Sections: - N:         0
             Name:      0
             Type:      SHT_NULL
@@ -59,7 +59,7 @@ Sections: - N:         0
             EntSize:   0x0000000000000004
           - N:         4
             Name:      65
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     0x0000000000000002
             Addr:      0x0000000000000450
             Offset:    0x0000000000000450
@@ -92,7 +92,7 @@ Sections: - N:         0
             EntSize:   0x0000000000000000
           - N:         7
             Name:      91
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     0x0000000000000002
             Addr:      0x0000000000000b44
             Offset:    0x0000000000000b44
@@ -103,7 +103,7 @@ Sections: - N:         0
             EntSize:   0x0000000000000002
           - N:         8
             Name:      104
-            Type:      SHT_EXT 1879048189
+            Type:      ElfSectionType 1879048189
             Flags:     0x0000000000000002
             Addr:      0x0000000000000b88
             Offset:    0x0000000000000b88
@@ -396,7 +396,7 @@ Segments: - N:        0
             MemSize:  0x0000000000000024
             Align:    0x0000000000000004
           - N:        7
-            Type:     PT_EXT 1685382483
+            Type:     ElfSegmentType 1685382483
             Flags:    [PF_R]
             Offset:   0x00000000000002a8
             VirtAddr: 0x00000000000002a8
@@ -405,7 +405,7 @@ Segments: - N:        0
             MemSize:  0x0000000000000020
             Align:    0x0000000000000008
           - N:        8
-            Type:     PT_EXT 1685382480
+            Type:     ElfSegmentType 1685382480
             Flags:    [PF_R]
             Offset:   0x0000000000026c5c
             VirtAddr: 0x0000000000026c5c
@@ -414,7 +414,7 @@ Segments: - N:        0
             MemSize:  0x000000000000072c
             Align:    0x0000000000000004
           - N:        9
-            Type:     PT_EXT 1685382481
+            Type:     ElfSegmentType 1685382481
             Flags:    [PF_W,PF_R]
             Offset:   0x0000000000000000
             VirtAddr: 0x0000000000000000
@@ -423,7 +423,7 @@ Segments: - N:        0
             MemSize:  0x0000000000000000
             Align:    0x0000000000000010
           - N:        10
-            Type:     PT_EXT 1685382482
+            Type:     ElfSegmentType 1685382482
             Flags:    [PF_R]
             Offset:   0x000000000002a4c0
             VirtAddr: 0x000000000002b4c0

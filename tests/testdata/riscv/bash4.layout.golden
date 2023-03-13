@@ -15,19 +15,19 @@
  ││╓ 0x00000244 S3 ".note.gnu.build-id" SHT_NOTE [SHF_ALLOC]
  ││╙ 0x00000267
  │└─ 0x00000267
- │ ╓ 0x00000268 S4 ".gnu.hash" SHT_EXT 1879048182 [SHF_ALLOC]
+ │ ╓ 0x00000268 S4 ".gnu.hash" ElfSectionType 1879048182 [SHF_ALLOC]
  │ ╙ 0x000036cb
  │ ╓ 0x000036d0 S5 ".dynsym" SHT_DYNSYM [SHF_ALLOC]
  │ ╙ 0x0000e217
  │ ╓ 0x0000e218 S6 ".dynstr" SHT_STRTAB [SHF_ALLOC]
  │ ╙ 0x00014dcc
- │ ╓ 0x00014dce S7 ".gnu.version" SHT_EXT 1879048191 [SHF_ALLOC]
+ │ ╓ 0x00014dce S7 ".gnu.version" ElfSectionType 1879048191 [SHF_ALLOC]
  │ ╙ 0x00015c13
- │ ╓ 0x00015c18 S8 ".gnu.version_r" SHT_EXT 1879048190 [SHF_ALLOC]
+ │ ╓ 0x00015c18 S8 ".gnu.version_r" ElfSectionType 1879048190 [SHF_ALLOC]
  │ ╙ 0x00015c77
  │ ╓ 0x00015c78 S9 ".rela.dyn" SHT_RELA [SHF_ALLOC]
  │ ╙ 0x0001634f
- │ ╓ 0x00016350 S10 ".rela.plt" SHT_RELA [SHF_ALLOC,SHF_EXT 64]
+ │ ╓ 0x00016350 S10 ".rela.plt" SHT_RELA [SHF_ALLOC,ElfSectionFlag 64]
  │ ╙ 0x00017d2f
  │ ╓ 0x00017d30 S11 ".plt" SHT_PROGBITS [SHF_ALLOC,SHF_EXECINSTR]
  │ ╙ 0x00018e8f
@@ -35,7 +35,7 @@
  │ ╙ 0x0007200f
  │ ╓ 0x00072010 S13 ".rodata" SHT_PROGBITS [SHF_ALLOC]
  │ ╙ 0x0007e9ff
- │┌─ 0x0007ea00 P PT_EXT 1685382480 [PF_R]
+ │┌─ 0x0007ea00 P ElfSegmentType 1685382480 [PF_R]
  ││╓ 0x0007ea00 S14 ".eh_frame_hdr" SHT_PROGBITS [SHF_ALLOC]
  ││╙ 0x0007ea13
  │└─ 0x0007ea13
@@ -43,12 +43,12 @@
  │ ╙ 0x0007ea43
  └── 0x0007ea43
 ┌─── 0x0007ede0 P PT_LOAD [PF_W,PF_R]
-│┌── 0x0007ede0 P PT_EXT 1685382482 [PF_R]
-││ ╓ 0x0007ede0 S16 ".preinit_array" SHT_EXT 16 [SHF_WRITE,SHF_ALLOC]
+│┌── 0x0007ede0 P ElfSegmentType 1685382482 [PF_R]
+││ ╓ 0x0007ede0 S16 ".preinit_array" ElfSectionType 16 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0007ede7
-││ ╓ 0x0007ede8 S17 ".init_array" SHT_EXT 14 [SHF_WRITE,SHF_ALLOC]
+││ ╓ 0x0007ede8 S17 ".init_array" ElfSectionType 14 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0007edef
-││ ╓ 0x0007edf0 S18 ".fini_array" SHT_EXT 15 [SHF_WRITE,SHF_ALLOC]
+││ ╓ 0x0007edf0 S18 ".fini_array" ElfSectionType 15 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0007edf7
 ││ ╓ 0x0007edf8 S19 ".data.rel.ro" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0007edff

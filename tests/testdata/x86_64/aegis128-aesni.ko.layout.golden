@@ -12,9 +12,9 @@
 ╙ 0x00001727
 ╓ 0x00001730 S9 ".rodata" SHT_PROGBITS [SHF_ALLOC]
 ╙ 0x00001777
-╓ 0x00001780 S11 ".rodata.cst16.aegis128_const" SHT_PROGBITS [SHF_ALLOC,SHF_EXT 16]
+╓ 0x00001780 S11 ".rodata.cst16.aegis128_const" SHT_PROGBITS [SHF_ALLOC,ElfSectionFlag 16]
 ╙ 0x0000179f
-╓ 0x000017a0 S12 ".rodata.cst16.aegis128_counter" SHT_PROGBITS [SHF_ALLOC,SHF_EXT 16]
+╓ 0x000017a0 S12 ".rodata.cst16.aegis128_counter" SHT_PROGBITS [SHF_ALLOC,ElfSectionFlag 16]
 ╙ 0x000017af
 ╓ 0x000017b0 S13 "__mcount_loc" SHT_PROGBITS [SHF_ALLOC]
 ╙ 0x000017ef
@@ -25,26 +25,26 @@
 ╓ 0x00001b40 S18 ".gnu.linkonce.this_module" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ╙ 0x00001ebf
 - 0x00001ec0 S20 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
-╓ 0x00001ec0 S21 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x00001ec0 S21 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x00001ee5
 - 0x00001ee6 S22 ".note.GNU-stack" SHT_PROGBITS [SHF_EXECINSTR]
 ╓ 0x00001ee8 S23 ".symtab" SHT_SYMTAB []
 ╙ 0x0000267f
 ╓ 0x00002680 S24 ".strtab" SHT_STRTAB []
 ╙ 0x00002c09
-╓ 0x00002c10 S4 ".rela.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00002c10 S4 ".rela.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00002fb7
-╓ 0x00002fb8 S6 ".rela.init.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00002fb8 S6 ".rela.init.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00003047
-╓ 0x00003048 S8 ".rela.exit.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00003048 S8 ".rela.exit.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000308f
-╓ 0x00003090 S10 ".rela.rodata" SHT_RELA [SHF_EXT 64]
+╓ 0x00003090 S10 ".rela.rodata" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000311f
-╓ 0x00003120 S14 ".rela__mcount_loc" SHT_RELA [SHF_EXT 64]
+╓ 0x00003120 S14 ".rela__mcount_loc" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x000031df
-╓ 0x000031e0 S17 ".rela.data" SHT_RELA [SHF_EXT 64]
+╓ 0x000031e0 S17 ".rela.data" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00003287
-╓ 0x00003288 S19 ".rela.gnu.linkonce.this_module" SHT_RELA [SHF_EXT 64]
+╓ 0x00003288 S19 ".rela.gnu.linkonce.this_module" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x000032b7
 ╓ 0x000032b8 S25 ".shstrtab" SHT_STRTAB []
 ╙ 0x000033c8

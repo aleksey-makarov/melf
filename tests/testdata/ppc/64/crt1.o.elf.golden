@@ -35,7 +35,7 @@ section 2 ".text" {
 }
 section 4 ".rodata.cst4" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_ALLOC,SHF_EXT 16]
+    Flags:     [SHF_ALLOC,ElfSectionFlag 16]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
     EntSize:   0x0000000000000004
@@ -97,7 +97,7 @@ section 12 ".bss" {
 }
 section 13 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -128,7 +128,7 @@ symbol table section 14 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 2
+            ShNdx: ElfSectionIndex 2
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }
@@ -136,7 +136,7 @@ symbol table section 14 ".symtab" {
         symbol "__data_start" {
             Bind:  STB_Global
             Type:  STT_NoType
-            ShNdx: SHN_EXT 9
+            ShNdx: ElfSectionIndex 9
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }
@@ -158,7 +158,7 @@ section 15 ".strtab" {
 }
 section 3 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -170,7 +170,7 @@ section 3 ".rela.text" {
 }
 section 6 ".rela.opd" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -182,7 +182,7 @@ section 6 ".rela.opd" {
 }
 section 8 ".rela.toc" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -193,7 +193,7 @@ section 8 ".rela.toc" {
 }
 section 11 ".rela.data.rel.ro.local" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018

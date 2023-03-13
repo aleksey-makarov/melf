@@ -1,5 +1,5 @@
  ┌── 0x00000000 P PT_LOAD [PF_X,PF_R]
- │ - 0x00000000 P PT_EXT 1685382481 [PF_W,PF_R]
+ │ - 0x00000000 P ElfSegmentType 1685382481 [PF_W,PF_R]
  │ ┎ 0x00000000 H
  │ ┖ 0x0000003f
  │┌─ 0x00000040 P PT_PHDR [PF_R]
@@ -16,19 +16,19 @@
  ││╓ 0x00000278 S3 ".note.ABI-tag" SHT_NOTE [SHF_ALLOC]
  ││╙ 0x00000297
  │└─ 0x00000297
- │ ╓ 0x00000298 S4 ".gnu.hash" SHT_EXT 1879048182 [SHF_ALLOC]
+ │ ╓ 0x00000298 S4 ".gnu.hash" ElfSectionType 1879048182 [SHF_ALLOC]
  │ ╙ 0x000002b3
  │ ╓ 0x000002b8 S5 ".dynsym" SHT_DYNSYM [SHF_ALLOC]
  │ ╙ 0x000009d7
  │ ╓ 0x000009d8 S6 ".dynstr" SHT_STRTAB [SHF_ALLOC]
  │ ╙ 0x00000ceb
- │ ╓ 0x00000cec S7 ".gnu.version" SHT_EXT 1879048191 [SHF_ALLOC]
+ │ ╓ 0x00000cec S7 ".gnu.version" ElfSectionType 1879048191 [SHF_ALLOC]
  │ ╙ 0x00000d83
- │ ╓ 0x00000d88 S8 ".gnu.version_r" SHT_EXT 1879048190 [SHF_ALLOC]
+ │ ╓ 0x00000d88 S8 ".gnu.version_r" ElfSectionType 1879048190 [SHF_ALLOC]
  │ ╙ 0x00000dc7
  │ ╓ 0x00000dc8 S9 ".rela.dyn" SHT_RELA [SHF_ALLOC]
  │ ╙ 0x00001d3f
- │ ╓ 0x00001d40 S10 ".rela.plt" SHT_RELA [SHF_ALLOC,SHF_EXT 64]
+ │ ╓ 0x00001d40 S10 ".rela.plt" SHT_RELA [SHF_ALLOC,ElfSectionFlag 64]
  │ ╙ 0x00001d87
  │ ╓ 0x00001d88 S11 ".init" SHT_PROGBITS [SHF_ALLOC,SHF_EXECINSTR]
  │ ╙ 0x00001d9b
@@ -40,7 +40,7 @@
  │ ╙ 0x0000a927
  │ ╓ 0x0000a928 S15 ".rodata" SHT_PROGBITS [SHF_ALLOC]
  │ ╙ 0x0000bc27
- │┌─ 0x0000bc28 P PT_EXT 1685382480 [PF_R]
+ │┌─ 0x0000bc28 P ElfSegmentType 1685382480 [PF_R]
  ││╓ 0x0000bc28 S16 ".eh_frame_hdr" SHT_PROGBITS [SHF_ALLOC]
  ││╙ 0x0000c0bb
  │└─ 0x0000c0bb
@@ -48,10 +48,10 @@
  │ ╙ 0x0000d84f
  └── 0x0000d84f
 ┌─── 0x0000e808 P PT_LOAD [PF_W,PF_R]
-│┌── 0x0000e808 P PT_EXT 1685382482 [PF_R]
-││ ╓ 0x0000e808 S18 ".init_array" SHT_EXT 14 [SHF_WRITE,SHF_ALLOC]
+│┌── 0x0000e808 P ElfSegmentType 1685382482 [PF_R]
+││ ╓ 0x0000e808 S18 ".init_array" ElfSectionType 14 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0000e80f
-││ ╓ 0x0000e810 S19 ".fini_array" SHT_EXT 15 [SHF_WRITE,SHF_ALLOC]
+││ ╓ 0x0000e810 S19 ".fini_array" ElfSectionType 15 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0000e817
 ││ ╓ 0x0000e818 S20 ".data.rel.ro" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0000e9cf
@@ -66,7 +66,7 @@
 │  ╙ 0x0000f0ef
 └─── 0x0000f0ef
    - 0x0000f0f0 S24 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
-   ╓ 0x0000f0f0 S25 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+   ╓ 0x0000f0f0 S25 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
    ╙ 0x0000f12a
    ╓ 0x0000f12b S26 ".shstrtab" SHT_STRTAB []
    ╙ 0x0000f221

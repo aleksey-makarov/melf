@@ -58,7 +58,7 @@ section 5 ".text.startup" {
 }
 section 7 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -140,41 +140,41 @@ section 12 ".strtab" {
 }
 section 2 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
     Info:      0x00000001
     Link:      0x0000000b
-    Data:      0x0000000000000080 0x0000000000000000 R_AARCH64_CALL26 16 ("char_to_int" bind: STB_Global type: STT_Func sindex: SHN_EXT 1 value: 0x0000000000000000 size: 0x0000000000000038)
-               0x00000000000000d0 0x0000000000000000 R_AARCH64_CALL26 17 ("int_to_char" bind: STB_Global type: STT_Func sindex: SHN_EXT 1 value: 0x0000000000000038 size: 0x0000000000000020)
+    Data:      0x0000000000000080 0x0000000000000000 R_AARCH64_CALL26 16 ("char_to_int" bind: STB_Global type: STT_Func sindex: ElfSectionIndex 1 value: 0x0000000000000000 size: 0x0000000000000038)
+               0x00000000000000d0 0x0000000000000000 R_AARCH64_CALL26 17 ("int_to_char" bind: STB_Global type: STT_Func sindex: ElfSectionIndex 1 value: 0x0000000000000038 size: 0x0000000000000020)
 }
 section 6 ".rela.text.startup" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
     Info:      0x00000005
     Link:      0x0000000b
-    Data:      0x0000000000000014 0x0000000000000000 R_AARCH64_ADR_PREL_PG_HI21 4 ("" bind: STB_Local type: STT_Section sindex: SHN_EXT 4 value: 0x0000000000000000 size: 0x0000000000000000)
-               0x0000000000000018 0x0000000000000000 R_AARCH64_ADD_ABS_LO12_NC 4 ("" bind: STB_Local type: STT_Section sindex: SHN_EXT 4 value: 0x0000000000000000 size: 0x0000000000000000)
+    Data:      0x0000000000000014 0x0000000000000000 R_AARCH64_ADR_PREL_PG_HI21 4 ("" bind: STB_Local type: STT_Section sindex: ElfSectionIndex 4 value: 0x0000000000000000 size: 0x0000000000000000)
+               0x0000000000000018 0x0000000000000000 R_AARCH64_ADD_ABS_LO12_NC 4 ("" bind: STB_Local type: STT_Section sindex: ElfSectionIndex 4 value: 0x0000000000000000 size: 0x0000000000000000)
                ...
                0x0000000000000058 0x0000000000000000 R_AARCH64_CALL26 22 ("write" bind: STB_Global type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                total: 7
 }
 section 10 ".rela.eh_frame" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
     Info:      0x00000009
     Link:      0x0000000b
-    Data:      0x000000000000001c 0x0000000000000000 R_AARCH64_PREL32 2 ("" bind: STB_Local type: STT_Section sindex: SHN_EXT 1 value: 0x0000000000000000 size: 0x0000000000000000)
-               0x0000000000000030 0x0000000000000038 R_AARCH64_PREL32 2 ("" bind: STB_Local type: STT_Section sindex: SHN_EXT 1 value: 0x0000000000000000 size: 0x0000000000000000)
+    Data:      0x000000000000001c 0x0000000000000000 R_AARCH64_PREL32 2 ("" bind: STB_Local type: STT_Section sindex: ElfSectionIndex 1 value: 0x0000000000000000 size: 0x0000000000000000)
+               0x0000000000000030 0x0000000000000038 R_AARCH64_PREL32 2 ("" bind: STB_Local type: STT_Section sindex: ElfSectionIndex 1 value: 0x0000000000000000 size: 0x0000000000000000)
                ...
-               0x0000000000000098 0x0000000000000000 R_AARCH64_PREL32 6 ("" bind: STB_Local type: STT_Section sindex: SHN_EXT 5 value: 0x0000000000000000 size: 0x0000000000000000)
+               0x0000000000000098 0x0000000000000000 R_AARCH64_PREL32 6 ("" bind: STB_Local type: STT_Section sindex: ElfSectionIndex 5 value: 0x0000000000000000 size: 0x0000000000000000)
                total: 5
 }
 string table section 13 ".shstrtab"

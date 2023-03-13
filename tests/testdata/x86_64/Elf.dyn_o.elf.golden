@@ -48,7 +48,7 @@ section 5 ".bss" {
 }
 section 6 ".rodata.str" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_ALLOC,SHF_EXT 16,SHF_EXT 32]
+    Flags:     [SHF_ALLOC,ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -72,7 +72,7 @@ section 7 ".note.GNU-stack" {
 }
 section 8 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -99,7 +99,7 @@ symbol table section 9 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }
@@ -107,7 +107,7 @@ symbol table section 9 ".symtab" {
         symbol "elfzm0zi31zmI4tXZZPXzzZZs0GF67yXELdbG_DataziElf_ElfRBuilderSegmentTable_closure" {
             Bind:  STB_Global
             Type:  STT_Object
-            ShNdx: SHN_EXT 3
+            ShNdx: ElfSectionIndex 3
             Value: 0x00000000000013f8
             Size:  0x0000000000000000
         }
@@ -129,7 +129,7 @@ section 10 ".strtab" {
 }
 section 2 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -143,7 +143,7 @@ section 2 ".rela.text" {
 }
 section 4 ".rela.data" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018

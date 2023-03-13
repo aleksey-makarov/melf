@@ -7,7 +7,7 @@ segment {
     Align:      0x00001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382481
+            Type:       ElfSegmentType 1685382481
             Flags:      [PF_W,PF_R]
             VirtAddr:   0x00000000
             PhysAddr:   0x00000000
@@ -88,7 +88,7 @@ segment {
                 }
         }
         section 4 ".gnu.hash" {
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     [SHF_ALLOC]
             Addr:      0x080481ac
             AddrAlign: 0x00000004
@@ -126,7 +126,7 @@ segment {
                 symbol "_ZSt4cout" {
                     Bind:  STB_Global
                     Type:  STT_Object
-                    ShNdx: SHN_EXT 26
+                    ShNdx: ElfSectionIndex 26
                     Value: 0x0804a040
                     Size:  0x0000008c
                 }
@@ -147,7 +147,7 @@ segment {
                        total: 409
         }
         section 7 ".gnu.version" {
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     [SHF_ALLOC]
             Addr:      0x08048456
             AddrAlign: 0x00000002
@@ -158,7 +158,7 @@ segment {
                        00 00 03 00 01 00 03 00 03 00 03 00             # ............
         }
         section 8 ".gnu.version_r" {
-            Type:      SHT_EXT 1879048190
+            Type:      ElfSectionType 1879048190
             Flags:     [SHF_ALLOC]
             Addr:      0x08048474
             AddrAlign: 0x00000004
@@ -183,7 +183,7 @@ segment {
         }
         section 10 ".rel.plt" {
             Type:      SHT_REL
-            Flags:     [SHF_ALLOC,SHF_EXT 64]
+            Flags:     [SHF_ALLOC,ElfSectionFlag 64]
             Addr:      0x080484d4
             AddrAlign: 0x00000004
             EntSize:   0x00000008
@@ -268,7 +268,7 @@ segment {
                        6f 20 77 6f 72 6c 64 21 00                      # o world!.
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x08048804
             PhysAddr:   0x08048804
@@ -314,7 +314,7 @@ segment {
     Align:      0x00001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382482
+            Type:       ElfSegmentType 1685382482
             Flags:      [PF_R]
             VirtAddr:   0x08049eec
             PhysAddr:   0x08049eec
@@ -322,7 +322,7 @@ segment {
             Align:      0x00000001
             Data:       
                 section 19 ".init_array" {
-                    Type:      SHT_EXT 14
+                    Type:      ElfSectionType 14
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x08049eec
                     AddrAlign: 0x00000004
@@ -332,7 +332,7 @@ segment {
                     Data:      e0 86 04 08 00 86 04 08                         # ........
                 }
                 section 20 ".fini_array" {
-                    Type:      SHT_EXT 15
+                    Type:      ElfSectionType 15
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x08049ef4
                     AddrAlign: 0x00000004
@@ -420,7 +420,7 @@ section 26 ".bss" {
 }
 section 27 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -451,7 +451,7 @@ symbol table section 29 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x08048154
             Size:  0x00000000
         }
@@ -459,7 +459,7 @@ symbol table section 29 ".symtab" {
         symbol "_init" {
             Bind:  STB_Global
             Type:  STT_Func
-            ShNdx: SHN_EXT 11
+            ShNdx: ElfSectionIndex 11
             Value: 0x0804850c
             Size:  0x00000000
         }

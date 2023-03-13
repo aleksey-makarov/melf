@@ -87,7 +87,7 @@ symbol table section 7 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }
@@ -95,7 +95,7 @@ symbol table section 7 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 6
+            ShNdx: ElfSectionIndex 6
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }

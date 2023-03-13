@@ -6,7 +6,7 @@
 - 0x00000070 S4 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
 ╓ 0x00000070 S5 ".opd" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ╙ 0x00000087
-╓ 0x00000088 S7 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x00000088 S7 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x000000a8
 ╓ 0x000000ac S8 ".eh_frame" SHT_PROGBITS [SHF_ALLOC]
 ╙ 0x000000df
@@ -14,11 +14,11 @@
 ╙ 0x000001b7
 ╓ 0x000001b8 S11 ".strtab" SHT_STRTAB []
 ╙ 0x000001c1
-╓ 0x000001c8 S2 ".rela.text" SHT_RELA [SHF_EXT 64]
+╓ 0x000001c8 S2 ".rela.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x000001df
-╓ 0x000001e0 S6 ".rela.opd" SHT_RELA [SHF_EXT 64]
+╓ 0x000001e0 S6 ".rela.opd" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000020f
-╓ 0x00000210 S9 ".rela.eh_frame" SHT_RELA [SHF_EXT 64]
+╓ 0x00000210 S9 ".rela.eh_frame" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00000227
 ╓ 0x00000228 S12 ".shstrtab" SHT_STRTAB []
 ╙ 0x0000027a

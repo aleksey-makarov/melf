@@ -7,19 +7,19 @@
  ││╓ 0x00000158 S1 ".note.gnu.build-id" SHT_NOTE [SHF_ALLOC]
  ││╙ 0x0000017b
  │└─ 0x0000017b
- │ ╓ 0x00000180 S2 ".gnu.hash" SHT_EXT 1879048182 [SHF_ALLOC]
+ │ ╓ 0x00000180 S2 ".gnu.hash" ElfSectionType 1879048182 [SHF_ALLOC]
  │ ╙ 0x0000088b
  │ ╓ 0x00000890 S3 ".dynsym" SHT_DYNSYM [SHF_ALLOC]
  │ ╙ 0x00001fcf
  │ ╓ 0x00001fd0 S4 ".dynstr" SHT_STRTAB [SHF_ALLOC]
  │ ╙ 0x00002b47
- │ ╓ 0x00002b48 S5 ".gnu.version" SHT_EXT 1879048191 [SHF_ALLOC]
+ │ ╓ 0x00002b48 S5 ".gnu.version" ElfSectionType 1879048191 [SHF_ALLOC]
  │ ╙ 0x00002d37
- │ ╓ 0x00002d38 S6 ".gnu.version_r" SHT_EXT 1879048190 [SHF_ALLOC]
+ │ ╓ 0x00002d38 S6 ".gnu.version_r" ElfSectionType 1879048190 [SHF_ALLOC]
  │ ╙ 0x00002db7
  │ ╓ 0x00002db8 S7 ".rela.dyn" SHT_RELA [SHF_ALLOC]
  │ ╙ 0x00005cf7
- │ ╓ 0x00005cf8 S8 ".rela.plt" SHT_RELA [SHF_ALLOC,SHF_EXT 64]
+ │ ╓ 0x00005cf8 S8 ".rela.plt" SHT_RELA [SHF_ALLOC,ElfSectionFlag 64]
  │ ╙ 0x0000714f
  │ ╓ 0x00007150 S9 ".plt" SHT_PROGBITS [SHF_ALLOC,SHF_EXECINSTR]
  │ ╙ 0x00007eff
@@ -31,10 +31,10 @@
  │ ╙ 0x000252c3
  └── 0x000252c3
 ┌─── 0x00025d38 P PT_LOAD [PF_W,PF_R]
-│┌── 0x00025d38 P PT_EXT 1685382482 [PF_R]
-││ ╓ 0x00025d38 S13 ".init_array" SHT_EXT 14 [SHF_WRITE,SHF_ALLOC]
+│┌── 0x00025d38 P ElfSegmentType 1685382482 [PF_R]
+││ ╓ 0x00025d38 S13 ".init_array" ElfSectionType 14 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x00025d3f
-││ ╓ 0x00025d40 S14 ".fini_array" SHT_EXT 15 [SHF_WRITE,SHF_ALLOC]
+││ ╓ 0x00025d40 S14 ".fini_array" ElfSectionType 15 [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x00025d47
 ││ ╓ 0x00025d48 S15 ".data.rel.ro" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x00026e1f

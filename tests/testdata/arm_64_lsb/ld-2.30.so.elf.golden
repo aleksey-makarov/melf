@@ -7,7 +7,7 @@ segment {
     Align:      0x0000000000010000
     Data:       
         segment {
-            Type:       PT_EXT 1685382481
+            Type:       ElfSegmentType 1685382481
             Flags:      [PF_W,PF_R]
             VirtAddr:   0x0000000000000000
             PhysAddr:   0x0000000000000000
@@ -62,7 +62,7 @@ segment {
                        total: 360
         }
         section 3 ".gnu.hash" {
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000358
             AddrAlign: 0x0000000000000008
@@ -94,7 +94,7 @@ segment {
                 symbol "" {
                     Bind:  STB_Local
                     Type:  STT_Section
-                    ShNdx: SHN_EXT 11
+                    ShNdx: ElfSectionIndex 11
                     Value: 0x0000000000001180
                     Size:  0x0000000000000000
                 }
@@ -102,7 +102,7 @@ segment {
                 symbol "_dl_var_init" {
                     Bind:  STB_Global
                     Type:  STT_Func
-                    ShNdx: SHN_EXT 11
+                    ShNdx: ElfSectionIndex 11
                     Value: 0x0000000000014400
                     Size:  0x0000000000000014
                 }
@@ -123,7 +123,7 @@ segment {
                        total: 560
         }
         section 6 ".gnu.version" {
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000a58
             AddrAlign: 0x0000000000000002
@@ -137,7 +137,7 @@ segment {
                        total: 72
         }
         section 7 ".gnu.version_d" {
-            Type:      SHT_EXT 1879048189
+            Type:      ElfSectionType 1879048189
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000aa0
             AddrAlign: 0x0000000000000008
@@ -161,21 +161,21 @@ segment {
             Data:      0x000000000002f588 0x000000000001bd20 R_AARCH64_RELATIVE 0 ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                        0x000000000002f598 0x000000000001bd70 R_AARCH64_RELATIVE 0 ("" bind: STB_Local type: STT_NoType sindex: SHN_Undef value: 0x0000000000000000 size: 0x0000000000000000)
                        ...
-                       0x000000000002fff8 0x0000000000000000 R_AARCH64_GLOB_DAT 26 ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
+                       0x000000000002fff8 0x0000000000000000 R_AARCH64_GLOB_DAT 26 ("free" bind: STB_Weak type: STT_Func sindex: ElfSectionIndex 11 value: 0x0000000000015238 size: 0x000000000000004c)
                        total: 51
         }
         section 9 ".rela.plt" {
             Type:      SHT_RELA
-            Flags:     [SHF_ALLOC,SHF_EXT 64]
+            Flags:     [SHF_ALLOC,ElfSectionFlag 64]
             Addr:      0x0000000000000fc8
             AddrAlign: 0x0000000000000008
             EntSize:   0x0000000000000018
             Info:      0x00000011
             Link:      0x00000004
-            Data:      0x000000000002ff78 0x0000000000000000 R_AARCH64_JUMP_SLOT 6 ("_dl_catch_exception" bind: STB_Global type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015880 size: 0x0000000000000088)
-                       0x000000000002ff80 0x0000000000000000 R_AARCH64_JUMP_SLOT 34 ("malloc" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x00000000000150d8 size: 0x0000000000000124)
+            Data:      0x000000000002ff78 0x0000000000000000 R_AARCH64_JUMP_SLOT 6 ("_dl_catch_exception" bind: STB_Global type: STT_Func sindex: ElfSectionIndex 11 value: 0x0000000000015880 size: 0x0000000000000088)
+                       0x000000000002ff80 0x0000000000000000 R_AARCH64_JUMP_SLOT 34 ("malloc" bind: STB_Weak type: STT_Func sindex: ElfSectionIndex 11 value: 0x00000000000150d8 size: 0x0000000000000124)
                        ...
-                       0x000000000002ffb8 0x0000000000000000 R_AARCH64_JUMP_SLOT 26 ("free" bind: STB_Weak type: STT_Func sindex: SHN_EXT 11 value: 0x0000000000015238 size: 0x000000000000004c)
+                       0x000000000002ffb8 0x0000000000000000 R_AARCH64_JUMP_SLOT 26 ("free" bind: STB_Weak type: STT_Func sindex: ElfSectionIndex 11 value: 0x0000000000015238 size: 0x000000000000004c)
                        total: 9
         }
         section 10 ".plt" {
@@ -221,7 +221,7 @@ segment {
                        total: 16568
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x000000000001c160
             PhysAddr:   0x000000000001c160
@@ -267,7 +267,7 @@ segment {
     Align:      0x0000000000010000
     Data:       
         segment {
-            Type:       PT_EXT 1685382482
+            Type:       ElfSegmentType 1685382482
             Flags:      [PF_R]
             VirtAddr:   0x000000000002f588
             PhysAddr:   0x000000000002f588
@@ -353,7 +353,7 @@ section 19 ".bss" {
 }
 section 20 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -381,7 +381,7 @@ symbol table section 21 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x00000000000001c8
             Size:  0x0000000000000000
         }
@@ -389,7 +389,7 @@ symbol table section 21 ".symtab" {
         symbol "free" {
             Bind:  STB_Weak
             Type:  STT_Func
-            ShNdx: SHN_EXT 11
+            ShNdx: ElfSectionIndex 11
             Value: 0x0000000000015238
             Size:  0x000000000000004c
         }
