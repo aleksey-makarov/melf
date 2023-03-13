@@ -1,8 +1,6 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE TemplateHaskell #-}
 
-{-# OPTIONS_GHC -Wall -fwarn-tabs #-}
-
 module Data.Elf.Constants.TH ( mkDeclarations
                              , BaseWord(..)
                              ) where

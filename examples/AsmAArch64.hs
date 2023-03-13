@@ -9,16 +9,6 @@
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeFamilies #-}
 
-{-# LANGUAGE CPP #-}
-
-#if defined(MIN_VERSION_GLASGOW_HASKELL)
-#if MIN_VERSION_GLASGOW_HASKELL(8,10,0,0)
-{-# LANGUAGE StandaloneKindSignatures #-}
-#endif
-#endif
-
-{-# OPTIONS_GHC -Wno-unused-top-binds #-}
-
 module AsmAArch64
     ( CodeState
     , Register
