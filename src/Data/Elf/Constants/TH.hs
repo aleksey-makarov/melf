@@ -1,5 +1,7 @@
-{-# OPTIONS_GHC -Wall -fwarn-tabs #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE TemplateHaskell #-}
+
+{-# OPTIONS_GHC -Wall -fwarn-tabs #-}
 
 module Data.Elf.Constants.TH ( mkDeclarations
                              , BaseWord(..)
@@ -7,7 +9,9 @@ module Data.Elf.Constants.TH ( mkDeclarations
 
 import Control.Monad
 import Language.Haskell.TH
+#if MIN_VERSION_template_haskell(2,18,0)
 import Language.Haskell.TH.Syntax
+#endif
 
 data BaseWord = BaseWord8 | BaseWord16 | BaseWord32 | BaseWord64
 
@@ -143,9 +147,12 @@ mkDeclarations baseType typeNameString patternPrefixString enums = do
                 (conP typeName [litP $ IntegerL n])
             ]
 
-    let mkPatternDocs (s, _, doc) = putDoc (DeclDoc $ patternName s) doc
-
     let patterns = join (map mkPatterns enums)
 
+#if MIN_VERSION_template_haskell(2,18,0)
+    let mkPatternDocs (s, _, doc) = putDoc (DeclDoc $ patternName s) doc
+
     mapM_ (addModFinalizer . mkPatternDocs) enums
+#endif
+
     sequence $ newTypeDef : showInstance : patterns ++ binaryInstances
