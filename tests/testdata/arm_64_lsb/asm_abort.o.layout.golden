@@ -4,7 +4,7 @@
 ╙ 0x000000af
 - 0x000000b0 S3 ".data" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 - 0x000000b0 S4 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
-╓ 0x000000b0 S5 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x000000b0 S5 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x000000da
 - 0x000000db S6 ".note.GNU-stack" SHT_PROGBITS []
 ╓ 0x000000e0 S7 ".eh_frame" SHT_PROGBITS [SHF_ALLOC]
@@ -13,9 +13,9 @@
 ╙ 0x0000024f
 ╓ 0x00000250 S10 ".strtab" SHT_STRTAB []
 ╙ 0x00000280
-╓ 0x00000288 S2 ".rela.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00000288 S2 ".rela.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x00000317
-╓ 0x00000318 S8 ".rela.eh_frame" SHT_RELA [SHF_EXT 64]
+╓ 0x00000318 S8 ".rela.eh_frame" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000032f
 ╓ 0x00000330 S11 ".shstrtab" SHT_STRTAB []
 ╙ 0x00000388

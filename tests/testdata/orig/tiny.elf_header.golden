@@ -12,4 +12,4 @@ PhEntSize:  0x0038
 PhNum:      2
 ShEntSize:  0x0040
 ShNum:      3
-ShStrNdx:   SHN_EXT 2
+ShStrNdx:   ElfSectionIndex 2

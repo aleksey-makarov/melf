@@ -5,18 +5,18 @@
 ╓ 0x0000a8e8 S3 ".data" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ╙ 0x0000bc6f
 - 0x0000bc70 S5 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
-╓ 0x0000bc70 S6 ".rodata.str" SHT_PROGBITS [SHF_ALLOC,SHF_EXT 16,SHF_EXT 32]
+╓ 0x0000bc70 S6 ".rodata.str" SHT_PROGBITS [SHF_ALLOC,ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x0000c1e0
 - 0x0000c1e1 S7 ".note.GNU-stack" SHT_PROGBITS []
-╓ 0x0000c1e1 S8 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x0000c1e1 S8 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x0000c1eb
 ╓ 0x0000c1f0 S9 ".symtab" SHT_SYMTAB []
 ╙ 0x0000dcef
 ╓ 0x0000dcf0 S10 ".strtab" SHT_STRTAB []
 ╙ 0x00011e38
-╓ 0x00011e40 S2 ".rela.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00011e40 S2 ".rela.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0001b157
-╓ 0x0001b158 S4 ".rela.data" SHT_RELA [SHF_EXT 64]
+╓ 0x0001b158 S4 ".rela.data" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0001d257
 ╓ 0x0001d258 S11 ".shstrtab" SHT_STRTAB []
 ╙ 0x0001d2b2

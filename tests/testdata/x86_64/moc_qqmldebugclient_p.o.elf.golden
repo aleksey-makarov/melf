@@ -9,7 +9,7 @@ header {
     Flags:      0x00000000
 }
 section 1 ".group" {
-    Type:      SHT_EXT 17
+    Type:      ElfSectionType 17
     Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
@@ -19,7 +19,7 @@ section 1 ".group" {
     Data:      01 00 00 00 09 00 00 00 0a 00 00 00             # ............
 }
 section 2 ".group" {
-    Type:      SHT_EXT 17
+    Type:      ElfSectionType 17
     Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
@@ -29,7 +29,7 @@ section 2 ".group" {
     Data:      01 00 00 00 0b 00 00 00                         # ........
 }
 section 3 ".group" {
-    Type:      SHT_EXT 17
+    Type:      ElfSectionType 17
     Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
@@ -39,7 +39,7 @@ section 3 ".group" {
     Data:      01 00 00 00 0c 00 00 00 0d 00 00 00             # ............
 }
 section 4 ".group" {
-    Type:      SHT_EXT 17
+    Type:      ElfSectionType 17
     Flags:     []
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000004
@@ -84,7 +84,7 @@ section 8 ".bss" {
 }
 section 9 ".qtversion" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_ALLOC,SHF_EXT 512]
+    Flags:     [SHF_ALLOC,ElfSectionFlag 512]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -94,7 +94,7 @@ section 9 ".qtversion" {
 }
 section 11 ".rodata._ZTS15QQmlDebugClient" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_ALLOC,SHF_EXT 512]
+    Flags:     [SHF_ALLOC,ElfSectionFlag 512]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000010
     EntSize:   0x0000000000000000
@@ -105,7 +105,7 @@ section 11 ".rodata._ZTS15QQmlDebugClient" {
 }
 section 12 ".data.rel.ro._ZTI15QQmlDebugClient" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_WRITE,SHF_ALLOC,SHF_EXT 512]
+    Flags:     [SHF_WRITE,SHF_ALLOC,ElfSectionFlag 512]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -116,7 +116,7 @@ section 12 ".data.rel.ro._ZTI15QQmlDebugClient" {
 }
 section 14 ".data.rel.ro._ZTV15QQmlDebugClient" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_WRITE,SHF_ALLOC,SHF_EXT 512]
+    Flags:     [SHF_WRITE,SHF_ALLOC,ElfSectionFlag 512]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000000
@@ -156,7 +156,7 @@ section 18 ".rodata" {
 }
 section 19 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -209,7 +209,7 @@ symbol table section 23 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 5
+            ShNdx: ElfSectionIndex 5
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }
@@ -239,7 +239,7 @@ section 24 ".strtab" {
 }
 section 6 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -253,7 +253,7 @@ section 6 ".rela.text" {
 }
 section 10 ".rela.qtversion" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64,SHF_EXT 512]
+    Flags:     [ElfSectionFlag 64,ElfSectionFlag 512]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -264,7 +264,7 @@ section 10 ".rela.qtversion" {
 }
 section 13 ".rela.data.rel.ro._ZTI15QQmlDebugClient" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64,SHF_EXT 512]
+    Flags:     [ElfSectionFlag 64,ElfSectionFlag 512]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -278,7 +278,7 @@ section 13 ".rela.data.rel.ro._ZTI15QQmlDebugClient" {
 }
 section 15 ".rela.data.rel.ro._ZTV15QQmlDebugClient" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64,SHF_EXT 512]
+    Flags:     [ElfSectionFlag 64,ElfSectionFlag 512]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -292,7 +292,7 @@ section 15 ".rela.data.rel.ro._ZTV15QQmlDebugClient" {
 }
 section 17 ".rela.data.rel.ro" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -306,7 +306,7 @@ section 17 ".rela.data.rel.ro" {
 }
 section 22 ".rela.eh_frame" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018

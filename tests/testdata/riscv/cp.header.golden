@@ -3,7 +3,7 @@ Header:   Class:      ELFCLASS32
           OSABI:      ELFOSABI_SYSV
           ABIVersion: 0
           Type:       ET_DYN
-          Machine:    EM_EXT 243
+          Machine:    ElfMachine 243
           Entry:      0x00002b8c
           PhOff:      0x00000034
           ShOff:      0x000173b0
@@ -12,7 +12,7 @@ Header:   Class:      ELFCLASS32
           PhNum:      8
           ShEntSize:  0x0028
           ShNum:      24
-          ShStrNdx:   SHN_EXT 23
+          ShStrNdx:   ElfSectionIndex 23
 Sections: - N:         0
             Name:      0
             Type:      SHT_NULL
@@ -48,7 +48,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         3
             Name:      33
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     0x00000002
             Addr:      0x00000178
             Offset:    0x00000178
@@ -81,7 +81,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         6
             Name:      59
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     0x00000002
             Addr:      0x0000105a
             Offset:    0x0000105a
@@ -92,7 +92,7 @@ Sections: - N:         0
             EntSize:   0x00000002
           - N:         7
             Name:      72
-            Type:      SHT_EXT 1879048190
+            Type:      ElfSectionType 1879048190
             Flags:     0x00000002
             Addr:      0x00001174
             Offset:    0x00001174
@@ -180,7 +180,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         15
             Name:      145
-            Type:      SHT_EXT 16
+            Type:      ElfSectionType 16
             Flags:     0x00000003
             Addr:      0x00017c84
             Offset:    0x00016c84
@@ -191,7 +191,7 @@ Sections: - N:         0
             EntSize:   0x00000004
           - N:         16
             Name:      160
-            Type:      SHT_EXT 14
+            Type:      ElfSectionType 14
             Flags:     0x00000003
             Addr:      0x00017c88
             Offset:    0x00016c88
@@ -202,7 +202,7 @@ Sections: - N:         0
             EntSize:   0x00000004
           - N:         17
             Name:      172
-            Type:      SHT_EXT 15
+            Type:      ElfSectionType 15
             Flags:     0x00000003
             Addr:      0x00017c8c
             Offset:    0x00016c8c
@@ -332,7 +332,7 @@ Segments: - N:        0
             MemSize:  0x00000020
             Align:    0x00000004
           - N:        6
-            Type:     PT_EXT 1685382480
+            Type:     ElfSegmentType 1685382480
             Flags:    [PF_R]
             Offset:   0x000165a4
             VirtAddr: 0x000165a4
@@ -341,7 +341,7 @@ Segments: - N:        0
             MemSize:  0x00000024
             Align:    0x00000004
           - N:        7
-            Type:     PT_EXT 1685382482
+            Type:     ElfSegmentType 1685382482
             Flags:    [PF_R]
             Offset:   0x00016c84
             VirtAddr: 0x00017c84

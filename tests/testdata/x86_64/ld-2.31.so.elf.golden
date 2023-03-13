@@ -7,7 +7,7 @@ segment {
     Align:      0x0000000000001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382481
+            Type:       ElfSegmentType 1685382481
             Flags:      [PF_W,PF_R]
             VirtAddr:   0x0000000000000000
             PhysAddr:   0x0000000000000000
@@ -27,7 +27,7 @@ segment {
         }
         segment table
         segment {
-            Type:       PT_EXT 1685382483
+            Type:       ElfSegmentType 1685382483
             Flags:      [PF_R]
             VirtAddr:   0x00000000000002a8
             PhysAddr:   0x00000000000002a8
@@ -91,7 +91,7 @@ segment {
                        total: 352
         }
         section 4 ".gnu.hash" {
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000450
             AddrAlign: 0x0000000000000008
@@ -123,7 +123,7 @@ segment {
                 symbol "_dl_deallocate_tls" {
                     Bind:  STB_Global
                     Type:  STT_Func
-                    ShNdx: SHN_EXT 14
+                    ShNdx: ElfSectionIndex 14
                     Value: 0x0000000000013e00
                     Size:  0x000000000000007f
                 }
@@ -131,7 +131,7 @@ segment {
                 symbol "calloc" {
                     Bind:  STB_Weak
                     Type:  STT_Func
-                    ShNdx: SHN_EXT 14
+                    ShNdx: ElfSectionIndex 14
                     Value: 0x000000000001bca0
                     Size:  0x0000000000000038
                 }
@@ -152,7 +152,7 @@ segment {
                        total: 548
         }
         section 7 ".gnu.version" {
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000b44
             AddrAlign: 0x0000000000000002
@@ -166,7 +166,7 @@ segment {
                        total: 68
         }
         section 8 ".gnu.version_d" {
-            Type:      SHT_EXT 1879048189
+            Type:      ElfSectionType 1879048189
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000b88
             AddrAlign: 0x0000000000000008
@@ -195,7 +195,7 @@ segment {
         }
         section 10 ".rela.plt" {
             Type:      SHT_RELA
-            Flags:     [SHF_ALLOC,SHF_EXT 64]
+            Flags:     [SHF_ALLOC,ElfSectionFlag 64]
             Addr:      0x0000000000001050
             AddrAlign: 0x0000000000000008
             EntSize:   0x0000000000000018
@@ -302,7 +302,7 @@ segment {
             Data:      00                                              # .
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x0000000000026c5c
             PhysAddr:   0x0000000000026c5c
@@ -348,7 +348,7 @@ segment {
     Align:      0x0000000000001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382482
+            Type:       ElfSegmentType 1685382482
             Flags:      [PF_R]
             VirtAddr:   0x000000000002b4c0
             PhysAddr:   0x000000000002b4c0
@@ -438,7 +438,7 @@ section 23 ".bss" {
 }
 section 24 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -480,7 +480,7 @@ symbol table section 26 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x00000000000002a8
             Size:  0x0000000000000000
         }
@@ -488,7 +488,7 @@ symbol table section 26 ".symtab" {
         symbol "free" {
             Bind:  STB_Weak
             Type:  STT_Func
-            ShNdx: SHN_EXT 14
+            ShNdx: ElfSectionIndex 14
             Value: 0x000000000001bce0
             Size:  0x000000000000003c
         }

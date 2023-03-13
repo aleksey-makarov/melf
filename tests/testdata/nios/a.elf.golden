@@ -12,7 +12,7 @@ segment {
             OSABI:      ELFOSABI_SYSV
             ABIVersion: 0
             Type:       ET_EXEC
-            Machine:    EM_EXT 113
+            Machine:    ElfMachine 113
             Entry:      0x000010c8
             Flags:      0x00000000
         }
@@ -70,7 +70,7 @@ segment {
         }
         section 4 ".sdata" {
             Type:      SHT_PROGBITS
-            Flags:     [SHF_WRITE,SHF_ALLOC,SHF_EXT 268435456]
+            Flags:     [SHF_WRITE,SHF_ALLOC,ElfSectionFlag 268435456]
             Addr:      0x0000fbd4
             AddrAlign: 0x00000004
             EntSize:   0x00000000
@@ -81,7 +81,7 @@ segment {
 }
 section 5 ".sbss" {
     Type:      SHT_NOBITS
-    Flags:     [SHF_WRITE,SHF_ALLOC,SHF_EXT 268435456]
+    Flags:     [SHF_WRITE,SHF_ALLOC,ElfSectionFlag 268435456]
     Addr:      0x0000fbe4
     AddrAlign: 0x00000004
     EntSize:   0x00000000
@@ -101,7 +101,7 @@ section 6 ".bss" {
 }
 section 7 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -183,7 +183,7 @@ section 12 ".debug_frame" {
 }
 section 13 ".debug_str" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -242,7 +242,7 @@ symbol table section 16 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x00001078
             Size:  0x00000000
         }
@@ -250,7 +250,7 @@ symbol table section 16 ".symtab" {
         symbol "_Bfree" {
             Bind:  STB_Global
             Type:  STT_Func
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x00006680
             Size:  0x00000024
         }

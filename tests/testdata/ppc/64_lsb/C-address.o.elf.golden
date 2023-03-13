@@ -40,7 +40,7 @@ section 3 ".bss" {
 }
 section 4 ".rodata.str1.8" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_ALLOC,SHF_EXT 16,SHF_EXT 32]
+    Flags:     [SHF_ALLOC,ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000001
@@ -68,7 +68,7 @@ section 5 ".data.rel.ro.local" {
 }
 section 7 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -107,7 +107,7 @@ symbol table section 9 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 4
+            ShNdx: ElfSectionIndex 4
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }
@@ -135,7 +135,7 @@ section 10 ".strtab" {
 }
 section 6 ".rela.data.rel.ro.local" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018

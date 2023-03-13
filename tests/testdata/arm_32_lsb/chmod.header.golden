@@ -12,7 +12,7 @@ Header:   Class:      ELFCLASS32
           PhNum:      9
           ShEntSize:  0x0028
           ShNum:      28
-          ShStrNdx:   SHN_EXT 27
+          ShStrNdx:   ElfSectionIndex 27
 Sections: - N:         0
             Name:      0
             Type:      SHT_NULL
@@ -59,7 +59,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         4
             Name:      52
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     0x00000002
             Addr:      0x000101b4
             Offset:    0x000001b4
@@ -92,7 +92,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         7
             Name:      78
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     0x00000002
             Addr:      0x00010eca
             Offset:    0x00000eca
@@ -103,7 +103,7 @@ Sections: - N:         0
             EntSize:   0x00000002
           - N:         8
             Name:      91
-            Type:      SHT_EXT 1879048190
+            Type:      ElfSectionType 1879048190
             Flags:     0x00000002
             Addr:      0x00010f78
             Offset:    0x00000f78
@@ -191,7 +191,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         16
             Name:      150
-            Type:      SHT_EXT 1879048193
+            Type:      ElfSectionType 1879048193
             Flags:     0x00000082
             Addr:      0x00019ba4
             Offset:    0x00009ba4
@@ -213,7 +213,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         18
             Name:      171
-            Type:      SHT_EXT 14
+            Type:      ElfSectionType 14
             Flags:     0x00000003
             Addr:      0x00029efc
             Offset:    0x00009efc
@@ -224,7 +224,7 @@ Sections: - N:         0
             EntSize:   0x00000000
           - N:         19
             Name:      183
-            Type:      SHT_EXT 15
+            Type:      ElfSectionType 15
             Flags:     0x00000003
             Addr:      0x00029f00
             Offset:    0x00009f00
@@ -301,7 +301,7 @@ Sections: - N:         0
             EntSize:   0x00000001
           - N:         26
             Name:      234
-            Type:      SHT_EXT 1879048195
+            Type:      ElfSectionType 1879048195
             Flags:     0x00000000
             Addr:      0x00000000
             Offset:    0x0000a1af
@@ -322,7 +322,7 @@ Sections: - N:         0
             AddrAlign: 0x00000001
             EntSize:   0x00000000
 Segments: - N:        0
-            Type:     PT_EXT 1879048193
+            Type:     ElfSegmentType 1879048193
             Flags:    [PF_R]
             Offset:   0x00009ba4
             VirtAddr: 0x00019ba4
@@ -385,7 +385,7 @@ Segments: - N:        0
             MemSize:  0x00000044
             Align:    0x00000004
           - N:        7
-            Type:     PT_EXT 1685382481
+            Type:     ElfSegmentType 1685382481
             Flags:    [PF_W,PF_R]
             Offset:   0x00000000
             VirtAddr: 0x00000000
@@ -394,7 +394,7 @@ Segments: - N:        0
             MemSize:  0x00000000
             Align:    0x00000010
           - N:        8
-            Type:     PT_EXT 1685382482
+            Type:     ElfSegmentType 1685382482
             Flags:    [PF_R]
             Offset:   0x00009efc
             VirtAddr: 0x00029efc

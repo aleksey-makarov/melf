@@ -86,7 +86,7 @@ section 9 ".rodata" {
 }
 section 11 ".rodata.cst16.aegis128_const" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_ALLOC,SHF_EXT 16]
+    Flags:     [SHF_ALLOC,ElfSectionFlag 16]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000010
     EntSize:   0x0000000000000020
@@ -97,7 +97,7 @@ section 11 ".rodata.cst16.aegis128_const" {
 }
 section 12 ".rodata.cst16.aegis128_counter" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_ALLOC,SHF_EXT 16]
+    Flags:     [SHF_ALLOC,ElfSectionFlag 16]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000010
     EntSize:   0x0000000000000010
@@ -173,7 +173,7 @@ section 20 ".bss" {
 }
 section 21 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001
@@ -212,7 +212,7 @@ symbol table section 23 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }
@@ -242,7 +242,7 @@ section 24 ".strtab" {
 }
 section 4 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -256,7 +256,7 @@ section 4 ".rela.text" {
 }
 section 6 ".rela.init.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -270,7 +270,7 @@ section 6 ".rela.init.text" {
 }
 section 8 ".rela.exit.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -284,7 +284,7 @@ section 8 ".rela.exit.text" {
 }
 section 10 ".rela.rodata" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -298,7 +298,7 @@ section 10 ".rela.rodata" {
 }
 section 14 ".rela__mcount_loc" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -312,7 +312,7 @@ section 14 ".rela__mcount_loc" {
 }
 section 17 ".rela.data" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018
@@ -326,7 +326,7 @@ section 17 ".rela.data" {
 }
 section 19 ".rela.gnu.linkonce.this_module" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000008
     EntSize:   0x0000000000000018

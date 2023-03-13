@@ -54,7 +54,7 @@ section 5 ".got2" {
 }
 section 7 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -107,7 +107,7 @@ symbol table section 11 ".symtab" {
         symbol "" {
             Bind:  STB_Local
             Type:  STT_Section
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x00000000
             Size:  0x00000000
         }
@@ -137,7 +137,7 @@ section 12 ".strtab" {
 }
 section 2 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c
@@ -151,7 +151,7 @@ section 2 ".rela.text" {
 }
 section 6 ".rela.got2" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c
@@ -161,7 +161,7 @@ section 6 ".rela.got2" {
 }
 section 10 ".rela.eh_frame" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c

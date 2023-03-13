@@ -18,7 +18,7 @@ segment {
         }
         segment table
         section 1 ".gnu.hash" {
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000158
             AddrAlign: 0x0000000000000008
@@ -50,7 +50,7 @@ segment {
                 symbol "" {
                     Bind:  STB_Local
                     Type:  STT_Section
-                    ShNdx: SHN_EXT 8
+                    ShNdx: ElfSectionIndex 8
                     Value: 0x0000000000000d80
                     Size:  0x0000000000000000
                 }
@@ -58,7 +58,7 @@ segment {
                 symbol "_ZN3gnu11autosprintfC1ERKS0_" {
                     Bind:  STB_Global
                     Type:  STT_Func
-                    ShNdx: SHN_EXT 17
+                    ShNdx: ElfSectionIndex 17
                     Value: 0x000000000001fe70
                     Size:  0x000000000000004c
                 }
@@ -79,7 +79,7 @@ segment {
                        total: 697
         }
         section 4 ".gnu.version" {
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     [SHF_ALLOC]
             Addr:      0x00000000000007aa
             AddrAlign: 0x0000000000000002
@@ -93,7 +93,7 @@ segment {
                        total: 62
         }
         section 5 ".gnu.version_r" {
-            Type:      SHT_EXT 1879048190
+            Type:      ElfSectionType 1879048190
             Flags:     [SHF_ALLOC]
             Addr:      0x00000000000007e8
             AddrAlign: 0x0000000000000008
@@ -122,7 +122,7 @@ segment {
         }
         section 7 ".rela.plt" {
             Type:      SHT_RELA
-            Flags:     [SHF_ALLOC,SHF_EXT 64]
+            Flags:     [SHF_ALLOC,ElfSectionFlag 64]
             Addr:      0x0000000000000c60
             AddrAlign: 0x0000000000000008
             EntSize:   0x0000000000000018
@@ -175,7 +175,7 @@ segment {
         }
         section 11 ".rodata" {
             Type:      SHT_PROGBITS
-            Flags:     [SHF_ALLOC,SHF_EXT 16,SHF_EXT 32]
+            Flags:     [SHF_ALLOC,ElfSectionFlag 16,ElfSectionFlag 32]
             Addr:      0x0000000000001520
             AddrAlign: 0x0000000000000008
             EntSize:   0x0000000000000001
@@ -185,7 +185,7 @@ segment {
                        72 69 6e 74 66 29 00                            # rintf).
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x0000000000001538
             PhysAddr:   0x0000000000001538
@@ -231,7 +231,7 @@ segment {
     Align:      0x0000000000010000
     Data:       
         segment {
-            Type:       PT_EXT 1685382482
+            Type:       ElfSegmentType 1685382482
             Flags:      [PF_R]
             VirtAddr:   0x000000000001fb60
             PhysAddr:   0x000000000001fb60
@@ -239,7 +239,7 @@ segment {
             Align:      0x0000000000000001
             Data:       
                 section 14 ".init_array" {
-                    Type:      SHT_EXT 14
+                    Type:      ElfSectionType 14
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x000000000001fb60
                     AddrAlign: 0x0000000000000008
@@ -249,7 +249,7 @@ segment {
                     Data:      00 00 00 00 00 01 fd e0 00 00 00 00 00 01 fe e8 # ................
                 }
                 section 15 ".fini_array" {
-                    Type:      SHT_EXT 15
+                    Type:      ElfSectionType 15
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x000000000001fb70
                     AddrAlign: 0x0000000000000008

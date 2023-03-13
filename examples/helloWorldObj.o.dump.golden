@@ -40,7 +40,7 @@ symbol table section 4 ".symtab" {
         symbol "_start" {
             Bind:  STB_Global
             Type:  STT_NoType
-            ShNdx: SHN_EXT 1
+            ShNdx: ElfSectionIndex 1
             Value: 0x0000000000000000
             Size:  0x0000000000000000
         }

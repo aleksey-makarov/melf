@@ -4,7 +4,7 @@ header {
     OSABI:      ELFOSABI_SYSV
     ABIVersion: 0
     Type:       ET_REL
-    Machine:    EM_EXT 113
+    Machine:    ElfMachine 113
     Entry:      0x00000000
     Flags:      0x00000000
 }
@@ -107,7 +107,7 @@ section 11 ".debug_line" {
 }
 section 13 ".debug_str" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -121,7 +121,7 @@ section 13 ".debug_str" {
 }
 section 14 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x00000000
     AddrAlign: 0x00000001
     EntSize:   0x00000001
@@ -191,7 +191,7 @@ section 18 ".strtab" {
 }
 section 2 ".rela.text" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c
@@ -203,7 +203,7 @@ section 2 ".rela.text" {
 }
 section 7 ".rela.debug_info" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c
@@ -217,7 +217,7 @@ section 7 ".rela.debug_info" {
 }
 section 10 ".rela.debug_aranges" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c
@@ -228,7 +228,7 @@ section 10 ".rela.debug_aranges" {
 }
 section 12 ".rela.debug_line" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c
@@ -238,7 +238,7 @@ section 12 ".rela.debug_line" {
 }
 section 16 ".rela.debug_frame" {
     Type:      SHT_RELA
-    Flags:     [SHF_EXT 64]
+    Flags:     [ElfSectionFlag 64]
     Addr:      0x00000000
     AddrAlign: 0x00000004
     EntSize:   0x0000000c

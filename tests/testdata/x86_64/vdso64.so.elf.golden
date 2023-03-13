@@ -32,7 +32,7 @@ segment {
                        total: 68
         }
         section 2 ".gnu.hash" {
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000168
             AddrAlign: 0x0000000000000008
@@ -64,7 +64,7 @@ segment {
                 symbol "clock_gettime" {
                     Bind:  STB_Weak
                     Type:  STT_Func
-                    ShNdx: SHN_EXT 11
+                    ShNdx: ElfSectionIndex 11
                     Value: 0x0000000000000980
                     Size:  0x00000000000001af
                 }
@@ -72,7 +72,7 @@ segment {
                 symbol "getcpu" {
                     Bind:  STB_Weak
                     Type:  STT_Func
-                    ShNdx: SHN_EXT 11
+                    ShNdx: ElfSectionIndex 11
                     Value: 0x0000000000000b90
                     Size:  0x0000000000000025
                 }
@@ -93,7 +93,7 @@ segment {
                        total: 114
         }
         section 5 ".gnu.version" {
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     [SHF_ALLOC]
             Addr:      0x000000000000034a
             AddrAlign: 0x0000000000000002
@@ -104,7 +104,7 @@ segment {
                        02 00 02 00 02 00 02 00                         # ........
         }
         section 6 ".gnu.version_d" {
-            Type:      SHT_EXT 1879048189
+            Type:      ElfSectionType 1879048189
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000368
             AddrAlign: 0x0000000000000008
@@ -164,7 +164,7 @@ segment {
                 }
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x0000000000000504
             PhysAddr:   0x0000000000000504
@@ -242,7 +242,7 @@ segment {
 }
 section 14 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001

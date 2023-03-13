@@ -7,7 +7,7 @@ segment {
     Align:      0x00001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382481
+            Type:       ElfSegmentType 1685382481
             Flags:      [PF_X,PF_W,PF_R]
             VirtAddr:   0x00000000
             PhysAddr:   0x00000000
@@ -72,7 +72,7 @@ segment {
                   total: 506636
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x00481b68
             PhysAddr:   0x00481b68

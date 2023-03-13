@@ -3,25 +3,25 @@
  │ ┖ 0x0000003f
  │ ┎ 0x00000040 PT (5)
  │ ┖ 0x00000157
- │ ╓ 0x00000158 S1 ".gnu.hash" SHT_EXT 1879048182 [SHF_ALLOC]
+ │ ╓ 0x00000158 S1 ".gnu.hash" ElfSectionType 1879048182 [SHF_ALLOC]
  │ ╙ 0x000002c3
  │ ╓ 0x000002c8 S2 ".dynsym" SHT_DYNSYM [SHF_ALLOC]
  │ ╙ 0x00000627
  │ ╓ 0x00000628 S3 ".dynstr" SHT_STRTAB [SHF_ALLOC]
  │ ╙ 0x00000878
- │ ╓ 0x0000087a S4 ".gnu.version" SHT_EXT 1879048191 [SHF_ALLOC]
+ │ ╓ 0x0000087a S4 ".gnu.version" ElfSectionType 1879048191 [SHF_ALLOC]
  │ ╙ 0x000008c1
- │ ╓ 0x000008c8 S5 ".gnu.version_d" SHT_EXT 1879048189 [SHF_ALLOC]
+ │ ╓ 0x000008c8 S5 ".gnu.version_d" ElfSectionType 1879048189 [SHF_ALLOC]
  │ ╙ 0x0000098f
  │ ╓ 0x00000990 S6 ".rela.dyn" SHT_RELA [SHF_ALLOC]
  │ ╙ 0x00003d7f
- │ ╓ 0x00003d80 S7 ".rela.plt" SHT_RELA [SHF_ALLOC,SHF_EXT 64]
+ │ ╓ 0x00003d80 S7 ".rela.plt" SHT_RELA [SHF_ALLOC,ElfSectionFlag 64]
  │ ╙ 0x00003ddf
  │ ╓ 0x00003de0 S8 ".text" SHT_PROGBITS [SHF_ALLOC,SHF_EXECINSTR]
  │ ╙ 0x00028593
  │ ╓ 0x00028598 S9 ".rodata" SHT_PROGBITS [SHF_ALLOC]
  │ ╙ 0x0002cec3
- │┌─ 0x0002cec4 P PT_EXT 1685382480 [PF_R]
+ │┌─ 0x0002cec4 P ElfSegmentType 1685382480 [PF_R]
  ││╓ 0x0002cec4 S10 ".eh_frame_hdr" SHT_PROGBITS [SHF_ALLOC]
  ││╙ 0x0002d607
  │└─ 0x0002d607
@@ -29,7 +29,7 @@
  │ ╙ 0x00030f83
  └── 0x00030f83
 ┌─── 0x0003dac0 P PT_LOAD [PF_W,PF_R]
-│┌── 0x0003dac0 P PT_EXT 1685382482 [PF_R]
+│┌── 0x0003dac0 P ElfSegmentType 1685382482 [PF_R]
 ││ ╓ 0x0003dac0 S12 ".data.rel.ro" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ││ ╙ 0x0003e61f
 ││┌─ 0x0003e620 P PT_DYNAMIC [PF_W,PF_R]

@@ -7,7 +7,7 @@ segment {
     Align:      0x0000000000001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382481
+            Type:       ElfSegmentType 1685382481
             Flags:      [PF_W,PF_R]
             VirtAddr:   0x0000000000000000
             PhysAddr:   0x0000000000000000
@@ -88,7 +88,7 @@ segment {
                 }
         }
         section 4 ".gnu.hash" {
-            Type:      SHT_EXT 1879048182
+            Type:      ElfSectionType 1879048182
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000000308
             AddrAlign: 0x0000000000000008
@@ -128,7 +128,7 @@ segment {
                 symbol "initialize_itemlist" {
                     Bind:  STB_Global
                     Type:  STT_Func
-                    ShNdx: SHN_EXT 11
+                    ShNdx: ElfSectionIndex 11
                     Value: 0x000000000007f3c0
                     Size:  0x0000000000000013
                 }
@@ -149,7 +149,7 @@ segment {
                        total: 28716
         }
         section 7 ".gnu.version" {
-            Type:      SHT_EXT 1879048191
+            Type:      ElfSectionType 1879048191
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000015654
             AddrAlign: 0x0000000000000002
@@ -163,7 +163,7 @@ segment {
                        total: 3800
         }
         section 8 ".gnu.version_r" {
-            Type:      SHT_EXT 1879048190
+            Type:      ElfSectionType 1879048190
             Flags:     [SHF_ALLOC]
             Addr:      0x0000000000016530
             AddrAlign: 0x0000000000000008
@@ -258,7 +258,7 @@ segment {
                        total: 100448
         }
         segment {
-            Type:       PT_EXT 1685382480
+            Type:       ElfSegmentType 1685382480
             Flags:      [PF_R]
             VirtAddr:   0x00000000000c1860
             PhysAddr:   0x00000000000c1860
@@ -304,7 +304,7 @@ segment {
     Align:      0x0000000000001000
     Data:       
         segment {
-            Type:       PT_EXT 1685382482
+            Type:       ElfSegmentType 1685382482
             Flags:      [PF_R]
             VirtAddr:   0x00000000000d7cd0
             PhysAddr:   0x00000000000d7cd0
@@ -312,7 +312,7 @@ segment {
             Align:      0x0000000000000001
             Data:       
                 section 16 ".init_array" {
-                    Type:      SHT_EXT 14
+                    Type:      ElfSectionType 14
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x00000000000d7cd0
                     AddrAlign: 0x0000000000000008
@@ -322,7 +322,7 @@ segment {
                     Data:      e0 09 02 00 00 00 00 00                         # ........
                 }
                 section 17 ".fini_array" {
-                    Type:      SHT_EXT 15
+                    Type:      ElfSectionType 15
                     Flags:     [SHF_WRITE,SHF_ALLOC]
                     Addr:      0x00000000000d7cd8
                     AddrAlign: 0x0000000000000008
@@ -410,7 +410,7 @@ section 22 ".bss" {
 }
 section 23 ".comment" {
     Type:      SHT_PROGBITS
-    Flags:     [SHF_EXT 16,SHF_EXT 32]
+    Flags:     [ElfSectionFlag 16,ElfSectionFlag 32]
     Addr:      0x0000000000000000
     AddrAlign: 0x0000000000000001
     EntSize:   0x0000000000000001

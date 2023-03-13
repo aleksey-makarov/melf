@@ -4,7 +4,7 @@
 ╙ 0x0000005f
 ╓ 0x00000060 S2 ".text" SHT_PROGBITS [SHF_ALLOC,SHF_EXECINSTR]
 ╙ 0x0000009b
-╓ 0x0000009c S4 ".rodata.cst4" SHT_PROGBITS [SHF_ALLOC,SHF_EXT 16]
+╓ 0x0000009c S4 ".rodata.cst4" SHT_PROGBITS [SHF_ALLOC,ElfSectionFlag 16]
 ╙ 0x0000009f
 ╓ 0x000000a0 S5 ".opd" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ╙ 0x000000b7
@@ -15,19 +15,19 @@
 ╓ 0x000000c8 S10 ".data.rel.ro.local" SHT_PROGBITS [SHF_WRITE,SHF_ALLOC]
 ╙ 0x000000e7
 - 0x000000e8 S12 ".bss" SHT_NOBITS [SHF_WRITE,SHF_ALLOC]
-╓ 0x000000e8 S13 ".comment" SHT_PROGBITS [SHF_EXT 16,SHF_EXT 32]
+╓ 0x000000e8 S13 ".comment" SHT_PROGBITS [ElfSectionFlag 16,ElfSectionFlag 32]
 ╙ 0x0000014a
 ╓ 0x00000150 S14 ".symtab" SHT_SYMTAB []
 ╙ 0x000002ff
 ╓ 0x00000300 S15 ".strtab" SHT_STRTAB []
 ╙ 0x0000034e
-╓ 0x00000350 S3 ".rela.text" SHT_RELA [SHF_EXT 64]
+╓ 0x00000350 S3 ".rela.text" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000037f
-╓ 0x00000380 S6 ".rela.opd" SHT_RELA [SHF_EXT 64]
+╓ 0x00000380 S6 ".rela.opd" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x000003af
-╓ 0x000003b0 S8 ".rela.toc" SHT_RELA [SHF_EXT 64]
+╓ 0x000003b0 S8 ".rela.toc" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x000003c7
-╓ 0x000003c8 S11 ".rela.data.rel.ro.local" SHT_RELA [SHF_EXT 64]
+╓ 0x000003c8 S11 ".rela.data.rel.ro.local" SHT_RELA [ElfSectionFlag 64]
 ╙ 0x0000040f
 ╓ 0x00000410 S16 ".shstrtab" SHT_STRTAB []
 ╙ 0x00000490

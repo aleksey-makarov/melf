@@ -16,12 +16,11 @@ newNamePE s = do
     n <- newName s
     return (varP n, varE n)
 
-mkDeclarations :: BaseWord -> String -> String -> String -> [(String, Integer, String)] -> Q [Dec]
-mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameString enums = do
+mkDeclarations :: BaseWord -> String -> String -> [(String, Integer, String)] -> Q [Dec]
+mkDeclarations baseType typeNameString patternPrefixString enums = do
 
     let typeName = mkName typeNameString
     let patternName s = mkName (patternPrefixString ++ s)
-    let defaultPatternName = mkName defaultPatternNameString
     let
         baseTypeT :: Q Type
         baseTypeT =
@@ -66,7 +65,7 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
         defaultShowClause =
             clause
                 [ conP typeName [nP] ]
-                (normalB [| defaultPatternNameString ++ " " ++ show $(nE) |])
+                (normalB [| typeNameString ++ " " ++ show $(nE) |])
                 []
 
     let showInstanceFunctions = funD (mkName "show") (showClauses ++ [ defaultShowClause ])
@@ -144,27 +143,9 @@ mkDeclarations baseType typeNameString patternPrefixString defaultPatternNameStr
                 (conP typeName [litP $ IntegerL n])
             ]
 
-        mkPatternDocs (s, _, doc) = putDoc (DeclDoc $ patternName s) doc
+    let mkPatternDocs (s, _, doc) = putDoc (DeclDoc $ patternName s) doc
 
-    let
-        defaultPatternSig =
-            patSynSigD
-                defaultPatternName
-                (appT (appT arrowT baseTypeT) (conT typeName))
-
-    localName3 <- newName "n"
-
-    let
-        defaultPatternDef :: Q Dec
-        defaultPatternDef =
-            patSynD
-                defaultPatternName
-                (prefixPatSyn [localName3])
-                implBidir
-                (conP typeName [varP localName3])
-
-    let patterns = join (map mkPatterns enums) ++ [ defaultPatternSig, defaultPatternDef ]
+    let patterns = join (map mkPatterns enums)
 
     mapM_ (addModFinalizer . mkPatternDocs) enums
-    addModFinalizer $ putDoc (DeclDoc defaultPatternName) "default"
     sequence $ newTypeDef : showInstance : patterns ++ binaryInstances
