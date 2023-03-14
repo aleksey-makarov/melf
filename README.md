@@ -7,12 +7,12 @@
 ## Parsing the header and table entries
 
 Module
-[`Data.Elf.Headers`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html)
+[`Data.Elf.Headers`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html)
 implements parsing and serialization of the ELF file header and the entries of section and segment tables.
 
 ELF files come in two flavors: 64-bit and 32-bit.
 To differentiate between them type
-[`ElfClass`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:ElfClass)
+[`ElfClass`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#t:ElfClass)
 is defined:
 
 ``` Haskell
@@ -22,17 +22,26 @@ data ElfClass
     deriving (Eq, Show)
 ```
 
+[Singleton](https://blog.jle.im/entry/introduction-to-singletons-1.html)
+types for `ElfClass` are also defined:
+
+``` Haskell
+-- | Singletons for ElfClass
+data SingElfClass :: ElfClass -> Type where
+    SELFCLASS32 :: SingElfClass 'ELFCLASS32  -- ^ Singleton for `ELFCLASS32`
+    SELFCLASS64 :: SingElfClass 'ELFCLASS64  -- ^ Singleton for `ELFCLASS64`
+```
+
 Some fields of the header and table entries have different bitwidth for 64-bit and 32-bit files.
 So the type
-[`WordXX a`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:WordXX)
+[`WordXX a`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#t:WordXX)
 was borrowed from the `data-elf` package:
 
 ``` Haskell
--- | @IsElfClass a@ is defined for each constructor of `ElfClass`.
---   It defines @WordXX a@, which is `Word32` for `ELFCLASS32`
---   and `Word64` for `ELFCLASS64`.
-class ( SingI c
-      , Typeable c
+-- | @SingElfClassI a@ is defined for each constructor of `ElfClass`.
+--   It defines @WordXX a@, which is `Word32` for `ELFCLASS32` and `Word64` for `ELFCLASS64`.
+--   Also it defines singletons for each of the `ElfClass` type.
+class ( Typeable c
       , Typeable (WordXX c)
       , Data (WordXX c)
       , Show (WordXX c)
@@ -48,18 +57,21 @@ class ( SingI c
       , FiniteBits (WordXX c)
       , Binary (Be (WordXX c))
       , Binary (Le (WordXX c))
-      ) => IsElfClass c where
+      ) => SingElfClassI (c :: ElfClass) where
     type WordXX c = r | r -> c
+    singElfClass :: SingElfClass c
 
-instance IsElfClass 'ELFCLASS32 where
+instance SingElfClassI 'ELFCLASS32 where
     type WordXX 'ELFCLASS32 = Word32
+    singElfClass = SELFCLASS32
 
-instance IsElfClass 'ELFCLASS64 where
+instance SingElfClassI 'ELFCLASS64 where
     type WordXX 'ELFCLASS64 = Word64
+    singElfClass = SELFCLASS64
 ```
 
 The header of the ELF file is represented with the type
-[`HeaderXX a`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:HeaderXX):
+[`HeaderXX a`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#t:HeaderXX):
 
 ``` Haskell
 -- | Parsed ELF header
@@ -84,23 +96,18 @@ data HeaderXX c =
 
 So we have two types `HeaderXX 'ELFCLASS64` and `HeaderXX 'ELFCLASS32`.
 To be able to work with headers uniformly the type
-[`Header`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:Header)
+[`Header`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#t:Header)
 was introduced:
 
 ``` Haskell
--- | Sigma type where `ElfClass` defines the type of `HeaderXX`
-type Header = Sigma ElfClass (TyCon1 HeaderXX)
+-- | Header is a sigma type where the first entry defines the type of the second one
+data Header = forall a . Header (SingElfClass a) (HeaderXX a)
 ```
 
 `Header` is a pair.
-The first element is an object of the type `ElfClass` defining the width of the word.
+The first element is an object of the type `SingElfClass` defining the width of the word.
 The second element is `HeaderXX` parametrized with the first element (i. e. Σ-type from
 the languages with dependent types).
-To simulate Σ-types the library
-`singletons`
-([Hackage](https://hackage.haskell.org/package/singletons),
- ["Introduction to singletons"](https://blog.jle.im/entry/introduction-to-singletons-1.html))
-was used.
 
 `Header` is an instance of the
 [`Binary`](https://hackage.haskell.org/package/binary-0.10.0.0/docs/Data-Binary.html#t:Binary)
@@ -110,13 +117,12 @@ So given a lazy bytestring containing large enough initial part of ELF file one 
 that file with a function like this:
 
 ``` Haskell
-withHeader ::                     BSL.ByteString ->
-    (forall a . IsElfClass a => HeaderXX a -> b) -> Either String b
+withHeader ::                        BSL.ByteString ->
+    (forall a . SingElfClassI a => HeaderXX a -> b) -> Either String b
 withHeader bs f =
     case decodeOrFail bs of
         Left (_, _, err) -> Left err
-        Right (_, _, (classS :&: hxx) :: Header) ->
-            Right $ withElfClass classS f hxx
+        Right (_, _, (Header sing hxx)) -> Right $ withSingElfClassI sing f hxx
 ```
 
 The function
@@ -124,50 +130,51 @@ The function
 is defined in the package
 [`binary`](https://hackage.haskell.org/package/binary).
 The function
-[`withElfClass`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#v:withElfClass)
+[`withSingElfClassI`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#v:withSingElfClassI)
 creates a context with an implicit word width available and looks like
 [`withSingI`](https://hackage.haskell.org/package/singletons-3.0.1/docs/Data-Singletons.html#v:withSingI):
 
 
 ``` Haskell
--- | Convenience function for creating a
--- context with an implicit ElfClass available.
-withElfClass :: Sing c -> (IsElfClass c => a) -> a
-withElfClass SELFCLASS64 x = x
-withElfClass SELFCLASS32 x = x
+-- | Convenience function for creating a context with an implicit singleton available.
+withSingElfClassI :: SingElfClass c -> (SingElfClassI c => r) -> r
+withSingElfClassI SELFCLASS64 x = x
+withSingElfClassI SELFCLASS32 x = x
 ```
 
 The module `Data.Elf.Headers` also defines the types
-[`SectionXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:SectionXX),
-[`SegmentXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:SegmentXX) and
-[`SymbolXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf-Headers.html#t:SymbolXX)
+[`SectionXX`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#t:SectionXX),
+[`SegmentXX`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#t:SegmentXX) and
+[`SymbolXX`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf-Headers.html#t:SymbolXX)
 for the elements of section, segment and symbol tables.
 
 ## Parsing the whole ELF file
 
 The module
-[`Data.Elf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html)
+[`Data.Elf`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html)
 implements parsing and serialization of the whole ELF files.
 To parse ELF file it reads ELF header, section table and segment table and uses that data to create
 a list of type
-[`ElfListXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#t:ElfListXX)
+[`ElfListXX`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html#t:ElfListXX)
 of elements of the type
-[`ElfXX`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#t:ElfXX)
+[`ElfXX`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html#t:ElfXX)
 representing the recursive structure of the ELF file.
 It also restores section names from the the string table indexes.
 That results in creating an object of type
-[`Elf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#t:Elf):
+[`Elf`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html#t:Elf):
 
 ``` Haskell
 -- | `Elf` is a forrest of trees of type `ElfXX`.
 -- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
 data ElfNodeType = Header | SectionTable | SegmentTable | Section | Segment | RawData | RawAlign
+
+-- | List of ELF nodes.
 data ElfListXX c where
     ElfListCons :: ElfXX t c -> ElfListXX c -> ElfListXX c
     ElfListNull :: ElfListXX c
 
--- | Elf is a sigma type where `ElfClass` defines the type of `ElfList`
-type Elf = Sigma ElfClass (TyCon1 ElfListXX)
+-- | Elf is a sigma type where the first entry defines the type of the second one
+data Elf = forall a . Elf (SingElfClass a) (ElfListXX a)
 
 -- | Section data may contain a string table.
 -- If a section contains a string table with section names, the data
@@ -230,6 +237,9 @@ data ElfXX t c where
         , eaAlign  :: WordXX c -- ^ Align module
         } -> ElfXX 'RawAlign c
 
+infixr 9 ~:
+
+-- | Helper for `ElfListCons`
 (~:) :: ElfXX t a -> ElfListXX a -> ElfListXX a
 (~:) = ElfListCons
 ```
@@ -252,9 +262,9 @@ Not each object of that type can be serialized.
     node `ElfSegmentTable`.
 
 Correctly composed ELF object can be serialized with the function
-[`serializeElf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:serializeElf)
+[`serializeElf`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html#v:serializeElf)
 and parsed with the function
-[`parseElf`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:parseElf):
+[`parseElf`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html#v:parseElf):
 
 ``` Haskell
 serializeElf :: MonadThrow m => Elf -> m ByteString
@@ -298,7 +308,7 @@ helloWorld :: MonadCatch m => StateT CodeState m ()
 Function `assemble` uses the `melf` library to generate an object file:
 
 ``` Haskell
-    return $ SELFCLASS64 :&:
+    return $ Elf SELFCLASS64 $
         ElfHeader
             { ehData       = ELFDATA2LSB
             , ehOSABI      = ELFOSABI_SYSV
@@ -417,9 +427,9 @@ for position-independent code that does not refer to external translation units,
 for example, it works with the code described above.
 
 Function `dummyLd` consumes an object of the type `Elf` and finds a section `.text`
-(using [`elfFindSectionByName`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:elfFindSectionByName))
+(using [`elfFindSectionByName`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html#v:elfFindSectionByName))
 and header
-(using [`elfFindHeader`](https://hackage.haskell.org/package/melf-1.2.0/docs/Data-Elf.html#v:elfFindHeader))
+(using [`elfFindHeader`](https://hackage.haskell.org/package/melf-1.3.0/docs/Data-Elf.html#v:elfFindHeader))
 in it.
 Then the header type is changed to `ET_EXEC`, the address of the first executable instruction is specified and
 a loadable segment containing the header and the content of `.text` is formed:
@@ -432,12 +442,12 @@ data MachineConfig a
                                 --   in physical memory (depends on max page size)
         }
 
-getMachineConfig :: (IsElfClass a, MonadThrow m) => ElfMachine -> m (MachineConfig a)
+getMachineConfig :: (SingElfClassI a, MonadThrow m) => ElfMachine -> m (MachineConfig a)
 getMachineConfig EM_AARCH64 = return $ MachineConfig 0x400000 0x10000
 getMachineConfig EM_X86_64  = return $ MachineConfig 0x400000 0x1000
 getMachineConfig _          = $chainedError "could not find machine config for this arch"
 
-dummyLd' :: forall a m . (MonadThrow m, IsElfClass a) => ElfListXX a -> m (ElfListXX a)
+dummyLd' :: forall a m . (MonadThrow m, SingElfClassI a) => ElfListXX a -> m (ElfListXX a)
 dummyLd' es = do
 
     section' <- elfFindSectionByName es ".text"
@@ -478,7 +488,7 @@ dummyLd' es = do
 -- into the loadable segment of the resulting ELF.
 -- This could work if there are no relocations or references to external symbols.
 dummyLd :: MonadThrow m => Elf -> m Elf
-dummyLd (c :&: l) = (c :&:) <$> withElfClass c dummyLd' l
+dummyLd (Elf c l) = Elf c <$> withSingElfClassI c dummyLd' l
 ```
 
 Try to use this code to produce executable file without GNU linker:
