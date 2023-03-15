@@ -22,20 +22,20 @@ jobs:
 
     # TODO: use cache with all the derivations
 
-    - run: nix-build --argstr compilerVersion ghc884
-    - run: nix-shell --argstr compilerVersion ghc884  --run "ghc --version"
+    - run: nix-build --argstr compilerVersion ghc88
+    - run: nix-shell --argstr compilerVersion ghc88  --run "ghc --version"
 
-    - run: nix-build --argstr compilerVersion ghc8107
-    - run: nix-shell --argstr compilerVersion ghc8107 --run "ghc --version"
+    - run: nix-build --argstr compilerVersion ghc810
+    - run: nix-shell --argstr compilerVersion ghc810 --run "ghc --version"
 
-    - run: nix-build --argstr compilerVersion ghc902
-    - run: nix-shell --argstr compilerVersion ghc902 --run "ghc --version"
+    - run: nix-build --argstr compilerVersion ghc90
+    - run: nix-shell --argstr compilerVersion ghc90 --run "ghc --version"
 
-    - run: nix-build --argstr compilerVersion ghc924
-    - run: nix-shell --argstr compilerVersion ghc924  --run "ghc --version"
+    - run: nix-build --argstr compilerVersion ghc92
+    - run: nix-shell --argstr compilerVersion ghc92  --run "ghc --version"
 
-    - run: nix-build --argstr compilerVersion ghc925
-    - run: nix-shell --argstr compilerVersion ghc925 --run "ghc --version"
+    - run: nix-build --argstr compilerVersion ghc94
+    - run: nix-shell --argstr compilerVersion ghc94 --run "ghc --version"
 
-    - run: nix-build --argstr compilerVersion ghc944
-    - run: nix-shell --argstr compilerVersion ghc944  --run "ghc --version"
+    # - run: nix-build --argstr compilerVersion ghc96
+    # - run: nix-shell --argstr compilerVersion ghc96  --run "ghc --version"

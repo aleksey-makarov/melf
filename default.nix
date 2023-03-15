@@ -2,12 +2,12 @@
 # - nix-shell --argstr compilerVersion ghc94
 # - or just uncomment below
 
-# { compilerVersion ? "ghc884"  }:
-# { compilerVersion ? "ghc8107" }:
-# { compilerVersion ? "ghc902"  }:
-  { compilerVersion ? "ghc924"  }: # default
-# { compilerVersion ? "ghc925"  }:
-# { compilerVersion ? "ghc944"  }:
+# { compilerVersion ? "ghc88"  }: # 8.8.4
+# { compilerVersion ? "ghc810" }: # 8.10.7
+# { compilerVersion ? "ghc90"  }: # 9.0.2
+  { compilerVersion ? "ghc92"  }: # 9.2.7 default
+# { compilerVersion ? "ghc94"  }: # 9.4.4
+# { compilerVersion ? "ghc96"  }: # 9.6.1
 let
   sources = import ./nix/sources.nix;
   pkgs = import sources.nixpkgs { };
