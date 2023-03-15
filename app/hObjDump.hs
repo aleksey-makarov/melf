@@ -31,7 +31,6 @@ opts = info (opts' <**> helper)
   <> header "hobjdump - dump ELF files"
   )
 
--- FIXME: use instance Binary Elf'
 printFile :: Bool -> String -> IO ()
 printFile full fileName = do
     bs <- fromStrict <$> BS.readFile fileName
