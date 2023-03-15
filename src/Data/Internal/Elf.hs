@@ -212,7 +212,7 @@ rBuilderInterval RBuilderSegmentTable{..} = segmentTableInterval rbptHeader
 rBuilderInterval RBuilderSection{..}      = sectionInterval rbsHeader
 rBuilderInterval RBuilderSegment{..}      = segmentInterval rbpHeader
 rBuilderInterval RBuilderRawData{..}      = rbrdInterval
-rBuilderInterval RBuilderRawAlign{}       = undefined -- FIXME
+rBuilderInterval RBuilderRawAlign{}       = error "Internal error: rBuilderInterval is not defined for RBuilderRawAlign"
 
 findInterval :: (Ord t, Num t) => (a -> Interval t) -> t -> [a] -> LZip a
 findInterval f e = findInterval' []
