@@ -4,7 +4,9 @@ import Control.Monad.Fix
 import Control.Monad.Catch
 import Data.Bits
 import Data.ByteString.Lazy as BSL
+import GHC.IO.Encoding (setLocaleEncoding)
 import System.FilePath
+import System.IO
 import System.Posix.Files
 import Test.Tasty
 import Test.Tasty.Golden
@@ -61,8 +63,10 @@ testElf elfFileName elf =
         l = t </> elfFileName <.> "layout"
 
 main :: IO ()
-main = defaultMain $ testGroup "examples"
-    (  testElf "helloWorldObj.o" helloWorldObj
-    ++ testElf "helloWorldExe"   helloWorldExe
-    ++ testElf "forwardLabelExe" forwardLabelExe
-    )
+main = do
+    setLocaleEncoding utf8
+    defaultMain $ testGroup "examples"
+        (  testElf "helloWorldObj.o" helloWorldObj
+        ++ testElf "helloWorldExe"   helloWorldExe
+        ++ testElf "forwardLabelExe" forwardLabelExe
+        )

@@ -8,10 +8,10 @@ import Control.Exception.ChainedException
 
 import Control.Exception hiding (try)
 import Control.Monad.Catch
+import GHC.IO.Encoding (setLocaleEncoding)
+import System.IO
 import Test.Tasty
 import Test.Tasty.HUnit
-
---------------------------------------------
 
 f :: IO ()
 f = $chainedError "some error"
@@ -54,14 +54,16 @@ checkExceptions m s = try m >>= \ case
     Left (e :: SomeException)  -> show e @?= s
 
 main :: IO ()
-main = defaultMain $ testGroup "exceptions" [ testCase "f"    $ checkExceptions f    "some error (tests/exceptions/Exceptions.hs:17)"
-                                            , testCase "f'"   $ checkExceptions f'   "(tests/exceptions/Exceptions.hs:20)"
-                                            , testCase "fe"   $ checkExceptions fe   "TestException"
-                                            , testCase "f1"   $ checkExceptions f1   "some context (tests/exceptions/Exceptions.hs:29) // some error (tests/exceptions/Exceptions.hs:17)"
-                                            , testCase "f1'"  $ checkExceptions f1'  "(tests/exceptions/Exceptions.hs:32) // some error (tests/exceptions/Exceptions.hs:17)"
-                                            , testCase "fe'"  $ checkExceptions fe'  "(tests/exceptions/Exceptions.hs:35) // TestException"
-                                            , testCase "fe'e" $ checkExceptions fe'e "some context 2 (tests/exceptions/Exceptions.hs:38) // (tests/exceptions/Exceptions.hs:35) // TestException"
-                                            , testCase "fmb"  $ checkExceptions fmb  "some context 3 (tests/exceptions/Exceptions.hs:41)"
-                                            , testCase "fmb'" $ checkExceptions fmb' "(tests/exceptions/Exceptions.hs:44)"
-                                            , testCase "fei'" $ checkExceptions fei' "some error description 4 (tests/exceptions/Exceptions.hs:47)"
-                                            ]
+main = do
+    setLocaleEncoding utf8
+    defaultMain $ testGroup "exceptions" [ testCase "f"    $ checkExceptions f    "some error (tests/exceptions/Exceptions.hs:17)"
+                                         , testCase "f'"   $ checkExceptions f'   "(tests/exceptions/Exceptions.hs:20)"
+                                         , testCase "fe"   $ checkExceptions fe   "TestException"
+                                         , testCase "f1"   $ checkExceptions f1   "some context (tests/exceptions/Exceptions.hs:29) // some error (tests/exceptions/Exceptions.hs:17)"
+                                         , testCase "f1'"  $ checkExceptions f1'  "(tests/exceptions/Exceptions.hs:32) // some error (tests/exceptions/Exceptions.hs:17)"
+                                         , testCase "fe'"  $ checkExceptions fe'  "(tests/exceptions/Exceptions.hs:35) // TestException"
+                                         , testCase "fe'e" $ checkExceptions fe'e "some context 2 (tests/exceptions/Exceptions.hs:38) // (tests/exceptions/Exceptions.hs:35) // TestException"
+                                         , testCase "fmb"  $ checkExceptions fmb  "some context 3 (tests/exceptions/Exceptions.hs:41)"
+                                         , testCase "fmb'" $ checkExceptions fmb' "(tests/exceptions/Exceptions.hs:44)"
+                                         , testCase "fei'" $ checkExceptions fei' "some error description 4 (tests/exceptions/Exceptions.hs:47)"
+                                         ]
