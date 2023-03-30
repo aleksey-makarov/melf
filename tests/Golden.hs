@@ -24,6 +24,7 @@ import Data.ByteString.Lazy as BSL
 import Data.Foldable as F
 -- import Data.Functor.Identity
 import Data.Int
+import GHC.IO.Encoding (setLocaleEncoding)
 import Prettyprinter
 import Prettyprinter.Render.Text
 import System.Directory
@@ -247,6 +248,8 @@ elfsForHeader = [ "testdata/orig/bloated"
 
 main :: IO ()
 main = do
+
+    setLocaleEncoding utf8
 
     elfs <- traverseDir "testdata" isElf
 
