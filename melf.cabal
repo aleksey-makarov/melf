@@ -1,6 +1,6 @@
 cabal-version: 1.18
 
--- This file has been generated from package.yaml by hpack version 0.35.1.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
@@ -76,9 +76,9 @@ library
     , bytestring >=0.10.10 && <0.12
     , exceptions >=0.10.4 && <0.11
     , lens >=5.0.1 && <5.3
-    , mtl >=2.2.2 && <2.3
+    , mtl >=2.2.2 && <2.4
     , prettyprinter >=1.7.0 && <1.8
-    , template-haskell >=2.15 && <2.20
+    , template-haskell >=2.15 && <2.21
   default-language: Haskell2010
 
 executable hobjdump
@@ -135,7 +135,7 @@ test-suite examples
     , tasty
     , tasty-golden
     , tasty-hunit
-    , unix >=2.7.2.2 && <2.8
+    , unix >=2.7.2.2 && <2.9
   default-language: Haskell2010
 
 test-suite exceptions
