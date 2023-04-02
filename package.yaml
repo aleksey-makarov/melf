@@ -86,7 +86,6 @@ tests:
       - tasty
       - tasty-golden
       - tasty-hunit
-      - unix >= 2.7.2.2 && < 2.9
 
 executables:
   hobjdump:
