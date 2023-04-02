@@ -135,7 +135,6 @@ test-suite examples
     , tasty
     , tasty-golden
     , tasty-hunit
-    , unix >=2.7.2.2 && <2.9
   default-language: Haskell2010
 
 test-suite exceptions
