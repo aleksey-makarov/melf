@@ -233,7 +233,7 @@ instance SingElfClassI 'ELFCLASS64 where
     singElfClass = SELFCLASS64
 
 -- | Convenience function for creating a context with an implicit singleton available.
---   See also [@withSing@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:withSingI)
+--   See also [@withSingI@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:withSingI)
 withSingElfClassI :: SingElfClass c -> (SingElfClassI c => r) -> r
 withSingElfClassI SELFCLASS64 x = x
 withSingElfClassI SELFCLASS32 x = x
@@ -241,7 +241,7 @@ withSingElfClassI SELFCLASS32 x = x
 -- | A convenience function useful when we need to name a singleton value multiple times.
 --   Without this function, each use of sing could potentially refer to a different singleton,
 --   and one has to use type signatures (often with ScopedTypeVariables) to ensure that they are the same.
---   See also [@withSingI@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:withSing)
+--   See also [@withSing@](https://hackage.haskell.org/package/singletons-3.0.2/docs/Data-Singletons.html#v:withSing)
 withSingElfClass :: SingElfClassI c => (SingElfClass c -> r) -> r
 withSingElfClass f = f singElfClass
 
