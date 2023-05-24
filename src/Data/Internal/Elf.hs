@@ -783,12 +783,12 @@ serializeElf' elfs = do
             wbsDataReversed %= (WBuilderDataHeader :)
             wbsOffset += headerSize elfClass
         elf2WBuilder ElfSectionTable = do
-            alignWord
+            alignWord -- FIXME: Don't hardcode this.  Instead use ElfRawAlign when parsing
             use wbsOffset >>= assign wbsShOff
             wbsDataReversed %= (WBuilderDataSectionTable :)
             wbsOffset += (sectionN + 1) * sectionTableEntrySize elfClass
         elf2WBuilder ElfSegmentTable = do
-            alignWord
+            alignWord -- <- FIXME: Ditto
             use wbsOffset >>= assign wbsPhOff
             wbsDataReversed %= (WBuilderDataSegmentTable :)
             wbsOffset += segmentN * segmentTableEntrySize elfClass
@@ -798,7 +798,7 @@ serializeElf' elfs = do
             -- I don't see any sense in aligning NOBITS section data
             -- still gcc does it for .o files
             when (esType /= SHT_NOBITS || (ehType header') == ET_REL) do
-                align 0 esAddrAlign
+                align 0 esAddrAlign -- <- FIXME: Don't hardcode this, use ElfRawAlign
             (n, ns) <- uses wbsNameIndexes \case
                 n' : ns' -> (n', ns')
                 _ -> error "internal error: different number of sections in two iterations"
