@@ -480,4 +480,8 @@ section 30 ".strtab" {
                total: 891
 }
 string table section 28 ".shstrtab"
+raw align {
+    Offset: 0x00000000
+    Align:  0x00000004
+}
 section table

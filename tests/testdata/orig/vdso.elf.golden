@@ -268,4 +268,8 @@ section 15 ".comment" {
                33 2e 30 00                                     # 3.0.
 }
 string table section 16 ".shstrtab"
+raw align {
+    Offset: 0x0000000000000000
+    Align:  0x0000000000000008
+}
 section table

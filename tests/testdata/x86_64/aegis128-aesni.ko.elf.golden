@@ -337,4 +337,8 @@ section 19 ".rela.gnu.linkonce.this_module" {
                01 00 00 00 34 00 00 00 00 00 00 00 00 00 00 00 # ....4...........
 }
 string table section 25 ".shstrtab"
+raw align {
+    Offset: 0x0000000000000000
+    Align:  0x0000000000000008
+}
 section table

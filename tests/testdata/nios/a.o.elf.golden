@@ -248,4 +248,8 @@ section 16 ".rela.debug_frame" {
                0c 02 00 00 00 00 00 00                         # ........
 }
 string table section 19 ".shstrtab"
+raw align {
+    Offset: 0x00000000
+    Align:  0x00000004
+}
 section table

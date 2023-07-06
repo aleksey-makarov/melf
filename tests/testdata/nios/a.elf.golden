@@ -271,4 +271,8 @@ section 17 ".strtab" {
                total: 2635
 }
 string table section 18 ".shstrtab"
+raw align {
+    Offset: 0x00000000
+    Align:  0x00000004
+}
 section table

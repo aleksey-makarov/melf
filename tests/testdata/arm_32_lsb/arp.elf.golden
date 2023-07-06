@@ -423,4 +423,8 @@ section 26 ".ARM.attributes" {
                total: 53
 }
 string table section 27 ".shstrtab"
+raw align {
+    Offset: 0x00000000
+    Align:  0x00000004
+}
 section table

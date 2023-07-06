@@ -61,4 +61,8 @@ section 5 ".note.GNU-stack" {
     Data:      
 }
 string table section 6 ".shstrtab"
+raw align {
+    Offset: 0x0000000000000000
+    Align:  0x0000000000000008
+}
 section table

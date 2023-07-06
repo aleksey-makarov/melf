@@ -319,4 +319,8 @@ section 15 ".rela__patchable_function_entries" {
                total: 4
 }
 string table section 25 ".shstrtab"
+raw align {
+    Offset: 0x0000000000000000
+    Align:  0x0000000000000008
+}
 section table

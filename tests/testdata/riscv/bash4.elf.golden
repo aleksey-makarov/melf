@@ -425,4 +425,8 @@ section 26 ".gnu_debuglink" {
     Data:      62 61 73 68 34 2e 64 65 62 75 67 00 7e 0c 51 7a # bash4.debug.~.Qz
 }
 string table section 27 ".shstrtab"
+raw align {
+    Offset: 0x0000000000000000
+    Align:  0x0000000000000008
+}
 section table

@@ -439,46 +439,62 @@ tail' :: [a] -> [a]
 tail' [] = []
 tail' (_ : xs) = xs
 
+-- a: alignment
+-- m: alignment module (a power of 2)
+-- x: current address
+-- returns the smallest position x' such that (x <= x') && (x' mod m == a)
 nextOffset :: SingElfClassI a => WordXX a -> WordXX a -> WordXX a -> WordXX a
-nextOffset _ 0 a = a
-nextOffset t m a | m .&. (m - 1) /= 0 = error $ "align module is not power of two " ++ show m
-                 | otherwise          = if a' + t' < a then a' + m + t' else a' + t'
+nextOffset _ 0 x = x
+nextOffset a m x | m .&. (m - 1) /= 0 = error $ "align module is not power of two " ++ show m
+                 | otherwise          = if x' + a' < x then x' + m + a' else x' + a'
     where
-        a' = a .&. complement (m - 1)
-        t' = t .&. (m - 1)
+        x' = x .&. complement (m - 1)
+        a' = a .&. (m - 1)
 
+-- | bs: the contents of the ELF file
+-- | rBuilders: the ELF tree that does not contain any RBuilderRawData or RBuilderRawAlign
+-- |            that are required to restore the original ELF file
+-- | returns rBuilder's that could be restored into the original ELF file modulo section numeration
 addRawData :: forall a . SingElfClassI a => BSL.ByteString -> [RBuilder a] -> [RBuilder a]
-addRawData _ [] = []
-addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
+-- addRawData _ [] = []
+addRawData bs rBuilders = snd $ addRawData' 0 (lrbib + lrbis, rBuilders)
     where
 
-        -- e, e', ee and lrbie stand for the first occupied byte after the place being fixed
-        -- lrbi: last rBuilder interval (begin, size)
-        lrbi@(I lrbib lrbis) = rBuilderInterval $ L.last rBuilders
-        lrbie = if I.empty lrbi then lrbib else lrbib + lrbis
+        -- | the last rBuilder interval (begin, size)
+        (I lrbib lrbis) = rBuilderInterval $ L.last rBuilders
 
         allEmpty :: WordXX a -> WordXX a -> Bool
         allEmpty b s = BSL.all (== 0) bs'
             where
                 bs' = cut bs (fromIntegral b) (fromIntegral s)
 
+        -- alignHint: max alignment of the container segments
+        -- e:         the first byte after the last element of rbs
+        -- rbs:       the content of ELF file or of a segment
+        -- returns (e', rbs') where rbs' is rbs with raw data inserted and
+        --                            e' is fixed e
+        -- how it is fixed: there may be some data in the segment between e and the end of the
+        --                  current segment.  When that data is added into rbs,
+        --                  the minimum e' such that all data from this position to the end
+        --                  of the current segment is empty
         addRawData' :: WordXX a -> (WordXX a, [RBuilder a]) -> (WordXX a, [RBuilder a])
         addRawData' alignHint (e, rbs) = L.foldr f (e, []) $ fmap fixRBuilder rbs
             where
+
                 f rb (e', rbs') =
                     let
-                        i@(I b s) = rBuilderInterval rb
-                        b' = if I.empty i then b else b + s
+                        rbi@(I b s) = rBuilderInterval rb
+                        b' = if I.empty rbi then b else b + s
                         rbs'' = addRaw b' e' rbs'
                     in
                         (b, rb : rbs'')
 
                 fixRBuilder :: RBuilder a -> RBuilder a
-                fixRBuilder p | I.empty $ rBuilderInterval p = p
-                fixRBuilder p@RBuilderSegment{..} =
+                fixRBuilder x | I.empty $ rBuilderInterval x = x
+                fixRBuilder x@RBuilderSegment{..} =
                     RBuilderSegment{ rbpData = addRaw b ee' rbs', ..}
                         where
-                            (I b s) = rBuilderInterval p
+                            (I b s) = rBuilderInterval x
                             ee = b + s
                             alignHint' = max (pAlign rbpHeader) alignHint
                             (ee', rbs') = addRawData' alignHint' (ee, rbpData)
@@ -498,24 +514,44 @@ addRawData bs rBuilders = snd $ addRawData' 0 (lrbie, rBuilders)
                                     -- than is required by alignment rules (e')
                                     if e' < ee && e'' == ee
                                         then
-                                            RBuilderRawAlign ee alignHint : rbs'
+                                            RBuilderRawAlign eAddr eAlignHint : rbs'
                                         else
                                             rbs'
                         else
                             rbs'
                     where
+                        wordSizeA = wordSize $ fromSingElfClass $ singElfClass @a
                         s = ee - b
+
                         eAddr = case rbs' of
                             (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pVirtAddr
                             _ -> 0
-                        eAddrAlign = case rbs' of
+
+                        eAlign = case rbs' of
                             (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pAlign
                             (RBuilderSection{rbsHeader = SectionXX{..}} : _) -> sAddrAlign
-                            _ -> wordSize $ fromSingElfClass $ singElfClass @a
+                            -- (RBuilderSectionTable{..} : _) -> 0
+                            -- (RBuilderSegmentTable{..} : _) -> 0
+                            -- _ -> wordSize $ fromSingElfClass $ singElfClass @a
+                            _ -> 0
+
+                        eAddrHint = case rbs' of
+                            (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pVirtAddr
+                            (RBuilderSection{rbsHeader = SectionXX{..}} : _) -> sAddr
+                            _ -> 0
+
+                        eAlignHint = case rbs' of
+                            (RBuilderSegment{rbpHeader = SegmentXX{..}} : _) -> pAlign
+                            (RBuilderSection{rbsHeader = SectionXX{..}} : _) -> sAddrAlign
+                            (RBuilderSectionTable{} : _)                     -> wordSizeA
+                            (RBuilderSegmentTable{} : _)                     -> wordSizeA
+                            []                                               -> alignHint
+                            _                                                -> 0
+
                         -- e' here is the address of the next section/segment
                         -- according to the regular alignment rules
-                        e' = nextOffset eAddr eAddrAlign b
-                        e'' = nextOffset ee alignHint b
+                        e'  = nextOffset eAddr     eAlign      b
+                        e'' = nextOffset eAddrHint eAlignHint  b
 
 infix 9 !!?
 
@@ -758,8 +794,8 @@ serializeElf' elfs = do
             offset' <- use wbsOffset
             wbsDataReversed %= (WBuilderDataByteStream (BSL.replicate (fromIntegral $ offset' - offset) 0) :)
 
-        alignWord :: (MonadThrow n, MonadState (WBuilderState a) n) => n ()
-        alignWord = align 0 $ wordSize $ fromSingElfClass $ singElfClass @a
+        -- alignWord :: (MonadThrow n, MonadState (WBuilderState a) n) => n ()
+        -- alignWord = align 0 $ wordSize $ fromSingElfClass $ singElfClass @a
 
         dataIsEmpty :: ElfSectionData c -> Bool
         dataIsEmpty (ElfSectionData bs)       = BSL.null bs
@@ -783,22 +819,25 @@ serializeElf' elfs = do
             wbsDataReversed %= (WBuilderDataHeader :)
             wbsOffset += headerSize elfClass
         elf2WBuilder ElfSectionTable = do
-            alignWord -- FIXME: Don't hardcode this.  Instead use ElfRawAlign when parsing
+            -- alignWord -- FIXME
             use wbsOffset >>= assign wbsShOff
             wbsDataReversed %= (WBuilderDataSectionTable :)
             wbsOffset += (sectionN + 1) * sectionTableEntrySize elfClass
         elf2WBuilder ElfSegmentTable = do
-            alignWord -- <- FIXME: Ditto
+            -- alignWord -- FIXME
             use wbsOffset >>= assign wbsPhOff
             wbsDataReversed %= (WBuilderDataSegmentTable :)
             wbsOffset += segmentN * segmentTableEntrySize elfClass
         elf2WBuilder ElfSection{esFlags = ElfSectionFlag f, ..} = do
             when (f .&. fromIntegral (complement (maxBound @(WordXX a))) /= 0) do
                 $chainedError $ "section flags at section " ++ show esN ++ "don't fit"
+
+            -- FIXME: this should be fixed at parsing
             -- I don't see any sense in aligning NOBITS section data
             -- still gcc does it for .o files
-            when (esType /= SHT_NOBITS || (ehType header') == ET_REL) do
-                align 0 esAddrAlign -- <- FIXME: Don't hardcode this, use ElfRawAlign
+            -- when (esType /= SHT_NOBITS || (ehType header') == ET_REL) do
+            --     align 0 esAddrAlign -- <- FIXME: Don't hardcode this, use ElfRawAlign
+
             (n, ns) <- uses wbsNameIndexes \case
                 n' : ns' -> (n', ns')
                 _ -> error "internal error: different number of sections in two iterations"
@@ -824,7 +863,7 @@ serializeElf' elfs = do
             wbsShStrNdx .= shStrNdx
             wbsNameIndexes .= ns
         elf2WBuilder ElfSegment { .. } = do
-            align epVirtAddr epAlign
+            -- align epVirtAddr epAlign
             offset <- use wbsOffset
             void $ mapMElfList elf2WBuilder epData
             offset' <- use wbsOffset

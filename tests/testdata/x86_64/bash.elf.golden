@@ -423,4 +423,8 @@ section 23 ".comment" {
                total: 76
 }
 string table section 24 ".shstrtab"
+raw align {
+    Offset: 0x0000000000000000
+    Align:  0x0000000000000008
+}
 section table

@@ -148,4 +148,8 @@ section 6 ".rela.data.rel.ro.local" {
                total: 312
 }
 string table section 11 ".shstrtab"
+raw align {
+    Offset: 0x0000000000000000
+    Align:  0x0000000000000008
+}
 section table
