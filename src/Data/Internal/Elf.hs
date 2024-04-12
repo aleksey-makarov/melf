@@ -79,7 +79,7 @@ instance Foldable LZip where
     foldMap f (LZip l  (Just c) r) = foldMap f $ LZip l Nothing (c : r)
     foldMap f (LZip l  Nothing  r) = foldMap f $ L.reverse l ++ r
 
--- | `Elf` is a forrest of trees of type `ElfXX`.
+-- | t`Elf` is a forrest of trees of type `ElfXX`.
 -- Trees are composed of `ElfXX` nodes, `ElfSegment` can contain subtrees
 data ElfNodeType = Header | SectionTable | SegmentTable | Section | Segment | RawData | RawAlign
 

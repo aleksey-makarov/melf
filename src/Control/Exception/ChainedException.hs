@@ -37,8 +37,8 @@ import Language.Haskell.TH
 
 -- | Structure to organize the stack of exceptions with locations
 data ChainedExceptionNext = Null                         -- ^ exception was initiated by @`chainedError`@
-                          | Next SomeException           -- ^ some context was added to @`SomeException`@ by @`addContext`@
-                          | NextChained ChainedException -- ^ some context was added to a @`ChainedException`@ by @`addContext`@
+                          | Next SomeException           -- ^ some context was added to @t`SomeException`@ by @`addContext`@
+                          | NextChained ChainedException -- ^ some context was added to a @t`ChainedException`@ by @`addContext`@
 
 -- | Exception that keeps track of error locations
 data ChainedException = ChainedException
@@ -77,7 +77,7 @@ chainedErrorX loc s = throwM $ ChainedException s loc Null
 
 -- | @\$chainedError@ results in a function of type
 -- \'@chainedError :: MonadThrow m => String -> m a@\'.
--- It throws `ChainedException` with its argument as error description.
+-- It throws t`ChainedException` with its argument as error description.
 chainedError :: Q Exp
 chainedError = withLoc [| chainedErrorX |]
 
@@ -95,7 +95,7 @@ addContextX loc s m = m `catch` f
 
 -- | @\$addContext@ results in a function of type
 -- \'@addContext :: MonadCatch m => String -> m a -> m a@\'.
--- It runs the second argument and adds `ChainedException` with its first argument
+-- It runs the second argument and adds t`ChainedException` with its first argument
 -- to the exceptions thrown from that monad.
 addContext :: Q Exp
 addContext = withLoc [| addContextX |]
@@ -109,7 +109,7 @@ maybeAddContextX loc s = maybe (throwM $ ChainedException s loc Null) return
 
 -- | @\$maybeAddContext@ results in a function of type
 -- \'@maybeAddContext :: MonadThrow m => String -> Maybe a -> m a@\'.
--- If its second argument is `Nothing`, it throws `ChainedException` with its first argument,
+-- If its second argument is `Nothing`, it throws t`ChainedException` with its first argument,
 -- else it returns the value of `Just`.
 maybeAddContext :: Q Exp
 maybeAddContext = withLoc [| maybeAddContextX |]
@@ -123,7 +123,7 @@ eitherAddContextX loc = either (\ s -> throwM $ ChainedException s loc Null) ret
 
 -- | @\$eitherAddContext'@ results in a function of type
 -- \'@eitherAddContext' :: MonadThrow m => Either String a -> m a@\'.
--- If its argument is @`Left` e@, it throws `ChainedException` with @e@ as error description,
+-- If its argument is @`Left` e@, it throws t`ChainedException` with @e@ as error description,
 -- else it returns the value of `Right`.
 eitherAddContext' :: Q Exp
 eitherAddContext' = withLoc [| eitherAddContextX |]
