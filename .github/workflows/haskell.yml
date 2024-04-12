@@ -20,23 +20,23 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        ghc-version: ['8.8', '8.10', '9.0', '9.2', '9.4', '9.6' ]
+        ghc-version: ['8.8', '8.10', '9.0', '9.2', '9.4', '9.6', '9.8']
         include:
           - os: windows-latest
-            ghc-version: '9.6'
+            ghc-version: '9.8'
           - os: macos-latest
-            ghc-version: '9.6'
+            ghc-version: '9.8'
 
     steps:
 
       # FIXME: should I set the full version here?
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           lfs: true
 
       - name: Set up GHC ${{ matrix.ghc-version }}
-        uses: haskell/actions/setup@v2
+        uses: haskell-actions/setup@v2
         id: setup
         with:
           ghc-version: ${{ matrix.ghc-version }}
@@ -59,7 +59,7 @@ jobs:
         # The last step generates dist-newstyle/cache/plan.json for the cache key.
 
       - name: Restore cached dependencies
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         id: cache
         with:
           path: ${{ steps.setup.outputs.cabal-store }}
@@ -72,7 +72,7 @@ jobs:
 
       # Cache dependencies already here, so that we do not have to rebuild them should the subsequent steps fail.
       - name: Save cached dependencies
-        uses: actions/cache/save@v3
+        uses: actions/cache/save@v4
         # Caches are immutable, trying to save with the same key would error.
         if: ${{ !steps.cache.outputs.cache-hit || steps.cache.outputs.cache-primary-key != steps.cache.outputs.cache-matched-key }}
         with:
