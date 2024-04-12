@@ -656,8 +656,8 @@ zeroSection :: forall a . SingElfClassI a => SectionXX a
 zeroSection = SectionXX 0 0 0 0 0 0 0 0 0 0
 
 neighbours :: [a] -> (a -> a -> b) -> [b]
-neighbours [] _ = []
-neighbours x  f = fmap (uncurry f) $ L.zip x $ L.tail x
+neighbours          [] _ = []
+neighbours x@(_:xtail) f = fmap (uncurry f) $ L.zip x xtail
 
 -- make string table and indexes for it from a list of strings
 mkStringTable :: [String] -> (BSL.ByteString, [Int64])
