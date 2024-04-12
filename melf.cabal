@@ -1,9 +1,5 @@
 cabal-version: 1.18
 
--- This file has been generated from package.yaml by hpack version 0.35.2.
---
--- see: https://github.com/sol/hpack
-
 name:           melf
 version:        1.3.0
 synopsis:       An Elf parser
