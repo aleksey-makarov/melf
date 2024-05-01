@@ -41,6 +41,9 @@
       .overrideAttrs (attrs: {
         buildInputs = attrs.nativeBuildInputs ++ my-nativeBuildInputs;
         shellHook = ''
+          export HOME=$(pwd)
+          echo "*** HOME:"
+          echo "''$HOME"
           echo "*** Haskell language server:"
           echo "${my-haskell.haskell-language-server}/bin/haskell-language-server"
           echo "*** VSCode extensions:"
