@@ -14,7 +14,7 @@ license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 tested-with:
-    GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.2, GHC == 9.2.8, GHC == 9.4.8, GHC == 9.6.4, GHC == 9.8.2
+    GHC == 8.8.4, GHC == 8.10.7, GHC == 9.0.2, GHC == 9.2.8, GHC == 9.4.8, GHC == 9.6.6, GHC == 9.8.2, GHC == 9.10.1
 extra-doc-files:
     ChangeLog.md
     README.md
@@ -71,10 +71,10 @@ library
     , binary >=0.8.7 && <0.9
     , bytestring >=0.10.10 && <0.13
     , exceptions >=0.10.4 && <0.11
-    , lens >=5.0.1 && <5.3
+    , lens >=5.0.1 && <5.4
     , mtl >=2.2.2 && <2.4
     , prettyprinter >=1.7.0 && <1.8
-    , template-haskell >=2.15 && <2.22
+    , template-haskell >=2.15 && <2.23
   default-language: Haskell2010
 
 executable hobjdump
