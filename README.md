@@ -371,7 +371,7 @@ Function `assemble` uses the `melf` library to generate an object file:
 ```
 
 It runs the `State` monad that was passed as an argument.
-As a result the final state of `CodeState` includes all the data neсessary to produce ELF file, in
+As a result the final state of `CodeState` includes all the data necessary to produce ELF file, in
 particular:
 
   * `txt` refers to the content of the `.text` section,
@@ -381,7 +381,7 @@ particular:
 Names with `SecN` suffixes (`textSecN`, `shstrtabSecN`, `symtabSecN`, `strtabSecN`)
 are predefined section numbers that conform to the conditions stated above.
 
-For the sake of simplicity external symbol resolution and data section allocation were not implemented.
+For the sake of simplicity, external symbol resolution and data section allocation were not implemented.
 It requires implementation of relocation tables.  On the other hand, the resulting code
 is position-independent.
 
