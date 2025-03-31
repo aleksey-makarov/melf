@@ -525,6 +525,10 @@ It works.
 
 These just parse/serialize ELF header and table entries but not the whole ELF files.
 
+- [elf-edit](https://github.com/GaloisInc/elf-edit)
+
+Looks like a fresh lib from Galois with comparable functionality.
+
 ## History
 
 For the early history look at the branch "[amakarov](https://github.com/aleksey-makarov/elf/tree/amakarov)" of
